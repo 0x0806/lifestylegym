@@ -1,13 +1,25 @@
 
-// Preloader
+// Simple Professional Preloader
 window.addEventListener('load', () => {
     const preloader = document.getElementById('preloader');
+    
+    // Show preloader for minimum 1.5 seconds for better UX
     setTimeout(() => {
         preloader.style.opacity = '0';
         setTimeout(() => {
             preloader.style.display = 'none';
         }, 500);
     }, 1500);
+    
+    // Fallback - ensure preloader disappears
+    setTimeout(() => {
+        if (preloader.style.display !== 'none') {
+            preloader.style.opacity = '0';
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 500);
+        }
+    }, 3000);
 });
 
 // Navigation functionality
@@ -669,6 +681,337 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// Video Player Functionality
+class VideoPlayer {
+    constructor(videoCard) {
+        this.videoCard = videoCard;
+        this.video = videoCard.querySelector('.gym-video');
+        this.playBtn = videoCard.querySelector('.play-btn');
+        this.overlay = videoCard.querySelector('.video-overlay');
+        this.isPlaying = false;
+        this.init();
+    }
+    
+    init() {
+        this.createControls();
+        this.attachEventListeners();
+    }
+    
+    createControls() {
+        const controlsHTML = `
+            <div class="video-controls">
+                <button class="control-btn play-pause-btn">
+                    <i class="fas fa-play"></i>
+                </button>
+                <div class="progress-container">
+                    <div class="progress-filled"></div>
+                </div>
+                <span class="time-display">0:00 / 0:00</span>
+                <div class="volume-container">
+                    <button class="control-btn volume-btn">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                    <input type="range" class="volume-slider" min="0" max="100" value="100">
+                </div>
+                <button class="control-btn fullscreen-btn">
+                    <i class="fas fa-expand"></i>
+                </button>
+            </div>
+        `;
+        
+        const videoContainer = this.videoCard.querySelector('.video-container');
+        videoContainer.insertAdjacentHTML('beforeend', controlsHTML);
+        
+        this.controls = videoContainer.querySelector('.video-controls');
+        this.playPauseBtn = this.controls.querySelector('.play-pause-btn');
+        this.progressContainer = this.controls.querySelector('.progress-container');
+        this.progressFilled = this.controls.querySelector('.progress-filled');
+        this.timeDisplay = this.controls.querySelector('.time-display');
+        this.volumeBtn = this.controls.querySelector('.volume-btn');
+        this.volumeSlider = this.controls.querySelector('.volume-slider');
+        this.fullscreenBtn = this.controls.querySelector('.fullscreen-btn');
+    }
+    
+    attachEventListeners() {
+        // Play button click
+        this.playBtn.addEventListener('click', () => this.togglePlay());
+        this.playPauseBtn.addEventListener('click', () => this.togglePlay());
+        
+        // Video events
+        this.video.addEventListener('loadedmetadata', () => this.updateTimeDisplay());
+        this.video.addEventListener('timeupdate', () => this.updateProgress());
+        this.video.addEventListener('ended', () => this.handleVideoEnd());
+        
+        // Progress bar
+        this.progressContainer.addEventListener('click', (e) => this.seekVideo(e));
+        
+        // Volume controls
+        this.volumeBtn.addEventListener('click', () => this.toggleMute());
+        this.volumeSlider.addEventListener('input', (e) => this.changeVolume(e));
+        
+        // Fullscreen
+        this.fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
+        
+        // Show/hide controls on hover
+        this.video.addEventListener('mouseenter', () => this.showControls());
+        this.video.addEventListener('mouseleave', () => this.hideControls());
+        this.controls.addEventListener('mouseenter', () => this.showControls());
+        this.controls.addEventListener('mouseleave', () => this.hideControls());
+        
+        // Click to play/pause
+        this.video.addEventListener('click', () => this.togglePlay());
+    }
+    
+    togglePlay() {
+        if (this.video.paused) {
+            this.playVideo();
+        } else {
+            this.pauseVideo();
+        }
+    }
+    
+    playVideo() {
+        // Pause all other videos first
+        document.querySelectorAll('.gym-video').forEach(v => {
+            if (v !== this.video && !v.paused) {
+                v.pause();
+                v.closest('.video-card').querySelector('.video-overlay').classList.remove('playing');
+                v.closest('.video-card').querySelector('.play-pause-btn i').className = 'fas fa-play';
+            }
+        });
+        
+        this.video.play();
+        this.overlay.classList.add('playing');
+        this.playPauseBtn.querySelector('i').className = 'fas fa-pause';
+        this.isPlaying = true;
+    }
+    
+    pauseVideo() {
+        this.video.pause();
+        this.overlay.classList.remove('playing');
+        this.playPauseBtn.querySelector('i').className = 'fas fa-play';
+        this.isPlaying = false;
+    }
+    
+    handleVideoEnd() {
+        this.overlay.classList.remove('playing');
+        this.playPauseBtn.querySelector('i').className = 'fas fa-play';
+        this.isPlaying = false;
+        this.video.currentTime = 0;
+    }
+    
+    updateProgress() {
+        const progress = (this.video.currentTime / this.video.duration) * 100;
+        this.progressFilled.style.width = `${progress}%`;
+        this.updateTimeDisplay();
+    }
+    
+    updateTimeDisplay() {
+        const current = this.formatTime(this.video.currentTime);
+        const duration = this.formatTime(this.video.duration);
+        this.timeDisplay.textContent = `${current} / ${duration}`;
+    }
+    
+    formatTime(seconds) {
+        if (isNaN(seconds)) return '0:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+    
+    seekVideo(e) {
+        const rect = this.progressContainer.getBoundingClientRect();
+        const pos = (e.clientX - rect.left) / rect.width;
+        this.video.currentTime = pos * this.video.duration;
+    }
+    
+    toggleMute() {
+        this.video.muted = !this.video.muted;
+        this.volumeBtn.querySelector('i').className = this.video.muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
+        this.volumeSlider.value = this.video.muted ? 0 : this.video.volume * 100;
+    }
+    
+    changeVolume(e) {
+        this.video.volume = e.target.value / 100;
+        this.video.muted = e.target.value == 0;
+        this.volumeBtn.querySelector('i').className = this.video.muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
+    }
+    
+    toggleFullscreen() {
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        } else {
+            this.video.requestFullscreen();
+        }
+    }
+    
+    showControls() {
+        if (this.isPlaying) {
+            this.controls.classList.add('show');
+        }
+    }
+    
+    hideControls() {
+        setTimeout(() => {
+            if (!this.controls.matches(':hover')) {
+                this.controls.classList.remove('show');
+            }
+        }, 2000);
+    }
+}
+
+// Initialize video players
+function initializeVideoPlayers() {
+    const videoCards = document.querySelectorAll('.video-card');
+    videoCards.forEach(card => {
+        new VideoPlayer(card);
+    });
+}
+
+// Enhanced form validation
+function enhanceFormValidation() {
+    const forms = document.querySelectorAll('form');
+    
+    forms.forEach(form => {
+        const inputs = form.querySelectorAll('input[required], textarea[required], select[required]');
+        
+        inputs.forEach(input => {
+            input.addEventListener('blur', () => validateField(input));
+            input.addEventListener('input', () => clearFieldError(input));
+        });
+        
+        form.addEventListener('submit', (e) => {
+            let isValid = true;
+            inputs.forEach(input => {
+                if (!validateField(input)) {
+                    isValid = false;
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                const firstError = form.querySelector('.field-error');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+    });
+}
+
+function validateField(field) {
+    const value = field.value.trim();
+    let isValid = true;
+    let errorMessage = '';
+    
+    // Remove existing error
+    clearFieldError(field);
+    
+    // Required field validation
+    if (field.hasAttribute('required') && !value) {
+        errorMessage = 'This field is required';
+        isValid = false;
+    }
+    
+    // Email validation
+    if (field.type === 'email' && value) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+            errorMessage = 'Please enter a valid email address';
+            isValid = false;
+        }
+    }
+    
+    // Phone validation
+    if (field.type === 'tel' && value) {
+        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+        if (!phoneRegex.test(value.replace(/[\s\-\(\)]/g, ''))) {
+            errorMessage = 'Please enter a valid phone number';
+            isValid = false;
+        }
+    }
+    
+    // Date validation (not in the past)
+    if (field.type === 'date' && value) {
+        const selectedDate = new Date(value);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (selectedDate < today) {
+            errorMessage = 'Please select a future date';
+            isValid = false;
+        }
+    }
+    
+    if (!isValid) {
+        showFieldError(field, errorMessage);
+    }
+    
+    return isValid;
+}
+
+function showFieldError(field, message) {
+    field.classList.add('field-error');
+    
+    const errorElement = document.createElement('span');
+    errorElement.className = 'error-message';
+    errorElement.textContent = message;
+    errorElement.style.cssText = `
+        color: var(--danger-color);
+        font-size: 0.8rem;
+        display: block;
+        margin-top: 0.25rem;
+        margin-left: 1rem;
+    `;
+    
+    field.parentElement.appendChild(errorElement);
+}
+
+function clearFieldError(field) {
+    field.classList.remove('field-error');
+    const errorElement = field.parentElement.querySelector('.error-message');
+    if (errorElement) {
+        errorElement.remove();
+    }
+}
+
+// Improved accessibility for keyboard navigation
+function enhanceKeyboardNavigation() {
+    // Tab trap for modals
+    const modal = document.getElementById('successModal');
+    const focusableElements = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    const firstFocusable = focusableElements[0];
+    const lastFocusable = focusableElements[focusableElements.length - 1];
+    
+    modal.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+            if (e.shiftKey) {
+                if (document.activeElement === firstFocusable) {
+                    lastFocusable.focus();
+                    e.preventDefault();
+                }
+            } else {
+                if (document.activeElement === lastFocusable) {
+                    firstFocusable.focus();
+                    e.preventDefault();
+                }
+            }
+        }
+    });
+    
+    // Focus management for mobile menu
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.getElementById('nav-menu');
+    
+    hamburger.addEventListener('click', () => {
+        setTimeout(() => {
+            if (navMenu.classList.contains('active')) {
+                navMenu.querySelector('.nav-link').focus();
+            }
+        }, 100);
+    });
+}
+
 // Initialize all components when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     console.log('New Lifestyle Gym website loaded successfully!');
@@ -680,11 +1023,12 @@ document.addEventListener('DOMContentLoaded', () => {
         dateInput.min = today;
     }
     
-    // Initialize any additional components
-    // This is where you would initialize other features like:
-    // - Workout tracking
-    // - Nutrition calculator
-    // - Progress tracking
-    // - Social features
-    // - etc.
+    // Initialize video players
+    initializeVideoPlayers();
+    
+    // Enhance form validation
+    enhanceFormValidation();
+    
+    // Enhance keyboard navigation
+    enhanceKeyboardNavigation();
 });
