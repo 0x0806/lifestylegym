@@ -787,7 +787,8 @@ section {
 
 .trainer-image {
     position: relative;
-    height: 250px;
+    height: auto;
+    min-height: 250px;
     background: var(--gradient-primary);
     display: flex;
     align-items: center;
@@ -797,8 +798,8 @@ section {
 
 .trainer-photo {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
+    object-fit: contain;
     transition: var(--transition);
 }
 
@@ -1801,7 +1802,8 @@ section {
     }
     
     .trainer-image {
-        height: 200px;
+        height: auto;
+        min-height: 200px;
     }
     
     .media-grid {
@@ -2009,7 +2011,8 @@ section {
     }
     
     .trainer-image {
-        height: 180px;
+        height: auto;
+        min-height: 180px;
     }
     
     .trainer-info {
