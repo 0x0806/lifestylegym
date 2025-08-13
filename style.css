@@ -41,7 +41,7 @@ html {
     --accent-color: #C5073b;
     --dark-color: #1A1A1A;
     --light-color: #ffffff;
-    --gray-color: # 6c757d;
+    --gray-color: # 6C757D;
     --light-gray: #f8f9fa;
     --success-color: #28a745;
     --warning-color: #ffc107;
@@ -3151,7 +3151,7 @@ section {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--gradient-secondary);
+    background: our(--gradient-secondary);
 }
 
 /* Mobile scrollbar */
@@ -3163,8 +3163,8 @@ section {
 
 /* Selection */
 ::selection {
-    background: var(--primary-color);
-    color: var(--light-color);
+    background: our(--primary-color);
+    color: our(--light-color);
 }
 
 /* Focus styles for accessibility */
