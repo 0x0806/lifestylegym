@@ -41,7 +41,7 @@ html {
     --accent-color: #C5073b;
     --dark-color: #1A1A1A;
     --light-color: #ffffff;
-    --gray-color: # 6c757d;
+    --gray-color: # 6C757D;
     --light-gray: #f8f9fa;
     --success-color: #28a745;
     --warning-color: #ffc107;
@@ -1713,27 +1713,32 @@ section {
 /* Responsive Design */
 @media (max-width: 1200px) {
     .container {
-        padding: 0 30px;
+        padding: 0 20px;
+        max-width: 100%;
     }
     
     .hero-title {
-        font-size: 3.5rem;
+        font-size: 3rem;
     }
     
     .services-grid {
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
     }
     
     .trainers-grid {
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1.5rem;
     }
     
     .media-grid {
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
     }
     
     .plans-grid {
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1.5rem;
     }
 }
 
@@ -1801,49 +1806,58 @@ section {
 }
 
 @media (max-width: 768px) {
+    * {
+        box-sizing: border-box;
+    }
+    
     html, body {
         overflow-x: hidden;
         max-width: 100vw;
+        width: 100%;
+        margin: 0;
+        padding: 0;
     }
     
     .container {
-        padding: 0 10px;
+        padding: 0 15px;
         max-width: 100%;
+        width: 100%;
         overflow-x: hidden;
+        margin: 0 auto;
     }
     
+    /* Navigation - FIXED */
     .nav-container {
-        padding: 0 10px;
-        height: 60px;
+        padding: 0 15px;
+        height: 70px;
         width: 100%;
         max-width: 100vw;
         overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: space-between;
+        position: relative;
     }
     
     .nav-logo {
-        flex: 1;
+        flex: 0 1 auto;
         min-width: 0;
-        overflow: hidden;
+        max-width: calc(100vw - 60px);
     }
     
     .nav-logo .Logo-3D {
-        font-size: 0.9rem;
-        padding: 2px 4px;
+        font-size: 1rem;
+        padding: 4px 8px;
         white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: calc(100vw - 80px);
         display: flex;
         align-items: center;
+        max-width: 100%;
     }
     
     .logo-image {
-        height: 24px;
+        height: 32px;
         width: auto;
-        margin-right: 4px;
+        margin-right: 8px;
         flex-shrink: 0;
     }
     
@@ -1851,28 +1865,33 @@ section {
         display: flex;
         position: relative;
         z-index: 1001;
-        padding: 4px;
+        padding: 8px;
         flex-shrink: 0;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
     }
     
     .hamburger .bar {
-        width: 20px;
-        height: 2px;
-        margin: 2px 0;
+        width: 22px;
+        height: 3px;
+        margin: 3px 0;
+        background: var(--light-color);
+        border-radius: 2px;
+        transition: all 0.3s ease;
     }
     
     .nav-menu {
         position: fixed;
-        top: 60px;
+        top: 70px;
         left: -100%;
         width: 100vw;
-        height: calc(100vh - 60px);
+        height: calc(100vh - 70px);
         background: linear-gradient(135deg, rgba(26, 26, 26, 0.98) 0%, rgba(45, 45, 45, 0.98) 100%);
         backdrop-filter: blur(30px);
         flex-direction: column;
         justify-content: flex-start;
         align-items: center;
-        padding: 1.5rem 1rem;
+        padding: 2rem 1rem;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 1000;
         gap: 0;
@@ -1885,20 +1904,21 @@ section {
     }
     
     .nav-item {
-        margin: 0.3rem 0;
-        width: 90%;
-        max-width: 250px;
+        margin: 0.5rem 0;
+        width: 100%;
+        max-width: 300px;
     }
     
     .nav-link {
         display: block;
-        padding: 0.8rem 1.2rem;
-        font-size: 0.9rem;
-        border-radius: 8px;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        border-radius: 12px;
         text-align: center;
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
         width: 100%;
+        transition: all 0.3s ease;
     }
     
     .nav-link::before {
@@ -1908,266 +1928,333 @@ section {
     .nav-link:hover {
         background: rgba(255, 107, 53, 0.15);
         border-color: rgba(255, 107, 53, 0.3);
-        transform: translateY(-1px);
+        transform: translateY(-2px);
     }
     
     .nav-link.cta-btn {
         background: var(--gradient-primary);
         border: none;
-        margin-top: 0.5rem;
+        margin-top: 1rem;
         font-weight: 700;
+        color: white;
     }
     
+    /* Hero Section - COMPLETELY FIXED */
     .hero {
         min-height: 100vh;
-        padding: 70px 0 1rem;
+        padding: 70px 0 2rem;
         overflow: hidden;
+        width: 100%;
     }
     
     .hero-content {
-        gap: 1.5rem;
-        padding: 0.5rem 10px;
-        max-width: 100vw;
-        overflow: hidden;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 1rem 15px;
+        max-width: 100%;
         width: 100%;
-        box-sizing: border-box;
+        text-align: center;
+        margin: 0 auto;
     }
     
     .hero-text {
         width: 100%;
         max-width: 100%;
-        overflow: hidden;
-        text-align: center;
+        order: 1;
     }
     
     .hero-title {
-        font-size: 1.8rem;
-        line-height: 1.1;
-        word-wrap: break-word;
-        hyphens: auto;
+        font-size: 2.2rem;
+        line-height: 1.2;
         margin-bottom: 1rem;
+        word-wrap: break-word;
         overflow-wrap: break-word;
+        hyphens: auto;
+        text-align: center;
     }
     
     .hero-subtitle {
-        font-size: 0.9rem;
-        margin-bottom: 0.5rem;
-        line-height: 1.4;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        line-height: 1.5;
         overflow-wrap: break-word;
+        word-wrap: break-word;
+        padding: 0 10px;
     }
     
     .hero-description {
-        font-size: 0.8rem;
-        margin-bottom: 1rem;
-        line-height: 1.5;
-        text-align: center;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
         overflow-wrap: break-word;
         word-wrap: break-word;
+        padding: 0 10px;
+        text-align: center;
     }
     
     .hero-stats {
+        display: flex;
         justify-content: center;
-        gap: 1rem;
+        gap: 1.5rem;
         flex-wrap: wrap;
-        margin-bottom: 1rem;
+        margin-bottom: 2rem;
+        padding: 0 10px;
     }
     
     .stat {
-        min-width: 70px;
         text-align: center;
+        flex: 1;
+        min-width: 80px;
+        max-width: 120px;
     }
     
     .stat-number {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
+        font-weight: 800;
+        display: block;
+        margin-bottom: 0.25rem;
     }
     
     .stat-label {
-        font-size: 0.7rem;
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.7);
     }
     
     .hero-buttons {
-        justify-content: center;
+        display: flex;
         flex-direction: column;
-        gap: 0.8rem;
+        gap: 1rem;
         width: 100%;
         align-items: center;
+        padding: 0 20px;
     }
     
     .hero-buttons .btn {
         width: 100%;
-        max-width: 280px;
-        padding: 10px 16px;
-        font-size: 0.85rem;
+        max-width: 300px;
+        padding: 12px 20px;
+        font-size: 0.95rem;
+        white-space: nowrap;
     }
     
+    /* Hero Videos - FIXED */
     .hero-visual {
-        height: auto;
+        order: 2;
         width: 100%;
         max-width: 100%;
-        overflow: hidden;
-        padding: 1rem 0;
+        padding: 1rem 15px;
+        height: auto;
     }
     
     .workout-gifs-grid {
+        display: grid;
         grid-template-columns: 1fr;
         gap: 1rem;
         max-width: 100%;
-        padding: 0;
+        width: 100%;
         justify-items: center;
+        padding: 0;
     }
     
     .workout-gif-container {
-        width: 90%;
+        width: 100%;
         max-width: 300px;
-        height: auto;
-        aspect-ratio: 9/16;
+        height: 200px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--shadow-medium);
+        margin: 0 auto;
     }
     
     .workout-gif, .hero-video {
         width: 100%;
         height: 100%;
         object-fit: cover;
+        border-radius: 12px;
     }
     
+    /* Sections - FIXED */
     section {
-        padding: 30px 0;
+        padding: 60px 0;
         width: 100%;
         overflow: hidden;
     }
     
     .section-header {
         text-align: center;
-        margin-bottom: 2rem;
-        padding: 0 10px;
+        margin-bottom: 3rem;
+        padding: 0 15px;
         width: 100%;
-        box-sizing: border-box;
     }
     
     .section-title {
-        font-size: 1.5rem;
-        margin-bottom: 0.5rem;
-        line-height: 1.2;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        line-height: 1.3;
         word-wrap: break-word;
         overflow-wrap: break-word;
-        hyphens: auto;
         text-align: center;
     }
     
     .section-subtitle {
-        font-size: 0.85rem;
-        margin-bottom: 1.5rem;
-        line-height: 1.4;
-        padding: 0 5px;
+        font-size: 1rem;
+        line-height: 1.5;
+        padding: 0 10px;
         word-wrap: break-word;
         overflow-wrap: break-word;
         text-align: center;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    /* About Section - FIXED */
+    .about-content {
+        grid-template-columns: 1fr;
+        gap: 3rem;
     }
     
     .about-text {
         grid-template-columns: 1fr;
-        gap: 1rem;
+        gap: 1.5rem;
         width: 100%;
-        max-width: 100%;
-        padding: 0 10px;
-        box-sizing: border-box;
+        padding: 0;
     }
     
     .about-card {
-        padding: 1rem;
+        padding: 1.5rem;
         word-wrap: break-word;
         overflow-wrap: break-word;
         text-align: center;
         width: 100%;
-        max-width: 100%;
+        margin: 0 auto;
+        max-width: 400px;
     }
     
     .about-card h3 {
-        font-size: 1.1rem;
+        font-size: 1.3rem;
         line-height: 1.3;
-        margin-bottom: 0.5rem;
+        margin-bottom: 1rem;
     }
     
     .about-card p {
-        font-size: 0.85rem;
-        line-height: 1.4;
+        font-size: 0.9rem;
+        line-height: 1.6;
         word-wrap: break-word;
         overflow-wrap: break-word;
     }
     
     .about-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 1.25rem;
-    }
-    
-    .services-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-        width: 100%;
-        max-width: 100%;
-        padding: 0 10px;
-        box-sizing: border-box;
-    }
-    
-    .service-card {
-        padding: 1.5rem 1rem;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        width: 100%;
-        max-width: 100%;
-        text-align: center;
-    }
-    
-    .service-card h3 {
-        font-size: 1.2rem;
-        line-height: 1.3;
-        margin-bottom: 0.8rem;
-    }
-    
-    .service-card p {
-        font-size: 0.85rem;
-        line-height: 1.4;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-    }
-    
-    .service-icon {
         width: 60px;
         height: 60px;
         font-size: 1.5rem;
+        margin-bottom: 1rem;
     }
     
-    .trainers-grid {
+    /* Services Section - FIXED */
+    .services-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
+        width: 100%;
+        padding: 0;
+    }
+    
+    .service-card {
+        padding: 2rem 1.5rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        width: 100%;
+        text-align: center;
+        margin: 0 auto;
+        max-width: 400px;
+    }
+    
+    .service-card h3 {
+        font-size: 1.4rem;
+        line-height: 1.3;
+        margin-bottom: 1rem;
+    }
+    
+    .service-card p {
+        font-size: 0.9rem;
+        line-height: 1.6;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        margin-bottom: 1.5rem;
+    }
+    
+    .service-icon {
+        width: 70px;
+        height: 70px;
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .service-features {
+        text-align: left;
+        margin: 1.5rem 0;
+    }
+    
+    .service-features li {
+        padding: 0.75rem 0;
+        font-size: 0.9rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    /* Trainers Section - FIXED */
+    .trainers-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
+    .trainer-card {
+        width: 100%;
+        margin: 0 auto;
     }
     
     .trainer-image {
-        height: auto;
-        min-height: 200px;
+        height: 250px;
+        width: 100%;
     }
     
+    .trainer-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .trainer-info {
+        padding: 1.5rem;
+        text-align: center;
+    }
+    
+    .trainer-info h3 {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Media Section - FIXED */
     .media-grid {
         grid-template-columns: 1fr;
-        gap: 1rem;
+        gap: 1.5rem;
         width: 100%;
-        max-width: 100%;
-        padding: 0 10px;
-        box-sizing: border-box;
+        padding: 0;
     }
     
     .video-card {
         width: 100%;
-        max-width: 100%;
-        overflow: hidden;
         margin: 0 auto;
+        max-width: 400px;
     }
     
     .video-container {
-        height: 180px;
+        height: 225px;
         width: 100%;
         position: relative;
         overflow: hidden;
+        border-radius: 12px;
     }
     
     .gym-video {
@@ -2177,46 +2264,87 @@ section {
     }
     
     .play-btn {
-        width: 50px;
-        height: 50px;
-        font-size: 1rem;
+        width: 60px;
+        height: 60px;
+        font-size: 1.2rem;
     }
     
     .video-info {
-        padding: 0.8rem;
+        padding: 1rem;
         word-wrap: break-word;
         overflow-wrap: break-word;
     }
     
     .video-info h3 {
-        font-size: 1rem;
+        font-size: 1.1rem;
         line-height: 1.3;
         margin-bottom: 0.5rem;
     }
     
     .video-info p {
-        font-size: 0.8rem;
-        line-height: 1.4;
-        margin-bottom: 0.8rem;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 1rem;
     }
     
+    /* Plans Section - FIXED */
     .plans-grid {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
+        gap: 2rem;
         max-width: 400px;
         margin: 0 auto;
     }
     
     .plan-card {
-        padding: 1.5rem;
+        padding: 2rem 1.5rem;
+        width: 100%;
+        margin: 0 auto;
     }
     
+    .plan-card h3 {
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+    }
+    
+    .plan-price .amount {
+        font-size: 2.5rem;
+    }
+    
+    .plan-features li {
+        padding: 0.75rem 0;
+        font-size: 0.9rem;
+    }
+    
+    /* Demo Section - FIXED */
     .demo-content {
-        gap: 2rem;
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+    
+    .demo-text h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+    
+    .demo-text p {
+        font-size: 1rem;
+        line-height: 1.6;
+        text-align: center;
+        margin-bottom: 2rem;
     }
     
     .demo-form {
-        padding: 1.5rem;
+        padding: 2rem 1.5rem;
+        width: 100%;
+        margin: 0 auto;
+        max-width: 500px;
+    }
+    
+    .booking-form h3 {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
     }
     
     .form-row {
@@ -2225,91 +2353,153 @@ section {
     }
     
     .form-group {
-        margin-bottom: 1rem;
-    }
-    
-    .contact-content {
-        gap: 1.5rem;
-        padding: 0 10px;
+        margin-bottom: 1.5rem;
         width: 100%;
-        max-width: 100%;
-        box-sizing: border-box;
-    }
-    
-    .contact-info {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-        width: 100%;
-    }
-    
-    .contact-card {
-        padding: 1rem;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        text-align: center;
-        width: 100%;
-    }
-    
-    .contact-card h3 {
-        font-size: 1rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .contact-card p {
-        font-size: 0.8rem;
-        line-height: 1.4;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-    }
-    
-    .contact-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1rem;
-    }
-    
-    .contact-form-container {
-        padding: 0.5rem;
-        margin: 0;
-        width: 100%;
-    }
-    
-    .contact-form {
-        padding: 1rem;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    
-    .form-group {
-        width: 100%;
-        margin-bottom: 1rem;
     }
     
     .form-group input,
     .form-group textarea,
     .form-group select {
         width: 100%;
-        padding: 0.8rem;
-        font-size: 0.9rem;
+        padding: 1rem;
+        font-size: 1rem;
+        border-radius: 8px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--light-color);
         box-sizing: border-box;
     }
     
+    .form-group label {
+        font-size: 0.9rem;
+    }
+    
+    /* Contact Section - FIXED */
+    .contact-content {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        width: 100%;
+        padding: 0;
+    }
+    
+    .contact-info {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        width: 100%;
+    }
+    
+    .contact-card {
+        padding: 1.5rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        text-align: center;
+        width: 100%;
+        margin: 0 auto;
+        max-width: 400px;
+    }
+    
+    .contact-card h3 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .contact-card p {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    .contact-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .contact-form-container {
+        padding: 1rem;
+        width: 100%;
+        margin: 0 auto;
+        max-width: 500px;
+    }
+    
+    .contact-form {
+        padding: 2rem 1.5rem;
+        width: 100%;
+    }
+    
+    .contact-form .form-group input,
+    .contact-form .form-group textarea {
+        width: 100%;
+        padding: 1rem;
+        font-size: 1rem;
+        box-sizing: border-box;
+    }
+    
+    /* Footer - FIXED */
     .footer {
-        padding: 3rem 0 1.5rem;
+        padding: 4rem 0 2rem;
+        width: 100%;
     }
     
     .footer-content {
         grid-template-columns: 1fr;
-        gap: 2rem;
+        gap: 3rem;
         text-align: center;
+        width: 100%;
+    }
+    
+    .footer-section {
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
     }
     
     .footer-logo .Logo-3D {
         justify-content: center;
+        font-size: 1.2rem;
     }
     
     .footer-logo .logo-image {
         height: 35px;
+    }
+    
+    .footer-logo p {
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+    
+    .footer-section h3 {
+        font-size: 1.2rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .footer-links li {
+        margin-bottom: 0.75rem;
+    }
+    
+    .footer-links a {
+        font-size: 0.9rem;
+    }
+    
+    .contact-item {
+        justify-content: center;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    
+    .contact-item span {
+        font-size: 0.9rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    .footer-bottom {
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 2rem;
     }
     
     .footer-bottom-content {
@@ -2324,169 +2514,229 @@ section {
         gap: 1rem;
     }
     
+    .footer-bottom-links a {
+        font-size: 0.9rem;
+    }
+    
+    /* Utility Classes */
     .back-to-top {
         bottom: 20px;
         right: 20px;
-        width: 45px;
-        height: 45px;
+        width: 50px;
+        height: 50px;
+        font-size: 1.1rem;
     }
     
     .modal-content {
-        padding: 2rem;
+        padding: 2rem 1.5rem;
         margin: 1rem;
+        width: calc(100% - 2rem);
+        max-width: 400px;
+    }
+    
+    .modal-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .modal-content h3 {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .modal-content p {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
     }
 }
 
 @media (max-width: 480px) {
     .container {
-        padding: 0 15px;
+        padding: 0 12px;
     }
     
     .nav-container {
         padding: 0 12px;
-        height: 65px;
+        height: 70px;
     }
     
     .nav-logo .Logo-3D {
-        font-size: 1.1rem;
-        padding: 2px 4px;
+        font-size: 0.9rem;
+        padding: 4px 6px;
     }
     
     .logo-image {
-        height: 28px;
+        height: 30px;
         margin-right: 6px;
     }
     
     .hamburger {
-        padding: 4px;
+        padding: 6px;
     }
     
     .hamburger .bar {
         width: 20px;
-        height: 2px;
-        margin: 2px 0;
+        height: 2.5px;
+        margin: 3px 0;
     }
     
     .nav-menu {
-        top: 65px;
-        height: calc(100vh - 65px);
-        padding-top: 1.5rem;
+        top: 70px;
+        height: calc(100vh - 70px);
+        padding: 1.5rem 1rem;
     }
     
     .nav-item {
-        margin: 0.3rem 0;
-        width: 85%;
+        margin: 0.4rem 0;
+        width: 100%;
+        max-width: 280px;
     }
     
     .nav-link {
-        padding: 0.9rem 1.2rem;
+        padding: 1rem 1.2rem;
         font-size: 0.95rem;
     }
     
     .hero {
-        padding: 65px 0 1rem;
+        padding: 70px 0 2rem;
+    }
+    
+    .hero-content {
+        padding: 1rem 12px;
+        gap: 2rem;
     }
     
     .hero-title {
-        font-size: 2rem;
-        line-height: 1.1;
+        font-size: 1.9rem;
+        line-height: 1.2;
+        margin-bottom: 1rem;
     }
     
     .hero-subtitle {
-        font-size: 0.9rem;
-        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+        padding: 0 5px;
     }
     
     .hero-description {
         font-size: 0.85rem;
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 0 5px;
     }
     
     .hero-stats {
         gap: 1rem;
         margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .stat {
+        flex: 1;
+        min-width: 70px;
+        max-width: 100px;
     }
     
     .stat-number {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
     }
     
     .stat-label {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
+    }
+    
+    .hero-buttons {
+        padding: 0 12px;
+        gap: 1rem;
+    }
+    
+    .hero-buttons .btn {
+        padding: 12px 18px;
+        font-size: 0.9rem;
+        max-width: 280px;
+    }
+    
+    .hero-visual {
+        padding: 1rem 12px;
+    }
+    
+    .workout-gif-container {
+        width: 100%;
+        max-width: 280px;
+        height: 180px;
     }
     
     .section-title {
-        font-size: 1.75rem;
-        line-height: 1.2;
+        font-size: 1.7rem;
+        line-height: 1.3;
+        padding: 0 5px;
     }
     
     .section-subtitle {
         font-size: 0.9rem;
-    }
-    
-    .btn {
-        padding: 12px 20px;
-        font-size: 0.9rem;
-    }
-    
-    .hero-buttons {
-        flex-direction: column;
-        width: 100%;
-        gap: 0.75rem;
-    }
-    
-    .hero-buttons .btn {
-        width: 100%;
-    }
-    
-    .workout-gif-container {
-        width: 250px;
-        height: 250px;
+        padding: 0 5px;
     }
     
     .about-card {
-        padding: 1.25rem;
+        padding: 1.5rem 1rem;
+        max-width: 350px;
     }
     
     .about-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 1.25rem;
+        width: 55px;
+        height: 55px;
+        font-size: 1.3rem;
     }
     
     .service-card {
         padding: 1.5rem 1rem;
+        max-width: 350px;
     }
     
     .service-icon {
-        width: 70px;
-        height: 70px;
-        font-size: 1.75rem;
+        width: 65px;
+        height: 65px;
+        font-size: 1.6rem;
     }
     
     .trainer-image {
-        height: auto;
-        min-height: 180px;
+        height: 220px;
     }
     
     .trainer-info {
         padding: 1.25rem;
     }
     
+    .video-container {
+        height: 200px;
+    }
+    
+    .video-card {
+        max-width: 350px;
+    }
+    
     .plan-card {
-        padding: 1.25rem;
+        padding: 1.5rem;
+        max-width: 350px;
     }
     
     .plan-price .amount {
-        font-size: 2.5rem;
+        font-size: 2.3rem;
+    }
+    
+    .demo-text h2 {
+        font-size: 1.8rem;
+        padding: 0 5px;
     }
     
     .demo-form {
-        padding: 1.25rem;
+        padding: 1.5rem 1rem;
+        max-width: 450px;
     }
     
     .contact-card {
         padding: 1.25rem;
+        max-width: 350px;
     }
     
     .contact-icon {
@@ -2495,95 +2745,313 @@ section {
         font-size: 1.1rem;
     }
     
+    .contact-form-container {
+        max-width: 450px;
+    }
+    
     .contact-form {
-        padding: 1.25rem;
+        padding: 1.5rem 1rem;
+    }
+    
+    .footer-section {
+        max-width: 350px;
     }
     
     .footer {
-        padding: 2.5rem 0 1rem;
+        padding: 3rem 0 1.5rem;
     }
     
     .back-to-top {
         bottom: 15px;
         right: 15px;
-        width: 40px;
-        height: 40px;
+        width: 45px;
+        height: 45px;
         font-size: 1rem;
     }
     
     .modal-content {
-        padding: 1.5rem;
-        width: 95%;
-    }
-    
-    .modal-icon {
-        font-size: 3rem;
+        padding: 1.5rem 1rem;
+        width: calc(100% - 1.5rem);
+        max-width: 350px;
     }
 }
 
 /* Extra small screens */
 @media (max-width: 320px) {
+    .container {
+        padding: 0 10px;
+    }
+    
     .nav-container {
         padding: 0 10px;
-        height: 60px;
+        height: 70px;
     }
     
     .nav-logo .Logo-3D {
-        font-size: 1rem;
+        font-size: 0.85rem;
+        padding: 4px;
     }
     
     .logo-image {
-        height: 26px;
+        height: 28px;
         margin-right: 5px;
+    }
+    
+    .hamburger {
+        padding: 5px;
     }
     
     .hamburger .bar {
         width: 18px;
+        height: 2px;
+        margin: 2.5px 0;
     }
     
     .nav-menu {
-        top: 60px;
-        height: calc(100vh - 60px);
+        top: 70px;
+        height: calc(100vh - 70px);
+        padding: 1rem 0.5rem;
+    }
+    
+    .nav-item {
+        width: 100%;
+        max-width: 260px;
+        margin: 0.3rem 0;
+    }
+    
+    .nav-link {
+        padding: 0.9rem 1rem;
+        font-size: 0.9rem;
     }
     
     .hero {
-        padding: 60px 0 1rem;
+        padding: 70px 0 1.5rem;
+    }
+    
+    .hero-content {
+        padding: 0.5rem 10px;
+        gap: 1.5rem;
     }
     
     .hero-title {
-        font-size: 1.75rem;
+        font-size: 1.6rem;
+        line-height: 1.2;
+        margin-bottom: 0.75rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 0.85rem;
+        margin-bottom: 0.75rem;
+        padding: 0;
+    }
+    
+    .hero-description {
+        font-size: 0.8rem;
+        margin-bottom: 1rem;
+        padding: 0;
+        line-height: 1.5;
+    }
+    
+    .hero-stats {
+        flex-direction: row;
+        justify-content: space-around;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .stat {
+        flex: 1;
+        min-width: 60px;
+        max-width: 80px;
+    }
+    
+    .stat-number {
+        font-size: 1.4rem;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+        line-height: 1.2;
+    }
+    
+    .hero-buttons {
+        padding: 0 10px;
+        gap: 0.75rem;
+    }
+    
+    .hero-buttons .btn {
+        padding: 10px 16px;
+        font-size: 0.85rem;
+        max-width: 260px;
+    }
+    
+    .hero-visual {
+        padding: 0.75rem 10px;
+    }
+    
+    .workout-gif-container {
+        width: 100%;
+        max-width: 250px;
+        height: 160px;
     }
     
     .section-title {
         font-size: 1.5rem;
+        line-height: 1.3;
+        padding: 0;
     }
     
-    .hero-stats {
-        flex-direction: column;
-        gap: 1rem;
+    .section-subtitle {
+        font-size: 0.85rem;
+        padding: 0;
     }
     
-    .workout-gif-container {
-        width: 220px;
-        height: 220px;
-    }
-    
-    .service-card,
     .about-card,
-    .trainer-info,
-    .plan-card,
+    .service-card,
     .contact-card {
+        padding: 1.25rem 1rem;
+        max-width: 300px;
+    }
+    
+    .about-card h3,
+    .service-card h3,
+    .contact-card h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .about-card p,
+    .service-card p,
+    .contact-card p {
+        font-size: 0.8rem;
+        line-height: 1.5;
+    }
+    
+    .about-icon,
+    .service-icon,
+    .contact-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+    }
+    
+    .trainer-card {
+        max-width: 300px;
+    }
+    
+    .trainer-image {
+        height: 200px;
+    }
+    
+    .trainer-info {
         padding: 1rem;
+    }
+    
+    .trainer-info h3 {
+        font-size: 1.1rem;
+    }
+    
+    .video-card {
+        max-width: 300px;
+    }
+    
+    .video-container {
+        height: 180px;
+    }
+    
+    .plan-card {
+        padding: 1.25rem 1rem;
+        max-width: 300px;
+    }
+    
+    .plan-card h3 {
+        font-size: 1.2rem;
+    }
+    
+    .plan-price .amount {
+        font-size: 2rem;
+    }
+    
+    .demo-text h2 {
+        font-size: 1.6rem;
+        line-height: 1.3;
+    }
+    
+    .demo-text p {
+        font-size: 0.85rem;
+        line-height: 1.5;
     }
     
     .demo-form,
     .contact-form {
-        padding: 1rem;
+        padding: 1.25rem 1rem;
+        max-width: 400px;
+    }
+    
+    .booking-form h3,
+    .contact-form h3 {
+        font-size: 1.3rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        padding: 0.9rem;
+        font-size: 0.9rem;
     }
     
     .btn {
         padding: 10px 16px;
         font-size: 0.85rem;
+    }
+    
+    .footer-section {
+        max-width: 300px;
+    }
+    
+    .footer-section h3 {
+        font-size: 1.1rem;
+    }
+    
+    .footer-logo .Logo-3D {
+        font-size: 1rem;
+    }
+    
+    .footer-logo p {
+        font-size: 0.8rem;
+    }
+    
+    .footer-links a,
+    .contact-item span {
+        font-size: 0.8rem;
+    }
+    
+    .back-to-top {
+        bottom: 12px;
+        right: 12px;
+        width: 40px;
+        height: 40px;
+        font-size: 0.9rem;
+    }
+    
+    .modal-content {
+        padding: 1.25rem 1rem;
+        width: calc(100% - 1rem);
+        max-width: 300px;
+    }
+    
+    .modal-content h3 {
+        font-size: 1.2rem;
+    }
+    
+    .modal-content p {
+        font-size: 0.8rem;
+    }
+    
+    .modal-icon {
+        font-size: 2.5rem;
     }
 }
 
