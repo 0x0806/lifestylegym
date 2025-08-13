@@ -158,6 +158,7 @@ function handleFormSubmit(e) {
     
     // Let FormSubmit handle the actual submission
     // The form will redirect to the success page automatically
+    // Don't prevent default - let the form submit naturally
 }
 
 function showModal() {
