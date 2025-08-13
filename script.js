@@ -1,26 +1,5 @@
 
-// Simple Professional Preloader
-window.addEventListener('load', () => {
-    const preloader = document.getElementById('preloader');
-    
-    // Show preloader for minimum 1.5 seconds for better UX
-    setTimeout(() => {
-        preloader.style.opacity = '0';
-        setTimeout(() => {
-            preloader.style.display = 'none';
-        }, 500);
-    }, 1500);
-    
-    // Fallback - ensure preloader disappears
-    setTimeout(() => {
-        if (preloader.style.display !== 'none') {
-            preloader.style.opacity = '0';
-            setTimeout(() => {
-                preloader.style.display = 'none';
-            }, 500);
-        }
-    }, 3000);
-});
+
 
 // Navigation functionality
 const navbar = document.getElementById('navbar');
@@ -154,42 +133,29 @@ document.querySelectorAll('.circle-progress').forEach(circle => {
     progressObserver.observe(circle);
 });
 
-// Form handling
+// Form handling with FormSubmit
 const demoForm = document.getElementById('demoForm');
 const contactForm = document.getElementById('contactForm');
 const modal = document.getElementById('successModal');
 
-// Demo form submission
-demoForm.addEventListener('submit', handleFormSubmit);
-contactForm.addEventListener('submit', handleFormSubmit);
+// Add loading states to forms
+if (demoForm) {
+    demoForm.addEventListener('submit', handleFormSubmit);
+}
+
+if (contactForm) {
+    contactForm.addEventListener('submit', handleFormSubmit);
+}
 
 function handleFormSubmit(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(e.target);
-    const data = Object.fromEntries(formData.entries());
-    
     // Show loading state
     const submitBtn = e.target.querySelector('button[type="submit"]');
     const originalText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
     submitBtn.disabled = true;
     
-    // Simulate form submission
-    setTimeout(() => {
-        // Reset button
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-        
-        // Reset form
-        e.target.reset();
-        
-        // Show success modal
-        showModal();
-        
-        // Log form data (in real implementation, send to server)
-        console.log('Form submitted:', data);
-    }, 2000);
+    // Let FormSubmit handle the actual submission
+    // The form will redirect to the success page automatically
 }
 
 function showModal() {
