@@ -1,31 +1,33 @@
 
 
 
-// Navigation functionality
-const navbar = document.getElementById('navbar');
+// Navigation functionality with null checks
+const navbar = document.getElementById('Navbar');
 const hamburger = document.getElementById('hamburger');
 const navMenu = document.getElementById('nav-menu');
 
 // Scroll effect for navbar
 window.addEventListener('scroll', () => {
-    if (window.scrollY > 100) {
+    if (navbar && window.scrollY > 100) {
         navbar.classList.add('scrolled');
-    } else {
+    } else if (navbar) {
         navbar.classList.remove('scrolled');
     }
 });
 
 // Mobile menu toggle
-hamburger.addEventListener('click', () => {
-    hamburger.classList.toggle('active');
-    navMenu.classList.toggle('active');
-});
+if (hamburger && navMenu) {
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navMenu.classList.toggle('active');
+    });
+}
 
 // Close mobile menu when clicking on a link
 document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', () => {
-        hamburger.classList.remove('active');
-        navMenu.classList.remove('active');
+        if (hamburger) hamburger.classList.remove('active');
+        if (navMenu) navMenu.classList.remove('active');
     });
 });
 
@@ -133,7 +135,7 @@ document.querySelectorAll('.circle-progress').forEach(circle => {
     progressObserver.observe(circle);
 });
 
-// Form handling with FormSubmit
+// Form handling with FormSubmit - safe initialization
 const demoForm = document.getElementById('demoForm');
 const contactForm = document.getElementById('contactForm');
 const modal = document.getElementById('successModal');
@@ -172,12 +174,14 @@ function closeModal() {
     }, 300);
 }
 
-// Close modal when clicking outside
-modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-        closeModal();
-    }
-});
+// Close modal when clicking outside - with null check
+if (modal) {
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+}
 
 // Form validation and styling
 function setupFormInputs() {
@@ -204,23 +208,25 @@ function setupFormInputs() {
 
 setupFormInputs();
 
-// Back to top button
-const backToTopBtn = document.getElementById('backToTop');
+// Back to top button with null check
+const backToTopBtn = document.getElementById('backtotop');
 
-window.addEventListener('scroll', () => {
-    if (window.scrollY > 300) {
-        backToTopBtn.classList.add('show');
-    } else {
-        backToTopBtn.classList.remove('show');
-    }
-});
-
-backToTopBtn.addEventListener('click', () => {
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
+if (backToTopBtn) {
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            backToTopBtn.classList.add('show');
+        } else {
+            backToTopBtn.classList.remove('show');
+        }
     });
-});
+
+    backToTopBtn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
 
 // Parallax effect for hero section
 window.addEventListener('scroll', () => {
@@ -311,6 +317,51 @@ class TestimonialSlider {
 const testimonialContainer = document.querySelector('.testimonials-slider');
 if (testimonialContainer) {
     new TestimonialSlider(testimonialContainer);
+}
+
+// Fix potential null reference errors
+function initializeSafeEventListeners() {
+    // Safely initialize navbar elements
+    const navbar = document.getElementById('Navbar');
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.getElementById('nav-menu');
+    
+    if (navbar && hamburger && navMenu) {
+        // Mobile menu toggle
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+            });
+        });
+    }
+
+    // Safely initialize back to top button
+    const backToTopBtn = document.getElementById('backtotop');
+    if (backToTopBtn) {
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
+
+    // Safely initialize modal
+    const modal = document.getElementById('successModal');
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+    }
 }
 
 // Workout class schedule (interactive calendar)
@@ -945,56 +996,134 @@ function clearFieldError(field) {
 function enhanceKeyboardNavigation() {
     // Tab trap for modals
     const modal = document.getElementById('successModal');
-    const focusableElements = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    const firstFocusable = focusableElements[0];
-    const lastFocusable = focusableElements[focusableElements.length - 1];
-    
-    modal.addEventListener('keydown', (e) => {
-        if (e.key === 'Tab') {
-            if (e.shiftKey) {
-                if (document.activeElement === firstFocusable) {
-                    lastFocusable.focus();
-                    e.preventDefault();
-                }
-            } else {
-                if (document.activeElement === lastFocusable) {
-                    firstFocusable.focus();
-                    e.preventDefault();
+    if (modal) {
+        const focusableElements = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        const firstFocusable = focusableElements[0];
+        const lastFocusable = focusableElements[focusableElements.length - 1];
+        
+        modal.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                if (e.shiftKey) {
+                    if (document.activeElement === firstFocusable) {
+                        lastFocusable?.focus();
+                        e.preventDefault();
+                    }
+                } else {
+                    if (document.activeElement === lastFocusable) {
+                        firstFocusable?.focus();
+                        e.preventDefault();
+                    }
                 }
             }
-        }
-    });
+        });
+    }
     
     // Focus management for mobile menu
     const hamburger = document.getElementById('hamburger');
     const navMenu = document.getElementById('nav-menu');
     
-    hamburger.addEventListener('click', () => {
-        setTimeout(() => {
-            if (navMenu.classList.contains('active')) {
-                navMenu.querySelector('.nav-link').focus();
-            }
-        }, 100);
+    if (hamburger && navMenu) {
+        hamburger.addEventListener('click', () => {
+            setTimeout(() => {
+                if (navMenu.classList.contains('active')) {
+                    const firstNavLink = navMenu.querySelector('.nav-link');
+                    if (firstNavLink) {
+                        firstNavLink.focus();
+                    }
+                }
+            }, 100);
+        });
+    }
+}
+
+// Auto-play videos function - optimized
+function initializeAutoplayVideos() {
+    // Play hero videos - seamless synchronization
+    const heroVideos = document.querySelectorAll('.hero-video');
+    heroVideos.forEach((video, index) => {
+        if (!video) return;
+        
+        video.muted = true;
+        video.playsInline = true;
+        video.autoplay = true;
+        video.loop = true;
+        video.preload = 'auto';
+        
+        const playVideo = () => {
+            video.currentTime = 0;
+            video.play().catch(e => {
+                console.log(`Hero video ${index + 1} autoplay prevented by browser policy`);
+            });
+        };
+        
+        if (video.readyState >= 2) {
+            playVideo();
+        } else {
+            video.addEventListener('loadeddata', playVideo, { once: true });
+        }
+    });
+
+    // Media section videos - enable autoplay with muted sound
+    const mediaVideos = document.querySelectorAll('#media .gym-video');
+    mediaVideos.forEach((video, index) => {
+        if (!video) return;
+        
+        video.muted = true;
+        video.playsInline = true;
+        video.loop = true;
+        video.autoplay = true;
+        video.preload = 'auto';
+        
+        const playVideo = () => {
+            video.currentTime = 0;
+            video.play().catch(e => {
+                console.log(`Media gallery video ${index + 1} autoplay prevented by browser policy`);
+            });
+        };
+        
+        if (video.readyState >= 2) {
+            playVideo();
+        } else {
+            video.addEventListener('loadeddata', playVideo, { once: true });
+        }
+        
+        const overlay = video.closest('.video-container')?.querySelector('.video-overlay');
+        if (overlay) {
+            overlay.style.display = 'none'; // Hide play button since videos autoplay
+        }
     });
 }
 
-// Initialize all components when DOM is loaded
+// Initialize all components when DOM is loaded - optimized
 document.addEventListener('DOMContentLoaded', () => {
     console.log('New Lifestyle Gym website loaded successfully!');
     
-    // Set minimum date for demo booking to today
-    const dateInput = document.getElementById('preferredDate');
-    if (dateInput) {
-        const today = new Date().toISOString().split('T')[0];
-        dateInput.min = today;
+    try {
+        // Initialize safe event listeners first
+        initializeSafeEventListeners();
+        
+        // Set minimum date for demo booking to today
+        const dateInput = document.getElementById('preferredDate');
+        if (dateInput) {
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.min = today;
+        }
+        
+        // Initialize autoplay videos immediately for seamless playback
+        initializeAutoplayVideos();
+        
+        // Initialize video players with delay for better performance
+        requestAnimationFrame(() => {
+            initializeVideoPlayers();
+        });
+        
+        // Enhance form validation
+        enhanceFormValidation();
+        
+        // Enhance keyboard navigation
+        enhanceKeyboardNavigation();
+        
+    } catch (error) {
+        console.warn('Non-critical initialization error:', error);
     }
-    
-    // Initialize video players
-    initializeVideoPlayers();
-    
-    // Enhance form validation
-    enhanceFormValidation();
-    
-    // Enhance keyboard navigation
-    enhanceKeyboardNavigation();
 });
