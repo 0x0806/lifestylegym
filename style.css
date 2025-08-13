@@ -223,7 +223,7 @@ p {
 }
 
 /* Navigation */
-.navbar {
+.Navbar {
     position: fixed;
     top: 0;
     width: 100%;
@@ -235,7 +235,7 @@ p {
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3), 0 2px 10px rgba(255, 107, 53, 0.2);
 }
 
-.navbar.scrolled {
+.Navbar.scrolled {
     background: linear-gradient(135deg, rgba(26, 26, 26, 0.99) 0%, rgba(45, 45, 45, 0.99) 100%);
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4), 0 4px 20px rgba(255, 107, 53, 0.3);
     border-bottom: 1px solid var(--primary-color);
@@ -251,7 +251,7 @@ p {
     height: 80px;
 }
 
-.nav-logo .logo-3d {
+.nav-logo .Logo-3D {
     display: flex;
     align-items: center;
     font-size: 1.5rem;
@@ -263,12 +263,12 @@ p {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.nav-logo .logo-3d:hover {
+.nav-logo .Logo-3D:hover {
     background: rgba(255, 107, 53, 0.1);
     transform: translateY(-2px);
 }
 
-.logo-3d i {
+.Logo-3D i {
     font-size: 2rem;
     background: var(--gradient-primary);
     -webkit-background-clip: text;
@@ -278,7 +278,7 @@ p {
     transition: var(--transition);
 }
 
-.logo-3d:hover i {
+.Logo-3D:hover i {
     transform: rotateY(0deg) scale(1.1);
 }
 
@@ -292,7 +292,7 @@ p {
     box-shadow: 0 2px 8px rgba(255, 107, 53, 0.2);
 }
 
-.logo-3d:hover .logo-image {
+.Logo-3D:hover .logo-image {
     transform: scale(1.08);
     filter: brightness(1.3) contrast(1.1);
     box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
@@ -1539,7 +1539,7 @@ section {
     color: var(--primary-color);
 }
 
-.footer-logo .logo-3d {
+.footer-logo .Logo-3D {
     display: flex;
     align-items: center;
     font-size: 1.5rem;
@@ -2066,7 +2066,7 @@ section {
         text-align: center;
     }
     
-    .footer-logo .logo-3d {
+    .footer-logo .Logo-3D {
         justify-content: center;
     }
     
