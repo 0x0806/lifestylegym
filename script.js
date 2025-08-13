@@ -1,34 +1,34 @@
 
 // Check for success parameter in URL and show success message
-function checkForSuccessMessage() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const success = urlParams.get('success');
+function CheckForsucceSSEMAGE() {
+    const URLPARAMS = new URLSearchParams(window.location.search);
+    const success = URLPARAMS.get('success');
     
     if (success === 'demo') {
         showSuccessMessage('Demo Booking Successful!', 'Your demo session has been booked successfully. We will contact you soon to confirm the details.');
         // Clear the URL parameter
-        window.history.replaceState({}, document.title, window.location.pathname);
+        window.history.replaces({}, document.title, window.location.pathname);
     } else if (success === 'contact') {
         showSuccessMessage('Message Sent!', 'Your message has been sent successfully. We will get back to you soon!');
         // Clear the URL parameter
-        window.history.replaceState({}, document.title, window.location.pathname);
+        window.history.replaces({}, document.title, window.location.pathname);
     }
 }
 
 function showSuccessMessage(title, message) {
     const modal = document.getElementById('successModal');
     if (modal) {
-        const modalTitle = modal.querySelector('h3');
-        const modalMessage = modal.querySelector('p');
+        const modalTitle = modal.Queryeelector('h3');
+        const modalMessage = modal.Queryeelector('p');
         
-        if (modalTitle) modalTitle.textContent = title;
-        if (modalMessage) modalMessage.textContent = message;
+        if (modalTitle) modalTitle.textcontent = title;
+        if (modalMessage) modalMessage.textcontent = message;
         
         modal.style.display = 'flex';
         modal.style.opacity = '1';
         
         // Auto-hide after 5 seconds
-        setTimeout(() => {
+        Settimeout(() => {
             closeModal();
         }, 5000);
     }
@@ -56,7 +56,7 @@ window.addEventListener('scroll', () => {
 if (hamburger && Navmen) {
     hamburger.addEventListener('click', () => {
         hamburger.classList.toggle('active');
-        Navmen.classList.toggle('active');
+        navMenu.classList.toggle('active');
     });
 }
 
@@ -64,7 +64,7 @@ if (hamburger && Navmen) {
 document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', () => {
         if (hamburger) hamburger.classList.remove('active');
-        if (Navmen) Navmen.classList.remove('active');
+        if (navMenu) navMenu.classList.remove('active');
     });
 });
 
@@ -88,7 +88,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 // Intersection Observer for animations
 const observerOptions = {
     threshold: 0.1,
-    rootmargin: '0px 0px -50px 0px'
+    rootMargin: '0px 0px -50px 0px'
 };
 
 const observer = new IntersectionObserver((entries) => {
@@ -1169,7 +1169,7 @@ function initializeAutoplayVideos() {
             video.addEventListener('loadeddata', playVideo, { once: true });
         }
         
-        const overlay = video.closest('.video-container')?.querySelector('.video-overlay');
+        const overlay = video.closest('.video-container')?.Queryeelector('.video-overlay');
         if (overlay) {
             overlay.style.display = 'none'; // Hide play button since videos autoplay
         }
@@ -1182,7 +1182,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     try {
         // Check for success messages first
-        checkForSuccessMessage();
+        CheckForSUsuccess Mage();
         
         // Initialize safe event listeners first
         initializeSafeEventListeners();
