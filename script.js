@@ -1,34 +1,33 @@
-
 // Check for success parameter in URL and show success message
-function CheckForsucceSSEMAGE() {
+function checkForSuccessMessage() {
     const URLPARAMS = new URLSearchParams(window.location.search);
     const success = URLPARAMS.get('success');
-    
+
     if (success === 'demo') {
         showSuccessMessage('Demo Booking Successful!', 'Your demo session has been booked successfully. We will contact you soon to confirm the details.');
         // Clear the URL parameter
-        window.history.replaces({}, document.title, window.location.pathname);
+        window.history.replaceState({}, document.title, window.location.pathname);
     } else if (success === 'contact') {
         showSuccessMessage('Message Sent!', 'Your message has been sent successfully. We will get back to you soon!');
         // Clear the URL parameter
-        window.history.replaces({}, document.title, window.location.pathname);
+        window.history.replaceState({}, document.title, window.location.pathname);
     }
 }
 
 function showSuccessMessage(title, message) {
     const modal = document.getElementById('successModal');
     if (modal) {
-        const modalTitle = modal.Queryeelector('h3');
-        const modalMessage = modal.Queryeelector('p');
-        
-        if (modalTitle) modalTitle.textcontent = title;
-        if (modalMessage) modalMessage.textcontent = message;
-        
+        const modalTitle = modal.querySelector('h3');
+        const modalMessage = modal.querySelector('p');
+
+        if (modalTitle) modalTitle.textContent = title;
+        if (modalMessage) modalMessage.textContent = message;
+
         modal.style.display = 'flex';
         modal.style.opacity = '1';
-        
+
         // Auto-hide after 5 seconds
-        Settimeout(() => {
+        setTimeout(() => {
             closeModal();
         }, 5000);
     }
@@ -38,35 +37,57 @@ function showSuccessMessage(title, message) {
 
 
 
-// Navigation functionality with null checks
-const navbar = document.getElementById('Navbar');
-const hamburger = document.getElementById('hamburger');
-const navMenu = document.getElementById('nav-menu');
+// Navigation functionality with proper initialization
+function initializeNavigation() {
+    const navbar = document.getElementById('Navbar');
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.getElementById('nav-menu');
 
-// Scroll effect for navbar
-window.addEventListener('scroll', () => {
-    if (Navbar && window.scrollY > 100) {
-        navbar.classList.add('scrolled');
-    } else if (Navbar) {
-        navbar.classList.remove('scrolled');
+    // Scroll effect for navbar
+    window.addEventListener('scroll', () => {
+        if (navbar && window.scrollY > 100) {
+            navbar.classList.add('scrolled');
+        } else if (navbar) {
+            navbar.classList.remove('scrolled');
+        }
+    });
+
+    // Mobile menu toggle
+    if (hamburger && navMenu) {
+        hamburger.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Hamburger clicked'); // Debug log
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            
+            // Prevent body scroll when menu is open
+            if (navMenu.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!navMenu.contains(e.target) && !hamburger.contains(e.target)) {
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
     }
-});
 
-// Mobile menu toggle
-if (hamburger && Navmen) {
-    hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('active');
-        Navmen.classList.toggle('active');
+    // Close mobile menu when clicking on a link
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            if (hamburger) hamburger.classList.remove('active');
+            if (navMenu) navMenu.classList.remove('active');
+            document.body.style.overflow = '';
+        });
     });
 }
-
-// Close mobile menu when clicking on a link
-document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', () => {
-        if (hamburger) hamburger.classList.remove('active');
-        if (Navmen) Navmen.classList.remove('active');
-    });
-});
 
 // Smooth scrolling for navigation links
 function scrollToSection(sectionId) {
@@ -101,7 +122,7 @@ const observer = new IntersectionObserver((entries) => {
 }, observerOptions);
 
 // Observe elements for animation
-document.querySelectorAll('.about-card, .service-card, .trainer-card, .plan-card, .contact-card').forEach(he => {
+document.querySelectorAll('.about-card, .service-card, .trainer-card, .plan-card, .contact-card').forEach(el => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(30px)';
     el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
@@ -112,21 +133,21 @@ document.querySelectorAll('.about-card, .service-card, .trainer-card, .plan-card
 function animateCounter(element, target, duration) {
     let start = 0;
     const startTime = performance.now();
-    
+
     function updateCounter(currentTime) {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
         const current = Math.floor(progress * target);
-        
+
         element.textContent = current;
-        
+
         if (progress < 1) {
             requestAnimationFrame(updateCounter);
         } else {
             element.textContent = target;
         }
     }
-    
+
     requestAnimationFrame(updateCounter);
 }
 
@@ -151,7 +172,7 @@ function animateProgressCircle(circle, percent) {
     const radius = 50;
     const circumference = 2 * Math.PI * radius;
     const offset = circumference - (percent / 100) * circumference;
-    
+
     circle.style.background = `conic-gradient(var(--primary-color) ${percent * 3.6}deg, var(--light-gray) 0deg)`;
 }
 
@@ -183,7 +204,7 @@ if (demoForm) {
         // Check required fields first
         const requiredFields = demoForm.querySelectorAll('[required]');
         let allValid = true;
-        
+
         requiredFields.forEach(field => {
             if (!field.value.trim()) {
                 allValid = false;
@@ -193,18 +214,18 @@ if (demoForm) {
                 field.style.borderColor = 'rgba(255, 255, 255, 0.2)';
             }
         });
-        
+
         if (!allValid) {
             e.preventDefault();
             return false;
         }
-        
+
         // Show loading state but don't prevent form submission
         const submitBtn = e.target.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
         submitBtn.disabled = true;
-        
+
         // Allow form to submit naturally to FormSubmit
         return true;
     });
@@ -215,7 +236,7 @@ if (contactForm) {
         // Check required fields first
         const requiredFields = contactForm.querySelectorAll('[required]');
         let allValid = true;
-        
+
         requiredFields.forEach(field => {
             if (!field.value.trim()) {
                 allValid = false;
@@ -225,18 +246,18 @@ if (contactForm) {
                 field.style.borderColor = 'rgba(255, 255, 255, 0.2)';
             }
         });
-        
+
         if (!allValid) {
             e.preventDefault();
             return false;
         }
-        
+
         // Show loading state but don't prevent form submission
         const submitBtn = e.target.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
         submitBtn.disabled = true;
-        
+
         // Allow form to submit naturally to FormSubmit
         return true;
     });
@@ -268,19 +289,19 @@ if (modal) {
 // Form validation and styling
 function setupFormInputs() {
     const inputs = document.querySelectorAll('input, select, textarea');
-    
+
     inputs.forEach(input => {
         // Handle floating labels
         input.addEventListener('focus', () => {
             input.parentElement.classList.add('focused');
         });
-        
+
         input.addEventListener('blur', () => {
             if (!input.value) {
                 input.parentElement.classList.remove('focused');
             }
         });
-        
+
         // Check if input has value on load
         if (input.value) {
             input.parentElement.classList.add('focused');
@@ -314,7 +335,7 @@ if (backToTopBtn) {
 window.addEventListener('scroll', () => {
     const scrolled = window.pageYOffset;
     const parallaxElements = document.querySelectorAll('.floating-card');
-    
+
     parallaxElements.forEach((element, index) => {
         const speed = 0.5 + (index * 0.1);
         element.style.transform = `translateY(${scrolled * speed}px)`;
@@ -325,7 +346,7 @@ window.addEventListener('scroll', () => {
 function typeWriter(element, text, speed = 100) {
     let i = 0;
     element.innerHTML = '';
-    
+
     function type() {
         if (i < text.length) {
             element.innerHTML += text.charAt(i);
@@ -333,14 +354,14 @@ function typeWriter(element, text, speed = 100) {
             setTimeout(type, speed);
         }
     }
-    
+
     type();
 }
 
 // Lazy loading for images (if any images are added later)
 function lazyLoadImages() {
     const images = document.querySelectorAll('img[data-src]');
-    
+
     const imageObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -351,7 +372,7 @@ function lazyLoadImages() {
             }
         });
     });
-    
+
     images.forEach(img => imageObserver.observe(img));
 }
 
@@ -365,29 +386,29 @@ class TestimonialSlider {
         this.currentSlide = 0;
         this.init();
     }
-    
+
     init() {
         this.showSlide(0);
         this.autoPlay();
     }
-    
+
     showSlide(index) {
         this.slides.forEach((slide, i) => {
             slide.classList.toggle('active', i === index);
         });
         this.currentSlide = index;
     }
-    
+
     nextSlide() {
         const next = (this.currentSlide + 1) % this.slides.length;
         this.showSlide(next);
     }
-    
+
     prevSlide() {
         const prev = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
         this.showSlide(prev);
     }
-    
+
     autoPlay() {
         setInterval(() => {
             this.nextSlide();
@@ -403,26 +424,8 @@ if (testimonialContainer) {
 
 // Fix potential null reference errors
 function initializeSafeEventListeners() {
-    // Safely initialize navbar elements
-    const navbar = document.getElementById('Navbar');
-    const hamburger = document.getElementById('hamburger');
-    const navMenu = document.getElementById('nav-menu');
-    
-    if (navbar && hamburger && navMenu) {
-        // Mobile menu toggle
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('active');
-            navMenu.classList.toggle('active');
-        });
-
-        // Close mobile menu when clicking on a link
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', () => {
-                hamburger.classList.remove('active');
-                navMenu.classList.remove('active');
-            });
-        });
-    }
+    // Initialize navigation properly
+    initializeNavigation();
 
     // Safely initialize back to top button
     const backToTopBtn = document.getElementById('backtotop');
@@ -453,17 +456,17 @@ class WorkoutSchedule {
         this.currentWeek = new Date();
         this.init();
     }
-    
+
     init() {
         this.renderSchedule();
         this.attachEventListeners();
     }
-    
+
     renderSchedule() {
         // Implementation for rendering workout schedule
         // This would create an interactive weekly schedule
     }
-    
+
     attachEventListeners() {
         // Event listeners for schedule interactions
     }
@@ -475,30 +478,30 @@ class BMICalculator {
         this.container = container;
         this.init();
     }
-    
+
     init() {
         const form = this.container.querySelector('.bmi-form');
         if (form) {
             form.addEventListener('submit', this.calculateBMI.bind(this));
         }
     }
-    
+
     calculateBMI(e) {
         e.preventDefault();
         const weight = parseFloat(e.target.weight.value);
         const height = parseFloat(e.target.height.value) / 100; // Convert cm to m
-        
+
         if (weight && height) {
             const bmi = weight / (height * height);
             this.displayResult(bmi);
         }
     }
-    
+
     displayResult(bmi) {
         const resultContainer = this.container.querySelector('.bmi-result');
         let category = '';
         let color = '';
-        
+
         if (bmi < 18.5) {
             category = 'Underweight';
             color = '#3498db';
@@ -512,14 +515,14 @@ class BMICalculator {
             category = 'Obese';
             color = '#e74c3c';
         }
-        
+
         resultContainer.innerHTML = `
             <div class="bmi-score" style="color: ${color}">
                 <span class="bmi-value">${bmi.toFixed(1)}</span>
                 <span class="bmi-category">${category}</span>
             </div>
         `;
-        
+
         resultContainer.style.display = 'block';
     }
 }
@@ -535,7 +538,7 @@ document.querySelectorAll('.plan-card').forEach(card => {
     card.addEventListener('mouseenter', () => {
         card.style.transform = 'translateY(-15px) rotateX(5deg)';
     });
-    
+
     card.addEventListener('mouseleave', () => {
         card.style.transform = 'translateY(0) rotateX(0)';
     });
@@ -547,16 +550,16 @@ document.querySelectorAll('.trainer-card').forEach(card => {
         const rect = card.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        
+
         const centerX = rect.width / 2;
         const centerY = rect.height / 2;
-        
+
         const rotateX = (y - centerY) / 5;
         const rotateY = (centerX - x) / 5;
-        
+
         card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(20px)`;
     });
-    
+
     card.addEventListener('mouseleave', () => {
         card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateZ(0)';
     });
@@ -565,11 +568,11 @@ document.querySelectorAll('.trainer-card').forEach(card => {
 // Service card animations
 document.querySelectorAll('.service-card').forEach(card => {
     const icon = card.querySelector('.service-icon');
-    
+
     card.addEventListener('mouseenter', () => {
         icon.style.transform = 'rotateY(180deg) scale(1.1)';
     });
-    
+
     card.addEventListener('mouseleave', () => {
         icon.style.transform = 'rotateY(0) scale(1)';
     });
@@ -578,11 +581,11 @@ document.querySelectorAll('.service-card').forEach(card => {
 // Floating animation for hero cards
 function animateFloatingCards() {
     const cards = document.querySelectorAll('.floating-card');
-    
+
     cards.forEach((card, index) => {
         const delay = index * 1000;
         const duration = 3000 + (index * 500);
-        
+
         setInterval(() => {
             card.style.transform = `translateY(-20px) rotate(${Math.sin(Date.now() / 1000) * 5}deg)`;
             setTimeout(() => {
@@ -603,13 +606,13 @@ class EquipmentShowcase {
         this.equipment = [];
         this.init();
     }
-    
+
     init() {
         this.loadEquipment();
         this.renderEquipment();
         this.attachEventListeners();
     }
-    
+
     loadEquipment() {
         this.equipment = [
             { name: 'Treadmills', count: 12, type: 'cardio' },
@@ -618,11 +621,11 @@ class EquipmentShowcase {
             { name: 'Rowing Machines', count: 6, type: 'cardio' }
         ];
     }
-    
+
     renderEquipment() {
         // Render equipment showcase
     }
-    
+
     attachEventListeners() {
         // Equipment showcase interactions
     }
@@ -636,12 +639,12 @@ class VirtualTour {
         this.rooms = {};
         this.init();
     }
-    
+
     init() {
         this.loadRooms();
         this.renderTour();
     }
-    
+
     loadRooms() {
         this.rooms = {
             'main-gym': {
@@ -662,11 +665,11 @@ class VirtualTour {
             }
         };
     }
-    
+
     renderTour() {
         // Render virtual tour interface
     }
-    
+
     switchRoom(roomId) {
         this.currentRoom = roomId;
         this.renderTour();
@@ -678,19 +681,19 @@ function optimizePerformance() {
     // Debounce scroll events
     let scrollTimer;
     const originalScrollHandler = window.onscroll;
-    
+
     window.addEventListener('scroll', () => {
         if (scrollTimer) clearTimeout(scrollTimer);
         scrollTimer = setTimeout(() => {
             if (originalScrollHandler) originalScrollHandler();
         }, 16); // 60fps
     });
-    
+
     // Preload critical images
     const criticalImages = [
         // Add image URLs that need to be preloaded
     ];
-    
+
     criticalImages.forEach(src => {
         const img = new Image();
         img.src = src;
@@ -708,12 +711,12 @@ function enhanceAccessibility() {
             closeModal();
         }
     });
-    
+
     // Focus management
     const focusableElements = document.querySelectorAll(
         'a[href], button, textarea, input, select, [tabindex]:not([tabindex="-1"])'
     );
-    
+
     // Skip to main content link
     const skipLink = document.createElement('a');
     skipLink.href = '#main';
@@ -731,15 +734,15 @@ function enhanceAccessibility() {
         z-index: 1000;
         transition: top 0.3s;
     `;
-    
+
     skipLink.addEventListener('focus', () => {
         skipLink.style.top = '6px';
     });
-    
+
     skipLink.addEventListener('blur', () => {
         skipLink.style.top = '-40px';
     });
-    
+
     document.body.insertBefore(skipLink, document.body.firstChild);
 }
 
@@ -750,12 +753,12 @@ enhanceAccessibility();
 function initializeAnalytics() {
     // Track page views
     console.log('Page view tracked');
-    
+
     // Track form submissions
     document.addEventListener('submit', (e) => {
         console.log('Form submission tracked:', e.target.id);
     });
-    
+
     // Track button clicks
     document.addEventListener('click', (e) => {
         if (e.target.classList.contains('btn')) {
@@ -790,12 +793,12 @@ class VideoPlayer {
         this.isPlaying = false;
         this.init();
     }
-    
+
     init() {
         this.createControls();
         this.attachEventListeners();
     }
-    
+
     createControls() {
         const controlsHTML = `
             <div class="video-controls">
@@ -817,10 +820,10 @@ class VideoPlayer {
                 </button>
             </div>
         `;
-        
+
         const videoContainer = this.videoCard.querySelector('.video-container');
         videoContainer.insertAdjacentHTML('beforeend', controlsHTML);
-        
+
         this.controls = videoContainer.querySelector('.video-controls');
         this.playPauseBtn = this.controls.querySelector('.play-pause-btn');
         this.progressContainer = this.controls.querySelector('.progress-container');
@@ -830,37 +833,37 @@ class VideoPlayer {
         this.volumeSlider = this.controls.querySelector('.volume-slider');
         this.fullscreenBtn = this.controls.querySelector('.fullscreen-btn');
     }
-    
+
     attachEventListeners() {
         // Play button click
         this.playBtn.addEventListener('click', () => this.togglePlay());
         this.playPauseBtn.addEventListener('click', () => this.togglePlay());
-        
+
         // Video events
         this.video.addEventListener('loadedmetadata', () => this.updateTimeDisplay());
         this.video.addEventListener('timeupdate', () => this.updateProgress());
         this.video.addEventListener('ended', () => this.handleVideoEnd());
-        
+
         // Progress bar
         this.progressContainer.addEventListener('click', (e) => this.seekVideo(e));
-        
+
         // Volume controls
         this.volumeBtn.addEventListener('click', () => this.toggleMute());
         this.volumeSlider.addEventListener('input', (e) => this.changeVolume(e));
-        
+
         // Fullscreen
         this.fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
-        
+
         // Show/hide controls on hover
         this.video.addEventListener('mouseenter', () => this.showControls());
         this.video.addEventListener('mouseleave', () => this.hideControls());
         this.controls.addEventListener('mouseenter', () => this.showControls());
         this.controls.addEventListener('mouseleave', () => this.hideControls());
-        
+
         // Click to play/pause
         this.video.addEventListener('click', () => this.togglePlay());
     }
-    
+
     togglePlay() {
         if (this.video.paused) {
             this.playVideo();
@@ -868,7 +871,7 @@ class VideoPlayer {
             this.pauseVideo();
         }
     }
-    
+
     playVideo() {
         // Pause all other videos first
         document.querySelectorAll('.gym-video').forEach(v => {
@@ -878,64 +881,64 @@ class VideoPlayer {
                 v.closest('.video-card').querySelector('.play-pause-btn i').className = 'fas fa-play';
             }
         });
-        
+
         this.video.play();
         this.overlay.classList.add('playing');
         this.playPauseBtn.querySelector('i').className = 'fas fa-pause';
         this.isPlaying = true;
     }
-    
+
     pauseVideo() {
         this.video.pause();
         this.overlay.classList.remove('playing');
         this.playPauseBtn.querySelector('i').className = 'fas fa-play';
         this.isPlaying = false;
     }
-    
+
     handleVideoEnd() {
         this.overlay.classList.remove('playing');
         this.playPauseBtn.querySelector('i').className = 'fas fa-play';
         this.isPlaying = false;
         this.video.currentTime = 0;
     }
-    
+
     updateProgress() {
         const progress = (this.video.currentTime / this.video.duration) * 100;
         this.progressFilled.style.width = `${progress}%`;
         this.updateTimeDisplay();
     }
-    
+
     updateTimeDisplay() {
         const current = this.formatTime(this.video.currentTime);
         const duration = this.formatTime(this.video.duration);
         this.timeDisplay.textContent = `${current} / ${duration}`;
     }
-    
+
     formatTime(seconds) {
         if (isNaN(seconds)) return '0:00';
         const mins = Math.floor(seconds / 60);
         const secs = Math.floor(seconds % 60);
         return `${mins}:${secs.toString().padStart(2, '0')}`;
     }
-    
+
     seekVideo(e) {
         const rect = this.progressContainer.getBoundingClientRect();
         const pos = (e.clientX - rect.left) / rect.width;
         this.video.currentTime = pos * this.video.duration;
     }
-    
+
     toggleMute() {
         this.video.muted = !this.video.muted;
         this.volumeBtn.querySelector('i').className = this.video.muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
         this.volumeSlider.value = this.video.muted ? 0 : this.video.volume * 100;
     }
-    
+
     changeVolume(e) {
         this.video.volume = e.target.value / 100;
         this.video.muted = e.target.value == 0;
         this.volumeBtn.querySelector('i').className = this.video.muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
     }
-    
+
     toggleFullscreen() {
         if (document.fullscreenElement) {
             document.exitFullscreen();
@@ -943,13 +946,13 @@ class VideoPlayer {
             this.video.requestFullscreen();
         }
     }
-    
+
     showControls() {
         if (this.isPlaying) {
             this.controls.classList.add('show');
         }
     }
-    
+
     hideControls() {
         setTimeout(() => {
             if (!this.controls.matches(':hover')) {
@@ -970,15 +973,15 @@ function initializeVideoPlayers() {
 // Enhanced form validation
 function enhanceFormValidation() {
     const forms = document.querySelectorAll('form');
-    
+
     forms.forEach(form => {
         const inputs = form.querySelectorAll('input[required], textarea[required], select[required]');
-        
+
         inputs.forEach(input => {
             input.addEventListener('blur', () => validateField(input));
             input.addEventListener('input', () => clearFieldError(input));
         });
-        
+
         form.addEventListener('submit', (e) => {
             let isValid = true;
             inputs.forEach(input => {
@@ -986,7 +989,7 @@ function enhanceFormValidation() {
                     isValid = false;
                 }
             });
-            
+
             if (!isValid) {
                 e.preventDefault();
                 const firstError = form.querySelector('.field-error');
@@ -1002,16 +1005,16 @@ function validateField(field) {
     const value = field.value.trim();
     let isValid = true;
     let errorMessage = '';
-    
+
     // Remove existing error
     clearFieldError(field);
-    
+
     // Required field validation
     if (field.hasAttribute('required') && !value) {
         errorMessage = 'This field is required';
         isValid = false;
     }
-    
+
     // Email validation
     if (field.type === 'email' && value) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -1020,7 +1023,7 @@ function validateField(field) {
             isValid = false;
         }
     }
-    
+
     // Phone validation
     if (field.type === 'tel' && value) {
         const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
@@ -1029,29 +1032,29 @@ function validateField(field) {
             isValid = false;
         }
     }
-    
+
     // Date validation (not in the past)
     if (field.type === 'date' && value) {
         const selectedDate = new Date(value);
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        
+
         if (selectedDate < today) {
             errorMessage = 'Please select a future date';
             isValid = false;
         }
     }
-    
+
     if (!isValid) {
         showFieldError(field, errorMessage);
     }
-    
+
     return isValid;
 }
 
 function showFieldError(field, message) {
     field.classList.add('field-error');
-    
+
     const errorElement = document.createElement('span');
     errorElement.className = 'error-message';
     errorElement.textContent = message;
@@ -1062,7 +1065,7 @@ function showFieldError(field, message) {
         margin-top: 0.25rem;
         margin-left: 1rem;
     `;
-    
+
     field.parentElement.appendChild(errorElement);
 }
 
@@ -1082,7 +1085,7 @@ function enhanceKeyboardNavigation() {
         const focusableElements = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
         const firstFocusable = focusableElements[0];
         const lastFocusable = focusableElements[focusableElements.length - 1];
-        
+
         modal.addEventListener('keydown', (e) => {
             if (e.key === 'Tab') {
                 if (e.shiftKey) {
@@ -1099,11 +1102,11 @@ function enhanceKeyboardNavigation() {
             }
         });
     }
-    
+
     // Focus management for mobile menu
     const hamburger = document.getElementById('hamburger');
     const navMenu = document.getElementById('nav-menu');
-    
+
     if (hamburger && navMenu) {
         hamburger.addEventListener('click', () => {
             setTimeout(() => {
@@ -1124,20 +1127,20 @@ function initializeAutoplayVideos() {
     const heroVideos = document.querySelectorAll('.hero-video');
     heroVideos.forEach((video, index) => {
         if (!video) return;
-        
+
         video.muted = true;
         video.playsInline = true;
         video.autoplay = true;
         video.loop = true;
         video.preload = 'auto';
-        
+
         const playVideo = () => {
             video.currentTime = 0;
             video.play().catch(e => {
                 console.log(`Hero video ${index + 1} autoplay prevented by browser policy`);
             });
         };
-        
+
         if (video.readyState >= 2) {
             playVideo();
         } else {
@@ -1149,26 +1152,26 @@ function initializeAutoplayVideos() {
     const mediaVideos = document.querySelectorAll('#media .gym-video');
     mediaVideos.forEach((video, index) => {
         if (!video) return;
-        
+
         video.muted = true;
         video.playsInline = true;
         video.loop = true;
         video.autoplay = true;
         video.preload = 'auto';
-        
+
         const playVideo = () => {
             video.currentTime = 0;
             video.play().catch(e => {
                 console.log(`Media gallery video ${index + 1} autoplay prevented by browser policy`);
             });
         };
-        
+
         if (video.readyState >= 2) {
             playVideo();
         } else {
             video.addEventListener('loadeddata', playVideo, { once: true });
         }
-        
+
         const overlay = video.closest('.video-container')?.Queryeelector('.video-overlay');
         if (overlay) {
             overlay.style.display = 'none'; // Hide play button since videos autoplay
@@ -1179,35 +1182,35 @@ function initializeAutoplayVideos() {
 // Initialize all components when DOM is loaded - optimized
 document.addEventListener('DOMContentLoaded', () => {
     console.log('New Lifestyle Gym website loaded successfully!');
-    
+
     try {
         // Check for success messages first
         CheckForsucceSSEMAGE();
-        
+
         // Initialize safe event listeners first
         initializeSafeEventListeners();
-        
+
         // Set minimum date for demo booking to today
         const dateInput = document.getElementById('preferredDate');
         if (dateInput) {
             const today = new Date().toISOString().split('T')[0];
             dateInput.min = today;
         }
-        
+
         // Initialize autoplay videos immediately for seamless playback
         initializeAutoplayVideos();
-        
+
         // Initialize video players with delay for better performance
         requestAnimationFrame(() => {
             initializeVideoPlayers();
         });
-        
+
         // Enhance form validation
         enhanceFormValidation();
-        
+
         // Enhance keyboard navigation
         enhanceKeyboardNavigation();
-        
+
     } catch (error) {
         console.warn('Non-critical initialization error:', error);
     }
