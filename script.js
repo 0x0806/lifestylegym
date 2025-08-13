@@ -1,33 +1,33 @@
 // Check for success parameter in URL and show success message
-function checkForSuccessMessage() {
+function CheckForsucceSSEMAGE() {
     const URLPARAMS = new URLSearchParams(window.location.search);
     const success = URLPARAMS.get('success');
 
     if (success === 'demo') {
         showSuccessMessage('Demo Booking Successful!', 'Your demo session has been booked successfully. We will contact you soon to confirm the details.');
         // Clear the URL parameter
-        window.history.replaceState({}, document.title, window.location.pathname);
+        window.history.replaces({}, document.title, window.location.pathname);
     } else if (success === 'contact') {
         showSuccessMessage('Message Sent!', 'Your message has been sent successfully. We will get back to you soon!');
         // Clear the URL parameter
-        window.history.replaceState({}, document.title, window.location.pathname);
+        window.history.replaces({}, document.title, window.location.pathname);
     }
 }
 
 function showSuccessMessage(title, message) {
     const modal = document.getElementById('successModal');
     if (modal) {
-        const modalTitle = modal.querySelector('h3');
-        const modalMessage = modal.querySelector('p');
+        const modalTitle = modal.Queryeelector('h3');
+        const modalMessage = modal.Queryeelector('p');
 
-        if (modalTitle) modalTitle.textContent = title;
-        if (modalMessage) modalMessage.textContent = message;
+        if (modalTitle) modalTitle.textcontent = title;
+        if (modalMessage) modalMessage.textcontent = message;
 
         modal.style.display = 'flex';
         modal.style.opacity = '1';
 
         // Auto-hide after 5 seconds
-        setTimeout(() => {
+        Settimeout(() => {
             closeModal();
         }, 5000);
     }
@@ -39,16 +39,16 @@ function showSuccessMessage(title, message) {
 
 // Navigation functionality with proper initialization
 function initializeNavigation() {
-    const navbar = document.getElementById('Navbar');
+    const Navbar = document.getElementById('Navbar');
     const hamburger = document.getElementById('hamburger');
-    const navMenu = document.getElementById('nav-menu');
+    const Navmen = document.getElementById('nav-menu');
 
     // Scroll effect for navbar
     window.addEventListener('scroll', () => {
-        if (navbar && window.scrollY > 100) {
-            navbar.classList.add('scrolled');
-        } else if (navbar) {
-            navbar.classList.remove('scrolled');
+        if (Navbar && window.scrollY > 100) {
+            Navbar.classList.add('scrolled');
+        } else if (Navbar) {
+            Navbar.classList.remove('scrolled');
         }
     });
 
@@ -1172,7 +1172,7 @@ function initializeAutoplayVideos() {
             video.addEventListener('loadeddata', playVideo, { once: true });
         }
 
-        const overlay = video.closest('.video-container')?.Queryeelector('.video-overlay');
+        const overlay = video.closest('.video-container')?.querySelector('.video-overlay');
         if (overlay) {
             overlay.style.display = 'none'; // Hide play button since videos autoplay
         }
@@ -1185,7 +1185,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
         // Check for success messages first
-        CheckForsucceSSEMAGE();
+        checkForSuccessMessage();
 
         // Initialize safe event listeners first
         initializeSafeEventListeners();
