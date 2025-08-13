@@ -1,4 +1,41 @@
 
+// Check for success parameter in URL and show success message
+function checkForSuccessMessage() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const success = urlParams.get('success');
+    
+    if (success === 'demo') {
+        showSuccessMessage('Demo Booking Successful!', 'Your demo session has been booked successfully. We will contact you soon to confirm the details.');
+        // Clear the URL parameter
+        window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (success === 'contact') {
+        showSuccessMessage('Message Sent!', 'Your message has been sent successfully. We will get back to you soon!');
+        // Clear the URL parameter
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+}
+
+function showSuccessMessage(title, message) {
+    const modal = document.getElementById('successModal');
+    if (modal) {
+        const modalTitle = modal.querySelector('h3');
+        const modalMessage = modal.querySelector('p');
+        
+        if (modalTitle) modalTitle.textContent = title;
+        if (modalMessage) modalMessage.textContent = message;
+        
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+        
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            closeModal();
+        }, 5000);
+    }
+}
+
+
+
 
 
 // Navigation functionality with null checks
@@ -143,7 +180,7 @@ const modal = document.getElementById('successModal');
 // Add loading states to forms
 if (demoForm) {
     demoForm.addEventListener('submit', (e) => {
-        // Check required fields
+        // Check required fields first
         const requiredFields = demoForm.querySelectorAll('[required]');
         let allValid = true;
         
@@ -162,29 +199,47 @@ if (demoForm) {
             return false;
         }
         
-        handleFormSubmit(e);
+        // Show loading state but don't prevent form submission
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+        submitBtn.disabled = true;
+        
+        // Allow form to submit naturally to FormSubmit
+        return true;
     });
 }
 
 if (contactForm) {
-    contactForm.addEventListener('submit', handleFormSubmit);
-}
-
-function handleFormSubmit(e) {
-    // Show loading state
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-    submitBtn.disabled = true;
-    
-    // Let FormSubmit handle the submission - don't prevent default
-    // The form will submit naturally and redirect to success page
-    
-    // Reset button after a delay in case redirect fails
-    setTimeout(() => {
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    }, 10000);
+    contactForm.addEventListener('submit', (e) => {
+        // Check required fields first
+        const requiredFields = contactForm.querySelectorAll('[required]');
+        let allValid = true;
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                allValid = false;
+                field.style.borderColor = '#e74c3c';
+                field.focus();
+            } else {
+                field.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+            }
+        });
+        
+        if (!allValid) {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Show loading state but don't prevent form submission
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+        submitBtn.disabled = true;
+        
+        // Allow form to submit naturally to FormSubmit
+        return true;
+    });
 }
 
 function showModal() {
@@ -1126,6 +1181,9 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('New Lifestyle Gym website loaded successfully!');
     
     try {
+        // Check for success messages first
+        checkForSuccessMessage();
+        
         // Initialize safe event listeners first
         initializeSafeEventListeners();
         
