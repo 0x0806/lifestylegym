@@ -41,7 +41,7 @@ html {
     --accent-color: #C5073b;
     --dark-color: #1A1A1A;
     --light-color: #ffffff;
-    --gray-color: # 6C757D;
+    --gray-color: # 6c757d;
     --light-gray: #f8f9fa;
     --success-color: #28a745;
     --warning-color: #ffc107;
@@ -1869,6 +1869,12 @@ section {
         flex-shrink: 0;
         background: rgba(255, 255, 255, 0.1);
         border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .hamburger:hover {
+        background: rgba(255, 107, 53, 0.2);
     }
     
     .hamburger .bar {
@@ -1892,15 +1898,17 @@ section {
         justify-content: flex-start;
         align-items: center;
         padding: 2rem 1rem;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 1000;
         gap: 0;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
+        border-right: 1px solid rgba(255, 107, 53, 0.3);
     }
     
     .nav-menu.active {
         left: 0;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
     }
     
     .nav-item {
@@ -3134,7 +3142,7 @@ section {
 }
 
 ::-webkit-scrollbar-track {
-    background: our(--light-gray);
+    background: var(--light-gray);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -3143,7 +3151,7 @@ section {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: our(--gradient-secondary);
+    background: var(--gradient-secondary);
 }
 
 /* Mobile scrollbar */
@@ -3155,8 +3163,8 @@ section {
 
 /* Selection */
 ::selection {
-    background: our(--primary-color);
-    color: our(--light-color);
+    background: var(--primary-color);
+    color: var(--light-color);
 }
 
 /* Focus styles for accessibility */
