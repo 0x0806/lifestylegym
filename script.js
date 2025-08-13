@@ -2,24 +2,24 @@
 
 
 // Navigation functionality with null checks
-const navbar = document.getElementById('Navbar');
+const Navbar = document.getElementById('Navbar');
 const hamburger = document.getElementById('hamburger');
-const navMenu = document.getElementById('nav-menu');
+const Navmen = document.getElementById('nav-menu');
 
 // Scroll effect for navbar
 window.addEventListener('scroll', () => {
-    if (navbar && window.scrollY > 100) {
-        navbar.classList.add('scrolled');
-    } else if (navbar) {
-        navbar.classList.remove('scrolled');
+    if (Navbar && window.scrollY > 100) {
+        Navbar.classList.add('scrolled');
+    } else if (Navbar) {
+        Navbar.classList.remove('scrolled');
     }
 });
 
 // Mobile menu toggle
-if (hamburger && navMenu) {
+if (hamburger && Navmen) {
     hamburger.addEventListener('click', () => {
         hamburger.classList.toggle('active');
-        navMenu.classList.toggle('active');
+        Navmen.classList.toggle('active');
     });
 }
 
@@ -27,7 +27,7 @@ if (hamburger && navMenu) {
 document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', () => {
         if (hamburger) hamburger.classList.remove('active');
-        if (navMenu) navMenu.classList.remove('active');
+        if (Navmen) Navmen.classList.remove('active');
     });
 });
 
@@ -51,7 +51,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 // Intersection Observer for animations
 const observerOptions = {
     threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
+    rootmargin: '0px 0px -50px 0px'
 };
 
 const observer = new IntersectionObserver((entries) => {
@@ -142,7 +142,28 @@ const modal = document.getElementById('successModal');
 
 // Add loading states to forms
 if (demoForm) {
-    demoForm.addEventListener('submit', handleFormSubmit);
+    demoForm.addEventListener('submit', (e) => {
+        // Check required fields
+        const requiredFields = demoForm.querySelectorAll('[required]');
+        let allValid = true;
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                allValid = false;
+                field.style.borderColor = '#e74c3c';
+                field.focus();
+            } else {
+                field.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+            }
+        });
+        
+        if (!allValid) {
+            e.preventDefault();
+            return false;
+        }
+        
+        handleFormSubmit(e);
+    });
 }
 
 if (contactForm) {
@@ -156,9 +177,14 @@ function handleFormSubmit(e) {
     submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
     submitBtn.disabled = true;
     
-    // Let FormSubmit handle the actual submission
-    // The form will redirect to the success page automatically
-    // Don't prevent default - let the form submit naturally
+    // Let FormSubmit handle the submission - don't prevent default
+    // The form will submit naturally and redirect to success page
+    
+    // Reset button after a delay in case redirect fails
+    setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }, 10000);
 }
 
 function showModal() {
