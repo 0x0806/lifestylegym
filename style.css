@@ -2223,14 +2223,19 @@ section {
     }
     
     .trainer-image {
-        height: 250px;
+        height: 300px;
         width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--light-gray);
     }
     
     .trainer-photo {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
+        border-radius: 12px;
     }
     
     .trainer-info {
@@ -2708,7 +2713,8 @@ section {
     }
     
     .trainer-image {
-        height: 220px;
+        height: 280px;
+        background: var(--light-gray);
     }
     
     .trainer-info {
@@ -2949,7 +2955,8 @@ section {
     }
     
     .trainer-image {
-        height: 200px;
+        height: 260px;
+        background: var(--light-gray);
     }
     
     .trainer-info {
