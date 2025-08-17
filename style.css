@@ -2,10 +2,20 @@
 /* Performance Optimizations */
 html {
     scroll-behavior: smooth;
+    height: 100%;
+    overflow-x: hidden;
 }
 
 * {
     box-sizing: border-box;
+}
+
+/* Mobile scroll fixes */
+body {
+    height: 100%;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
 }
 
 /* Optimize animations for better performance */
@@ -1974,6 +1984,7 @@ section {
         left: -100%;
         width: 100vw;
         height: calc(100vh - 70px);
+        height: calc(var(--vh, 1vh) * 100 - 70px);
         background: linear-gradient(135deg, rgba(26, 26, 26, 0.98) 0%, rgba(45, 45, 45, 0.98) 100%);
         backdrop-filter: blur(30px);
         flex-direction: column;
@@ -1985,7 +1996,9 @@ section {
         gap: 0;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
         border-right: 1px solid rgba(255, 107, 53, 0.3);
+        touch-action: pan-y;
     }
     
     .nav-menu.active {
@@ -3233,16 +3246,38 @@ section {
 
 /* Improve text readability on mobile */
 @media (max-width: 768px) {
+    html {
+        height: 100%;
+        height: calc(var(--vh, 1vh) * 100);
+        overflow-x: hidden;
+    }
+    
     body {
         -webkit-text-size-adjust: 100%;
         text-size-adjust: 100%;
         font-size: 16px;
         line-height: 1.6;
+        height: 100%;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: contain;
+        touch-action: manipulation;
+    }
+    
+    /* Fix iOS scroll bounce */
+    body.no-scroll {
+        position: fixed;
+        width: 100%;
+        top: 0;
+        left: 0;
+        overflow: hidden;
+        -webkit-overflow-scrolling: auto;
     }
     
     input, textarea, select {
         font-size: 16px; /* Prevents zoom on iOS */
         max-width: 100%;
+        touch-action: manipulation;
     }
     
     p, .hero-description, .section-subtitle {
@@ -3253,6 +3288,18 @@ section {
     
     .container {
         width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+    
+    /* Improve touch targets */
+    button, a, .btn {
+        touch-action: manipulation;
+        min-height: 44px;
+    }
+    
+    /* Prevent horizontal scrolling */
+    * {
         max-width: 100%;
         overflow-x: hidden;
     }
