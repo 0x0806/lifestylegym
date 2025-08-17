@@ -201,6 +201,9 @@ const modal = document.getElementById('successModal');
 // Add loading states to forms
 if (demoForm) {
     demoForm.addEventListener('submit', (e) => {
+        // Always prevent default submission first
+        e.preventDefault();
+        
         // Check required fields first
         const requiredFields = demoForm.querySelectorAll('[required]');
         let allValid = true;
@@ -216,18 +219,18 @@ if (demoForm) {
         });
 
         if (!allValid) {
-            e.preventDefault();
             return false;
         }
 
-        // Show loading state but don't prevent form submission
+        // Show loading state
         const submitBtn = e.target.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
         submitBtn.disabled = true;
 
-        // Allow form to submit naturally to FormSubmit
-        return true;
+        // Only submit if user explicitly clicks submit - no auto-submission
+        // Form will be submitted naturally to FormSubmit when user clicks submit
+        demoForm.submit();
     });
 }
 
