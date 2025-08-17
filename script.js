@@ -1148,7 +1148,7 @@ function initializeAutoplayVideos() {
         }
     });
 
-    // Media section videos - enable autoplay with muted sound
+    // Media section videos - disable autoplay, show controls
     const mediaVideos = document.querySelectorAll('#media .gym-video');
     mediaVideos.forEach((video, index) => {
         if (!video) return;
@@ -1156,25 +1156,15 @@ function initializeAutoplayVideos() {
         video.muted = true;
         video.playsInline = true;
         video.loop = true;
-        video.autoplay = true;
-        video.preload = 'auto';
+        video.autoplay = false; // Disable autoplay
+        video.preload = 'metadata';
+        video.removeAttribute('autoplay'); // Remove autoplay attribute
 
-        const playVideo = () => {
-            video.currentTime = 0;
-            video.play().catch(e => {
-                console.log(`Media gallery video ${index + 1} autoplay prevented by browser policy`);
-            });
-        };
-
-        if (video.readyState >= 2) {
-            playVideo();
-        } else {
-            video.addEventListener('loadeddata', playVideo, { once: true });
-        }
-
+        // Ensure overlay and play button are visible
         const overlay = video.closest('.video-container')?.querySelector('.video-overlay');
         if (overlay) {
-            overlay.style.display = 'none'; // Hide play button since videos autoplay
+            overlay.style.display = 'flex'; // Show play button overlay
+            overlay.classList.remove('playing'); // Ensure overlay is visible
         }
     });
 }
