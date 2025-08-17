@@ -175,8 +175,18 @@ const counterObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             const counter = entry.target.querySelector('.stat-number');
-            const target = parseInt(counter.textContent.replace(/\D/g, ''));
-            animateCounter(counter, target, 2000);
+            const counterText = counter.textContent;
+            
+            // Skip animation for 24/7 text
+            if (counterText.includes('/')) {
+                counterObserver.unobserve(entry.target);
+                return;
+            }
+            
+            const target = parseInt(counterText.replace(/\D/g, ''));
+            if (!isNaN(target)) {
+                animateCounter(counter, target, 2000);
+            }
             counterObserver.unobserve(entry.target);
         }
     });
