@@ -1,4 +1,3 @@
-
 /* Performance Optimizations */
 html {
     scroll-behavior: smooth;
@@ -56,16 +55,16 @@ body {
     --success-color: #28a745;
     --warning-color: #ffc107;
     --danger-color: #dc3545;
-    
+
     --gradient-primary: linear-gradient(135deg, #ff6b35 0%, #f7931E 100%);
     --gradient-secondary: linear-gradient(135deg, #C5073b 0%, #ff6b35 100%);
     --gradient-dark: linear-gradient(135deg, #1A1A1A 0%, #2d2d2d 100%);
-    
+
     --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.1);
     --shadow-medium: 0 5px 25px rgba(0, 0, 0, 0.15);
     --shadow-heavy: 0 10px 40px rgba(0, 0, 0, 0.2);
     --shadow-3d: 0 20px 60px rgba(255, 107, 53, 0.3);
-    
+
     --border-radius: 12px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --font-family: 'Poppins', sans-serif;
@@ -142,18 +141,20 @@ body {
 
 
 
-/* Mobile Responsive for Workout GIFs Grid */
+/* Enhanced Mobile Responsive for Workout GIFs Grid */
 @media (max-width: 768px) {
     .workout-gifs-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 2rem;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
         max-width: 100%;
         padding: 2rem 1rem;
+        justify-items: center;
     }
-    
+
     .workout-gif-container {
-        width: 140px;
-        height: 249px; /* 9:16 aspect ratio maintained */
+        width: min(300px, 90vw);
+        height: auto;
+        aspect-ratio: 9 / 16;
         margin: 0 auto;
     }
 }
@@ -164,7 +165,7 @@ body {
         max-width: 100%;
         padding: 0 0.5rem;
     }
-    
+
     .workout-gif-container {
         width: 120px;
         height: 213px; /* 9:16 aspect ratio maintained */
@@ -177,7 +178,7 @@ body {
         gap: 0.75rem;
         max-width: 100%;
     }
-    
+
     .workout-gif-container {
         width: 100px;
         height: 178px; /* 9:16 aspect ratio maintained */
@@ -191,7 +192,7 @@ body {
         max-width: 100%;
         grid-template-columns: 1fr 1fr 1fr;
     }
-    
+
     .workout-gif-container {
         width: 90px;
         height: 160px; /* 9:16 aspect ratio maintained */
@@ -199,19 +200,19 @@ body {
     }
 }
 
-/* Typography */
+/* Enhanced Responsive Typography */
 h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     line-height: 1.2;
     margin-bottom: 1rem;
 }
 
-h1 { font-size: 3.5rem; }
-h2 { font-size: 2.5rem; }
-h3 { font-size: 2rem; }
-h4 { font-size: 1.5rem; }
-h5 { font-size: 1.25rem; }
-h6 { font-size: 1rem; }
+h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
+h2 { font-size: clamp(1.75rem, 4vw, 2.5rem); }
+h3 { font-size: clamp(1.5rem, 3vw, 2rem); }
+h4 { font-size: clamp(1.25rem, 2.5vw, 1.5rem); }
+h5 { font-size: clamp(1.1rem, 2vw, 1.25rem); }
+h6 { font-size: clamp(1rem, 1.5vw, 1rem); }
 
 p {
     margin-bottom: 1rem;
@@ -225,11 +226,13 @@ p {
     background-clip: text;
 }
 
-/* Container */
+/* Enhanced Responsive Container */
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 clamp(15px, 4vw, 40px);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Navigation */
@@ -797,11 +800,13 @@ section {
     color: var(--primary-color);
 }
 
-/* Services Section */
+/* Enhanced Responsive Services Section */
 .services-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+    gap: clamp(1.5rem, 3vw, 2rem);
+    width: 100%;
+    padding: 0;
 }
 
 .service-card {
@@ -1022,7 +1027,7 @@ section {
     color: var(--warning-color);
 }
 
-/* Media Section */
+/* Enhanced Media Section */
 .media {
     background: var(--dark-color);
     color: var(--light-color);
@@ -1030,8 +1035,10 @@ section {
 
 .media-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+    gap: clamp(1.5rem, 3vw, 2rem);
+    width: 100%;
+    justify-content: center;
 }
 
 .video-card {
@@ -1791,26 +1798,26 @@ section {
         padding: 0 20px;
         max-width: 100%;
     }
-    
+
     .hero-title {
         font-size: 3rem;
     }
-    
+
     .services-grid {
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 1.5rem;
     }
-    
+
     .trainers-grid {
         grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
         gap: 1.5rem;
     }
-    
+
     .media-grid {
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 1.5rem;
     }
-    
+
     .plans-grid {
         grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
         gap: 1.5rem;
@@ -1824,57 +1831,57 @@ section {
         text-align: center;
         padding: 2rem 0;
     }
-    
+
     .hero-title {
         font-size: 3rem;
     }
-    
+
     .hero-visual {
         height: auto;
         margin-top: 2rem;
     }
-    
+
     .workout-gifs-grid {
         max-width: 600px;
         gap: 2.5rem;
         padding: 2rem 0;
     }
-    
+
     .workout-gif-container {
         width: 150px;
         height: 267px; /* 9:16 aspect ratio */
     }
-    
+
     .floating-card {
         position: relative;
         margin: 1rem;
         display: inline-block;
     }
-    
+
     .about-content {
         grid-template-columns: 1fr;
         gap: 3rem;
     }
-    
+
     .about-text {
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     }
-    
+
     .demo-content {
         grid-template-columns: 1fr;
         gap: 3rem;
     }
-    
+
     .contact-content {
         grid-template-columns: 1fr;
         gap: 3rem;
     }
-    
+
     .footer-content {
         grid-template-columns: repeat(2, 1fr);
         gap: 2rem;
     }
-    
+
     .nav-container {
         padding: 0 30px;
     }
@@ -1884,15 +1891,17 @@ section {
     * {
         box-sizing: border-box;
     }
-    
+
     html, body {
         overflow-x: hidden;
         max-width: 100vw;
         width: 100%;
         margin: 0;
         padding: 0;
+        font-size: 16px;
+        line-height: 1.8;
     }
-    
+
     /* WhatsApp Chat Button - Mobile */
     .whatsapp-chat {
         bottom: 90px;
@@ -1901,23 +1910,23 @@ section {
         border-radius: 40px;
         font-size: 0.9rem;
     }
-    
+
     .whatsapp-chat i {
         font-size: 1.3rem;
     }
-    
+
     .chat-text {
         font-size: 0.9rem;
     }
-    
+
     .container {
-        padding: 0 15px;
+        padding: 0 25px;
         max-width: 100%;
         width: 100%;
         overflow-x: hidden;
         margin: 0 auto;
     }
-    
+
     /* Navigation - FIXED */
     .nav-container {
         padding: 0 15px;
@@ -1930,13 +1939,13 @@ section {
         justify-content: space-between;
         position: relative;
     }
-    
+
     .nav-logo {
         flex: 0 1 auto;
         min-width: 0;
         max-width: calc(100vw - 60px);
     }
-    
+
     .nav-logo .Logo-3D {
         font-size: 1rem;
         padding: 4px 8px;
@@ -1945,14 +1954,14 @@ section {
         align-items: center;
         max-width: 100%;
     }
-    
+
     .logo-image {
         height: 32px;
         width: auto;
         margin-right: 8px;
         flex-shrink: 0;
     }
-    
+
     .hamburger {
         display: flex;
         position: relative;
@@ -1964,11 +1973,11 @@ section {
         cursor: pointer;
         transition: all 0.3s ease;
     }
-    
+
     .hamburger:hover {
         background: rgba(255, 107, 53, 0.2);
     }
-    
+
     .hamburger .bar {
         width: 22px;
         height: 3px;
@@ -1977,7 +1986,7 @@ section {
         border-radius: 2px;
         transition: all 0.3s ease;
     }
-    
+
     .nav-menu {
         position: fixed;
         top: 70px;
@@ -2000,18 +2009,18 @@ section {
         border-right: 1px solid rgba(255, 107, 53, 0.3);
         touch-action: pan-y;
     }
-    
+
     .nav-menu.active {
         left: 0;
         box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
     }
-    
+
     .nav-item {
         margin: 0.5rem 0;
         width: 100%;
         max-width: 300px;
     }
-    
+
     .nav-link {
         display: block;
         padding: 1rem 1.5rem;
@@ -2023,17 +2032,17 @@ section {
         width: 100%;
         transition: all 0.3s ease;
     }
-    
+
     .nav-link::before {
         display: none;
     }
-    
+
     .nav-link:hover {
         background: rgba(255, 107, 53, 0.15);
         border-color: rgba(255, 107, 53, 0.3);
         transform: translateY(-2px);
     }
-    
+
     .nav-link.cta-btn {
         background: var(--gradient-primary);
         border: none;
@@ -2041,60 +2050,63 @@ section {
         font-weight: 700;
         color: white;
     }
-    
+
     /* Hero Section - COMPLETELY FIXED */
     .hero {
         min-height: 100vh;
-        padding: 70px 0 2rem;
+        padding: 80px 0 3rem;
         overflow: hidden;
         width: 100%;
     }
-    
+
     .hero-content {
         grid-template-columns: 1fr;
-        gap: 2rem;
-        padding: 1rem 15px;
+        gap: 3rem;
+        padding: 2rem 25px;
         max-width: 100%;
         width: 100%;
         text-align: center;
         margin: 0 auto;
     }
-    
+
     .hero-text {
         width: 100%;
         max-width: 100%;
         order: 1;
+        padding: 0 10px;
     }
-    
+
     .hero-title {
-        font-size: 2.2rem;
-        line-height: 1.2;
-        margin-bottom: 1rem;
+        font-size: 2.5rem;
+        line-height: 1.4;
+        margin-bottom: 2rem;
         word-wrap: break-word;
         overflow-wrap: break-word;
         hyphens: auto;
         text-align: center;
+        letter-spacing: -0.02em;
+        padding: 0 10px;
     }
-    
+
     .hero-subtitle {
-        font-size: 1rem;
-        margin-bottom: 1rem;
-        line-height: 1.5;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        line-height: 1.8;
         overflow-wrap: break-word;
         word-wrap: break-word;
-        padding: 0 10px;
+        padding: 0 20px;
     }
-    
+
     .hero-description {
-        font-size: 0.9rem;
-        margin-bottom: 1.5rem;
-        line-height: 1.6;
+        font-size: 1rem;
+        margin-bottom: 2.5rem;
+        line-height: 1.9;
         overflow-wrap: break-word;
         word-wrap: break-word;
-        padding: 0 10px;
+        padding: 0 20px;
         text-align: center;
     }
-    
+
     .hero-stats {
         display: flex;
         justify-content: center;
@@ -2103,26 +2115,26 @@ section {
         margin-bottom: 2rem;
         padding: 0 10px;
     }
-    
+
     .stat {
         text-align: center;
         flex: 1;
         min-width: 80px;
         max-width: 120px;
     }
-    
+
     .stat-number {
         font-size: 1.8rem;
         font-weight: 800;
         display: block;
         margin-bottom: 0.25rem;
     }
-    
+
     .stat-label {
         font-size: 0.8rem;
         color: rgba(255, 255, 255, 0.7);
     }
-    
+
     .hero-buttons {
         display: flex;
         flex-direction: column;
@@ -2131,7 +2143,7 @@ section {
         align-items: center;
         padding: 0 20px;
     }
-    
+
     .hero-buttons .btn {
         width: 100%;
         max-width: 300px;
@@ -2139,7 +2151,7 @@ section {
         font-size: 0.95rem;
         white-space: nowrap;
     }
-    
+
     /* Hero Videos - FIXED */
     .hero-visual {
         order: 2;
@@ -2148,7 +2160,7 @@ section {
         padding: 1rem 15px;
         height: auto;
     }
-    
+
     .workout-gifs-grid {
         display: grid;
         grid-template-columns: 1fr;
@@ -2158,7 +2170,7 @@ section {
         justify-items: center;
         padding: 0;
     }
-    
+
     .workout-gif-container {
         width: 100%;
         max-width: 300px;
@@ -2168,142 +2180,151 @@ section {
         box-shadow: var(--shadow-medium);
         margin: 0 auto;
     }
-    
+
     .workout-gif, .hero-video {
         width: 100%;
         height: 100%;
         object-fit: cover;
         border-radius: 12px;
     }
-    
+
     /* Sections - FIXED */
     section {
-        padding: 60px 0;
+        padding: 80px 0;
         width: 100%;
         overflow: hidden;
     }
-    
+
     .section-header {
         text-align: center;
-        margin-bottom: 3rem;
-        padding: 0 15px;
+        margin-bottom: 4rem;
+        padding: 0 25px;
         width: 100%;
     }
-    
+
     .section-title {
-        font-size: 2rem;
-        margin-bottom: 1rem;
-        line-height: 1.3;
+        font-size: 2.3rem;
+        margin-bottom: 2rem;
+        line-height: 1.5;
         word-wrap: break-word;
         overflow-wrap: break-word;
         text-align: center;
-    }
-    
-    .section-subtitle {
-        font-size: 1rem;
-        line-height: 1.5;
+        letter-spacing: -0.01em;
         padding: 0 10px;
+    }
+
+    .section-subtitle {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        padding: 0 20px;
         word-wrap: break-word;
         overflow-wrap: break-word;
         text-align: center;
         max-width: 600px;
         margin: 0 auto;
     }
-    
+
     /* About Section - FIXED */
     .about-content {
         grid-template-columns: 1fr;
-        gap: 3rem;
+        gap: 4rem;
     }
-    
+
     .about-text {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
+        gap: 2rem;
         width: 100%;
         padding: 0;
     }
-    
+
     .about-card {
-        padding: 1.5rem;
+        padding: 2.5rem 2rem;
         word-wrap: break-word;
         overflow-wrap: break-word;
         text-align: center;
         width: 100%;
         margin: 0 auto;
-        max-width: 400px;
+        max-width: 450px;
     }
-    
+
     .about-card h3 {
-        font-size: 1.3rem;
-        line-height: 1.3;
-        margin-bottom: 1rem;
+        font-size: 1.4rem;
+        line-height: 1.5;
+        margin-bottom: 1.8rem;
+        letter-spacing: -0.01em;
+        padding: 0 10px;
     }
-    
+
     .about-card p {
-        font-size: 0.9rem;
-        line-height: 1.6;
+        font-size: 1rem;
+        line-height: 1.9;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        margin-bottom: 1rem;
+        padding: 0 10px;
     }
-    
+
     .about-icon {
         width: 60px;
         height: 60px;
         font-size: 1.5rem;
         margin-bottom: 1rem;
     }
-    
+
     /* Services Section - FIXED */
     .services-grid {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
+        gap: 2rem;
         width: 100%;
         padding: 0;
     }
-    
+
     .service-card {
-        padding: 2rem 1.5rem;
+        padding: 2.5rem 2rem;
         word-wrap: break-word;
         overflow-wrap: break-word;
         width: 100%;
         text-align: center;
         margin: 0 auto;
-        max-width: 400px;
+        max-width: 450px;
     }
-    
+
     .service-card h3 {
-        font-size: 1.4rem;
-        line-height: 1.3;
-        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        line-height: 1.5;
+        margin-bottom: 2rem;
+        letter-spacing: -0.01em;
+        padding: 0 10px;
     }
-    
+
     .service-card p {
-        font-size: 0.9rem;
-        line-height: 1.6;
+        font-size: 1rem;
+        line-height: 1.9;
         word-wrap: break-word;
         overflow-wrap: break-word;
-        margin-bottom: 1.5rem;
+        margin-bottom: 2.5rem;
+        padding: 0 10px;
     }
-    
+
     .service-icon {
         width: 70px;
         height: 70px;
         font-size: 1.8rem;
         margin-bottom: 1.5rem;
     }
-    
+
     .service-features {
         text-align: left;
         margin: 1.5rem 0;
     }
-    
+
     .service-features li {
         padding: 0.75rem 0;
         font-size: 0.9rem;
         word-wrap: break-word;
         overflow-wrap: break-word;
     }
-    
+
     /* Trainers Section - FIXED */
     .trainers-grid {
         grid-template-columns: 1fr;
@@ -2311,12 +2332,12 @@ section {
         max-width: 400px;
         margin: 0 auto;
     }
-    
+
     .trainer-card {
         width: 100%;
         margin: 0 auto;
     }
-    
+
     .trainer-image {
         height: 300px;
         width: 100%;
@@ -2325,24 +2346,24 @@ section {
         justify-content: center;
         background: var(--light-gray);
     }
-    
+
     .trainer-photo {
         width: 100%;
         height: 100%;
         object-fit: contain;
         border-radius: 12px;
     }
-    
+
     .trainer-info {
         padding: 1.5rem;
         text-align: center;
     }
-    
+
     .trainer-info h3 {
         font-size: 1.3rem;
         margin-bottom: 0.5rem;
     }
-    
+
     /* Media Section - FIXED */
     .media-grid {
         grid-template-columns: 1fr;
@@ -2350,13 +2371,13 @@ section {
         width: 100%;
         padding: 0;
     }
-    
+
     .video-card {
         width: 100%;
         margin: 0 auto;
         max-width: 400px;
     }
-    
+
     .video-container {
         height: 225px;
         width: 100%;
@@ -2364,37 +2385,37 @@ section {
         overflow: hidden;
         border-radius: 12px;
     }
-    
+
     .gym-video {
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
-    
+
     .play-btn {
         width: 60px;
         height: 60px;
         font-size: 1.2rem;
     }
-    
+
     .video-info {
         padding: 1rem;
         word-wrap: break-word;
         overflow-wrap: break-word;
     }
-    
+
     .video-info h3 {
         font-size: 1.1rem;
         line-height: 1.3;
         margin-bottom: 0.5rem;
     }
-    
+
     .video-info p {
         font-size: 0.9rem;
         line-height: 1.5;
         margin-bottom: 1rem;
     }
-    
+
     /* Plans Section - FIXED */
     .plans-grid {
         grid-template-columns: 1fr;
@@ -2402,141 +2423,149 @@ section {
         max-width: 400px;
         margin: 0 auto;
     }
-    
+
     .plan-card {
         padding: 2rem 1.5rem;
         width: 100%;
         margin: 0 auto;
     }
-    
+
     .plan-card h3 {
         font-size: 1.4rem;
         margin-bottom: 1rem;
     }
-    
+
     .plan-price .amount {
         font-size: 2.5rem;
     }
-    
+
     .plan-features li {
         padding: 0.75rem 0;
         font-size: 0.9rem;
     }
-    
+
     /* Demo Section - FIXED */
     .demo-content {
         grid-template-columns: 1fr;
-        gap: 3rem;
+        gap: 4rem;
     }
-    
+
     .demo-text h2 {
-        font-size: 2rem;
-        margin-bottom: 1rem;
-        text-align: center;
-    }
-    
-    .demo-text p {
-        font-size: 1rem;
-        line-height: 1.6;
-        text-align: center;
+        font-size: 2.3rem;
         margin-bottom: 2rem;
+        text-align: center;
+        line-height: 1.4;
+        letter-spacing: -0.01em;
+        padding: 0 20px;
     }
-    
+
+    .demo-text p {
+        font-size: 1.1rem;
+        line-height: 1.9;
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 0 25px;
+    }
+
     .demo-form {
-        padding: 2rem 1.5rem;
+        padding: 3rem 2.5rem;
         width: 100%;
         margin: 0 auto;
-        max-width: 500px;
+        max-width: 550px;
     }
-    
+
     .booking-form h3 {
-        font-size: 1.5rem;
-        margin-bottom: 2rem;
+        font-size: 1.6rem;
+        margin-bottom: 2.5rem;
         text-align: center;
+        line-height: 1.3;
     }
-    
+
     .form-row {
         grid-template-columns: 1fr;
         gap: 0;
     }
-    
+
     .form-group {
-        margin-bottom: 1.5rem;
+        margin-bottom: 2rem;
         width: 100%;
     }
-    
+
     .form-group input,
     .form-group textarea,
     .form-group select {
         width: 100%;
-        padding: 1rem;
+        padding: 1.2rem;
         font-size: 1rem;
-        border-radius: 8px;
+        border-radius: 10px;
         border: 2px solid rgba(255, 255, 255, 0.2);
         background: rgba(255, 255, 255, 0.1);
         color: var(--light-color);
         box-sizing: border-box;
+        line-height: 1.5;
     }
-    
+
     .form-group label {
-        font-size: 0.9rem;
+        font-size: 1rem;
     }
-    
+
     /* Contact Section - FIXED */
     .contact-content {
         grid-template-columns: 1fr;
-        gap: 3rem;
+        gap: 4rem;
         width: 100%;
         padding: 0;
     }
-    
+
     .contact-info {
         grid-template-columns: 1fr;
-        gap: 1.5rem;
+        gap: 2rem;
         width: 100%;
     }
-    
+
     .contact-card {
-        padding: 1.5rem;
+        padding: 2rem 1.5rem;
         word-wrap: break-word;
         overflow-wrap: break-word;
         text-align: center;
         width: 100%;
         margin: 0 auto;
-        max-width: 400px;
+        max-width: 450px;
     }
-    
+
     .contact-card h3 {
-        font-size: 1.2rem;
-        margin-bottom: 1rem;
+        font-size: 1.4rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.3;
+        letter-spacing: -0.01em;
     }
-    
+
     .contact-card p {
-        font-size: 0.9rem;
-        line-height: 1.5;
+        font-size: 1rem;
+        line-height: 1.7;
         word-wrap: break-word;
         overflow-wrap: break-word;
     }
-    
+
     .contact-icon {
         width: 50px;
         height: 50px;
         font-size: 1.2rem;
         margin-bottom: 1rem;
     }
-    
+
     .contact-form-container {
         padding: 1rem;
         width: 100%;
         margin: 0 auto;
         max-width: 500px;
     }
-    
+
     .contact-form {
         padding: 2rem 1.5rem;
         width: 100%;
     }
-    
+
     .contact-form .form-group input,
     .contact-form .form-group textarea {
         width: 100%;
@@ -2544,88 +2573,96 @@ section {
         font-size: 1rem;
         box-sizing: border-box;
     }
-    
+
     /* Footer - FIXED */
     .footer {
-        padding: 4rem 0 2rem;
+        padding: 5rem 0 3rem;
         width: 100%;
     }
-    
+
     .footer-content {
         grid-template-columns: 1fr;
-        gap: 3rem;
+        gap: 4rem;
         text-align: center;
         width: 100%;
     }
-    
+
     .footer-section {
         width: 100%;
-        max-width: 400px;
+        max-width: 450px;
         margin: 0 auto;
     }
-    
+
     .footer-logo .Logo-3D {
         justify-content: center;
-        font-size: 1.2rem;
+        font-size: 1.3rem;
     }
-    
+
     .footer-logo .logo-image {
-        height: 35px;
+        height: 38px;
     }
-    
+
     .footer-logo p {
-        font-size: 0.9rem;
-        line-height: 1.6;
-        margin-bottom: 1.5rem;
+        font-size: 1rem;
+        line-height: 1.9;
+        margin-bottom: 2.5rem;
+        padding: 0 20px;
     }
-    
+
     .footer-section h3 {
-        font-size: 1.2rem;
-        margin-bottom: 1.5rem;
+        font-size: 1.4rem;
+        margin-bottom: 2.5rem;
+        line-height: 1.4;
+        padding: 0 10px;
     }
-    
+
     .footer-links li {
-        margin-bottom: 0.75rem;
+        margin-bottom: 1.2rem;
     }
-    
+
     .footer-links a {
-        font-size: 0.9rem;
+        font-size: 1rem;
+        line-height: 1.7;
+        padding: 8px 0;
+        display: block;
     }
-    
+
     .contact-item {
         justify-content: center;
         text-align: center;
-        margin-bottom: 1rem;
+        margin-bottom: 2rem;
+        padding: 0 20px;
     }
-    
+
     .contact-item span {
-        font-size: 0.9rem;
+        font-size: 1rem;
         word-wrap: break-word;
         overflow-wrap: break-word;
+        line-height: 1.8;
     }
-    
+
     .footer-bottom {
         padding-top: 2rem;
         border-top: 1px solid rgba(255, 255, 255, 0.1);
         margin-top: 2rem;
     }
-    
+
     .footer-bottom-content {
         flex-direction: column;
         gap: 1rem;
         text-align: center;
     }
-    
+
     .footer-bottom-links {
         justify-content: center;
         flex-wrap: wrap;
         gap: 1rem;
     }
-    
+
     .footer-bottom-links a {
         font-size: 0.9rem;
     }
-    
+
     /* Utility Classes */
     .back-to-top {
         bottom: 20px;
@@ -2634,24 +2671,24 @@ section {
         height: 45px;
         font-size: 1rem;
     }
-    
+
     .modal-content {
         padding: 2rem 1.5rem;
         margin: 1rem;
         width: calc(100% - 2rem);
         max-width: 400px;
     }
-    
+
     .modal-icon {
         font-size: 3rem;
         margin-bottom: 1rem;
     }
-    
+
     .modal-content h3 {
         font-size: 1.3rem;
         margin-bottom: 1rem;
     }
-    
+
     .modal-content p {
         font-size: 0.9rem;
         line-height: 1.5;
@@ -2663,7 +2700,7 @@ section {
     .container {
         padding: 0 12px;
     }
-    
+
     /* WhatsApp Chat Button - Small screens */
     .whatsapp-chat {
         bottom: 80px;
@@ -2671,638 +2708,454 @@ section {
         padding: 10px 14px;
         gap: 8px;
     }
-    
+
     .whatsapp-chat i {
         font-size: 1.2rem;
     }
-    
+
     .chat-text {
         font-size: 0.85rem;
     }
-    
+
     .nav-container {
         padding: 0 12px;
         height: 70px;
     }
-    
+
     .nav-logo .Logo-3D {
         font-size: 0.9rem;
         padding: 4px 6px;
     }
-    
+
     .logo-image {
         height: 30px;
         margin-right: 6px;
     }
-    
+
     .hamburger {
         padding: 6px;
     }
-    
+
     .hamburger .bar {
         width: 20px;
         height: 2.5px;
         margin: 3px 0;
     }
-    
+
     .nav-menu {
         top: 70px;
         height: calc(100vh - 70px);
         padding: 1.5rem 1rem;
     }
-    
+
     .nav-item {
         margin: 0.4rem 0;
         width: 100%;
         max-width: 280px;
     }
-    
+
     .nav-link {
         padding: 1rem 1.2rem;
         font-size: 0.95rem;
     }
-    
+
     .hero {
         padding: 70px 0 2rem;
     }
-    
+
     .hero-content {
         padding: 1rem 12px;
         gap: 2rem;
     }
-    
+
     .hero-title {
         font-size: 1.9rem;
         line-height: 1.2;
         margin-bottom: 1rem;
     }
-    
+
     .hero-subtitle {
         font-size: 0.95rem;
         margin-bottom: 1rem;
         padding: 0 5px;
     }
-    
+
     .hero-description {
         font-size: 0.85rem;
         margin-bottom: 1.5rem;
         padding: 0 5px;
     }
-    
+
     .hero-stats {
         gap: 1rem;
         margin-bottom: 1.5rem;
         flex-wrap: wrap;
     }
-    
+
     .stat {
         flex: 1;
         min-width: 70px;
         max-width: 100px;
     }
-    
+
     .stat-number {
         font-size: 1.6rem;
     }
-    
+
     .stat-label {
         font-size: 0.75rem;
     }
-    
+
     .hero-buttons {
         padding: 0 12px;
         gap: 1rem;
     }
-    
+
     .hero-buttons .btn {
         padding: 12px 18px;
         font-size: 0.9rem;
         max-width: 280px;
     }
-    
+
     .hero-visual {
         padding: 1rem 12px;
     }
-    
+
     .workout-gif-container {
         width: 100%;
         max-width: 280px;
         height: 180px;
     }
-    
+
     .section-title {
         font-size: 1.7rem;
         line-height: 1.3;
         padding: 0 5px;
     }
-    
-    .section-subtitle {
-        font-size: 0.9rem;
-        padding: 0 5px;
-    }
-    
-    .about-card {
-        padding: 1.5rem 1rem;
-        max-width: 350px;
-    }
-    
-    .about-icon {
-        width: 55px;
-        height: 55px;
-        font-size: 1.3rem;
-    }
-    
-    .service-card {
-        padding: 1.5rem 1rem;
-        max-width: 350px;
-    }
-    
-    .service-icon {
-        width: 65px;
-        height: 65px;
-        font-size: 1.6rem;
-    }
-    
-    .trainer-image {
-        height: 280px;
-        background: var(--light-gray);
-    }
-    
-    .trainer-info {
-        padding: 1.25rem;
-    }
-    
-    .video-container {
-        height: 200px;
-    }
-    
-    .video-card {
-        max-width: 350px;
-    }
-    
-    .plan-card {
-        padding: 1.5rem;
-        max-width: 350px;
-    }
-    
-    .plan-price .amount {
-        font-size: 2.3rem;
-    }
-    
-    .demo-text h2 {
-        font-size: 1.8rem;
-        padding: 0 5px;
-    }
-    
-    .demo-form {
-        padding: 1.5rem 1rem;
-        max-width: 450px;
-    }
-    
-    .contact-card {
-        padding: 1.25rem;
-        max-width: 350px;
-    }
-    
-    .contact-icon {
-        width: 45px;
-        height: 45px;
-        font-size: 1.1rem;
-    }
-    
-    .contact-form-container {
-        max-width: 450px;
-    }
-    
-    .contact-form {
-        padding: 1.5rem 1rem;
-    }
-    
-    .footer-section {
-        max-width: 350px;
-    }
-    
-    .footer {
-        padding: 3rem 0 1.5rem;
-    }
-    
-    .back-to-top {
-        bottom: 15px;
-        right: 15px;
-        width: 45px;
-        height: 45px;
-        font-size: 1rem;
-    }
-    
-    .modal-content {
-        padding: 1.5rem 1rem;
-        width: calc(100% - 1.5rem);
-        max-width: 350px;
-    }
-}
 
-/* Extra small screens */
-@media (max-width: 320px) {
-    .container {
-        padding: 0 10px;
-    }
-    
-    /* WhatsApp Chat Button - Extra small screens */
-    .whatsapp-chat {
-        bottom: 75px;
-        right: 12px;
-        padding: 8px 12px;
-        gap: 6px;
-        border-radius: 30px;
-    }
-    
-    .whatsapp-chat i {
-        font-size: 1.1rem;
-    }
-    
-    .chat-text {
-        font-size: 0.8rem;
-    }
-    
-    .nav-container {
-        padding: 0 10px;
-        height: 70px;
-    }
-    
-    .nav-logo .Logo-3D {
-        font-size: 0.85rem;
-        padding: 4px;
-    }
-    
-    .logo-image {
-        height: 28px;
-        margin-right: 5px;
-    }
-    
-    .hamburger {
-        padding: 5px;
-    }
-    
-    .hamburger .bar {
-        width: 18px;
-        height: 2px;
-        margin: 2.5px 0;
-    }
-    
-    .nav-menu {
-        top: 70px;
-        height: calc(100vh - 70px);
-        padding: 1rem 0.5rem;
-    }
-    
-    .nav-item {
-        width: 100%;
-        max-width: 260px;
-        margin: 0.3rem 0;
-    }
-    
-    .nav-link {
-        padding: 0.9rem 1rem;
-        font-size: 0.9rem;
-    }
-    
-    .hero {
-        padding: 70px 0 1.5rem;
-    }
-    
-    .hero-content {
-        padding: 0.5rem 10px;
-        gap: 1.5rem;
-    }
-    
-    .hero-title {
-        font-size: 1.6rem;
-        line-height: 1.2;
-        margin-bottom: 0.75rem;
-    }
-    
-    .hero-subtitle {
-        font-size: 0.85rem;
-        margin-bottom: 0.75rem;
-        padding: 0;
-    }
-    
-    .hero-description {
-        font-size: 0.8rem;
-        margin-bottom: 1rem;
-        padding: 0;
-        line-height: 1.5;
-    }
-    
-    .hero-stats {
-        flex-direction: row;
-        justify-content: space-around;
-        gap: 0.5rem;
-        margin-bottom: 1.5rem;
-        flex-wrap: wrap;
-    }
-    
-    .stat {
-        flex: 1;
-        min-width: 60px;
-        max-width: 80px;
-    }
-    
-    .stat-number {
-        font-size: 1.4rem;
-    }
-    
-    .stat-label {
-        font-size: 0.7rem;
-        line-height: 1.2;
-    }
-    
-    .hero-buttons {
-        padding: 0 10px;
-        gap: 0.75rem;
-    }
-    
-    .hero-buttons .btn {
-        padding: 10px 16px;
-        font-size: 0.85rem;
-        max-width: 260px;
-    }
-    
-    .hero-visual {
-        padding: 0.75rem 10px;
-    }
-    
-    .workout-gif-container {
-        width: 100%;
-        max-width: 250px;
-        height: 160px;
-    }
-    
-    .section-title {
-        font-size: 1.5rem;
-        line-height: 1.3;
-        padding: 0;
-    }
-    
     .section-subtitle {
-        font-size: 0.85rem;
-        padding: 0;
+        font-size: 0.9rem;
+        padding: 0 5px;
     }
-    
+
     .about-card,
     .service-card,
     .contact-card {
-        padding: 1.25rem 1rem;
-        max-width: 300px;
+        padding: 1.5rem 1rem;
+        max-width: 350px;
     }
-    
+
     .about-card h3,
     .service-card h3,
     .contact-card h3 {
         font-size: 1.1rem;
         margin-bottom: 0.75rem;
     }
-    
+
     .about-card p,
     .service-card p,
     .contact-card p {
         font-size: 0.8rem;
         line-height: 1.5;
     }
-    
+
     .about-icon,
     .service-icon,
     .contact-icon {
-        width: 50px;
-        height: 50px;
-        font-size: 1.2rem;
+        width: 55px;
+        height: 55px;
+        font-size: 1.3rem;
     }
-    
+
     .trainer-card {
-        max-width: 300px;
+        max-width: 350px;
     }
-    
+
     .trainer-image {
-        height: 260px;
+        height: 280px;
         background: var(--light-gray);
     }
-    
+
     .trainer-info {
-        padding: 1rem;
+        padding: 1.25rem;
     }
-    
-    .trainer-info h3 {
-        font-size: 1.1rem;
-    }
-    
-    .video-card {
-        max-width: 300px;
-    }
-    
+
     .video-container {
-        height: 180px;
+        height: 200px;
     }
-    
+
+    .video-card {
+        max-width: 350px;
+    }
+
     .plan-card {
-        padding: 1.25rem 1rem;
-        max-width: 300px;
+        padding: 1.5rem;
+        max-width: 350px;
     }
-    
-    .plan-card h3 {
-        font-size: 1.2rem;
-    }
-    
+
     .plan-price .amount {
-        font-size: 2rem;
+        font-size: 2.3rem;
     }
-    
+
     .demo-text h2 {
-        font-size: 1.6rem;
-        line-height: 1.3;
+        font-size: 1.8rem;
+        padding: 0 5px;
     }
-    
-    .demo-text p {
-        font-size: 0.85rem;
-        line-height: 1.5;
-    }
-    
+
     .demo-form,
     .contact-form {
-        padding: 1.25rem 1rem;
-        max-width: 400px;
+        padding: 1.5rem 1rem;
+        max-width: 450px;
     }
-    
+
     .booking-form h3,
     .contact-form h3 {
         font-size: 1.3rem;
         margin-bottom: 1.5rem;
     }
-    
+
     .form-group input,
     .form-group textarea,
     .form-group select {
-        padding: 0.9rem;
-        font-size: 0.9rem;
+        padding: 1rem;
+        font-size: 1rem;
+        box-sizing: border-box;
     }
-    
+
     .btn {
         padding: 10px 16px;
         font-size: 0.85rem;
     }
-    
+
     .footer-section {
-        max-width: 300px;
+        max-width: 350px;
     }
-    
+
     .footer-section h3 {
         font-size: 1.1rem;
     }
-    
+
     .footer-logo .Logo-3D {
         font-size: 1rem;
     }
-    
+
     .footer-logo p {
         font-size: 0.8rem;
     }
-    
+
     .footer-links a,
     .contact-item span {
         font-size: 0.8rem;
     }
-    
+
     .back-to-top {
-        bottom: 12px;
-        right: 12px;
+        bottom: 15px;
+        right: 15px;
         width: 40px;
         height: 40px;
         font-size: 0.9rem;
     }
-    
+
     .modal-content {
         padding: 1.25rem 1rem;
         width: calc(100% - 1rem);
         max-width: 300px;
     }
-    
+
     .modal-content h3 {
         font-size: 1.2rem;
     }
-    
+
     .modal-content p {
         font-size: 0.8rem;
     }
-    
+
     .modal-icon {
         font-size: 2.5rem;
     }
 }
 
-/* Responsive Utilities */
-.mobile-only {
-    display: none;
+/* Responsive Utility Classes */
+.container-fluid {
+    width: 100%;
+    max-width: 100vw;
+    padding: 0 clamp(1rem, 3vw, 2rem);
+    margin: 0 auto;
+    box-sizing: border-box;
 }
 
-.desktop-only {
-    display: block;
+.text-responsive {
+    font-size: clamp(0.875rem, 1.5vw, 1.125rem);
+    line-height: clamp(1.4, 1.6, 1.8);
+}
+
+.aspect-ratio-16-9 {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    height: auto;
+}
+
+.aspect-ratio-9-16 {
+    aspect-ratio: 9 / 16;
+    width: 100%;
+    height: auto;
+}
+
+.aspect-ratio-1-1 {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    height: auto;
+}
+
+/* Responsive visibility utilities */
+@media (max-width: 768px) {
+    .hide-mobile { display: none !important; }
+    .show-mobile { display: block !important; }
+}
+
+@media (min-width: 769px) {
+    .hide-desktop { display: none !important; }
+    .show-desktop { display: block !important; }
+    .show-mobile { display: none !important; }
+}
+
+@media (max-width: 480px) {
+    .hide-small { display: none !important; }
+    .show-small { display: block !important; }
+}
+
+/* Responsive text alignment */
+.text-center-mobile {
+    text-align: left;
 }
 
 @media (max-width: 768px) {
-    .mobile-only {
-        display: block;
-    }
-    
-    .desktop-only {
-        display: none;
-    }
-    
-    .mobile-center {
+    .text-center-mobile {
         text-align: center;
     }
-    
-    .mobile-full-width {
-        width: 100%;
-    }
 }
 
-/* Touch-friendly interactions */
-@media (hover: none) and (pointer: coarse) {
-    .service-card:hover,
-    .trainer-card:hover,
-    .plan-card:hover,
-    .about-card:hover,
-    .contact-card:hover {
-        transform: none;
-    }
-    
-    .btn:hover {
-        transform: none;
-    }
-    
-    .btn:active {
-        transform: scale(0.98);
-    }
+/* Responsive margins and padding */
+.p-responsive {
+    padding: clamp(1rem, 3vw, 2.5rem);
 }
 
-/* Improve text readability on mobile */
+.m-responsive {
+    margin: clamp(0.5rem, 2vw, 2rem);
+}
+
+.gap-responsive {
+    gap: clamp(1rem, 2vw, 2rem);
+}
+
+/* Responsive widths */
+.w-full { width: 100%; }
+.w-auto { width: auto; }
+.w-fit { width: fit-content; }
+
+.max-w-responsive {
+    max-width: min(600px, 95vw);
+    margin: 0 auto;
+}
+
+/* Responsive flex utilities */
+.flex-column-mobile {
+    display: flex;
+    flex-direction: row;
+}
+
 @media (max-width: 768px) {
-    html {
-        height: 100%;
-        height: calc(var(--vh, 1vh) * 100);
-        overflow-x: hidden;
+    .flex-column-mobile {
+        flex-direction: column;
     }
-    
-    body {
-        -webkit-text-size-adjust: 100%;
-        text-size-adjust: 100%;
-        font-size: 16px;
-        line-height: 1.6;
-        height: 100%;
-        overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior-y: contain;
-        touch-action: manipulation;
+}
+
+.flex-wrap-responsive {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+    align-items: center;
+}
+
+.flex-wrap-responsive > * {
+    flex: 1 1 auto;
+    min-width: min-content;
+}
+
+/* Image responsiveness */
+.img-responsive {
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: clamp(8px, 1vw, 12px);
+}
+
+/* Button responsiveness */
+.btn-responsive {
+    padding: clamp(0.75rem, 2vw, 1rem) clamp(1.5rem, 3vw, 2rem);
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+    border-radius: clamp(8px, 1vw, 12px);
+    width: 100%;
+    max-width: min(300px, 100%);
+    margin: 0 auto;
+}
+
+@media (min-width: 769px) {
+    .btn-responsive {
+        width: auto;
+        max-width: none;
     }
-    
-    /* Fix iOS scroll bounce */
-    body.no-scroll {
-        position: fixed;
-        width: 100%;
-        top: 0;
-        left: 0;
-        overflow: hidden;
-        -webkit-overflow-scrolling: auto;
-    }
-    
-    input, textarea, select {
-        font-size: 16px; /* Prevents zoom on iOS */
-        max-width: 100%;
-        touch-action: manipulation;
-    }
-    
-    p, .hero-description, .section-subtitle {
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        hyphens: auto;
-    }
-    
-    .container {
-        width: 100%;
-        max-width: 100%;
-        overflow-x: hidden;
-    }
-    
-    /* Improve touch targets */
-    button, a, .btn {
-        touch-action: manipulation;
-        min-height: 44px;
-    }
-    
-    /* Prevent horizontal scrolling */
-    * {
-        max-width: 100%;
-        overflow-x: hidden;
-    }
+}
+
+/* Card responsiveness */
+.card-responsive {
+    width: 100%;
+    max-width: min(400px, 95vw);
+    margin: 0 auto;
+    padding: clamp(1rem, 3vw, 2rem);
+    border-radius: clamp(8px, 1vw, 12px);
+}
+
+/* Enhanced mobile touch targets */
+.touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Scrollable horizontal containers */
+.scroll-horizontal {
+    display: flex;
+    overflow-x: auto;
+    gap: 1rem;
+    padding: 1rem 0;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+}
+
+.scroll-horizontal > * {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+}
+
+.scroll-horizontal::-webkit-scrollbar {
+    height: 4px;
+}
+
+.scroll-horizontal::-webkit-scrollbar-track {
+    background: var(--light-gray);
+    border-radius: 2px;
+}
+
+.scroll-horizontal::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 2px;
+}
+
+.scroll-horizontal::-webkit-scrollbar-thumb:hover {
+    background: our(--gradient-secondary);
 }
 
 /* Custom Scrollbar */
