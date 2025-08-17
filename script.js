@@ -742,7 +742,10 @@ function optimizePerformance() {
         document.body.style.webkitOverflowScrolling = 'touch';
         document.body.style.overflowScrolling = 'touch';
     }
-}</optimizePerformance>
+}
+
+// Call the function
+optimizePerformance();
 
 // Add mobile-specific scroll handling
 function initializeMobileScrollFix() {
@@ -767,6 +770,199 @@ function initializeMobileScrollFix() {
     window.addEventListener('resize', setVH);
     window.addEventListener('orientationchange', setVH);
 }
+
+// Responsive Breakpoint Manager
+class ResponsiveManager {
+    constructor() {
+        this.breakpoints = {
+            mobile: '(max-width: 768px)',
+            tablet: '(min-width: 769px) and (max-width: 1024px)',
+            desktop: '(min-width: 1025px)',
+            small: '(max-width: 480px)',
+            large: '(min-width: 1200px)'
+        };
+        this.mediaQueries = {};
+        this.init();
+    }
+
+    init() {
+        // Create media query objects
+        Object.keys(this.breakpoints).forEach(key => {
+            this.mediaQueries[key] = window.matchMedia(this.breakpoints[key]);
+            this.mediaQueries[key].addEventListener('change', () => this.handleBreakpointChange(key));
+        });
+
+        // Initial setup
+        this.setupResponsiveComponents();
+        this.handleInitialBreakpoint();
+    }
+
+    handleBreakpointChange(breakpoint) {
+        if (this.mediaQueries[breakpoint].matches) {
+            this.applyBreakpointStyles(breakpoint);
+        }
+    }
+
+    handleInitialBreakpoint() {
+        Object.keys(this.mediaQueries).forEach(key => {
+            if (this.mediaQueries[key].matches) {
+                this.applyBreakpointStyles(key);
+            }
+        });
+    }
+
+    applyBreakpointStyles(breakpoint) {
+        document.body.classList.remove('mobile', 'tablet', 'desktop', 'small', 'large');
+        document.body.classList.add(breakpoint);
+
+        // Apply specific responsive behaviors
+        switch(breakpoint) {
+            case 'mobile':
+                this.optimizeForMobile();
+                break;
+            case 'tablet':
+                this.optimizeForTablet();
+                break;
+            case 'desktop':
+                this.optimizeForDesktop();
+                break;
+        }
+    }
+
+    optimizeForMobile() {
+        // Mobile-specific optimizations
+        const heroStats = document.querySelector('.hero-stats');
+        if (heroStats) {
+            heroStats.style.flexDirection = 'row';
+            heroStats.style.justifyContent = 'space-around';
+        }
+
+        // Adjust video containers for mobile
+        const videoContainers = document.querySelectorAll('.workout-gif-container');
+        videoContainers.forEach(container => {
+            container.style.width = 'min(300px, 90vw)';
+            container.style.height = 'auto';
+        });
+    }
+
+    optimizeForTablet() {
+        // Tablet-specific optimizations
+        const servicesGrid = document.querySelector('.services-grid');
+        if (servicesGrid) {
+            servicesGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        }
+    }
+
+    optimizeForDesktop() {
+        // Desktop-specific optimizations
+        const workoutGrid = document.querySelector('.workout-gifs-grid');
+        if (workoutGrid) {
+            workoutGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+        }
+    }
+
+    setupResponsiveComponents() {
+        // Setup responsive navigation
+        this.setupResponsiveNavigation();
+        
+        // Setup responsive forms
+        this.setupResponsiveForms();
+        
+        // Setup responsive videos
+        this.setupResponsiveVideos();
+    }
+
+    setupResponsiveNavigation() {
+        const nav = document.querySelector('.nav-container');
+        if (nav) {
+            // Add responsive navigation behaviors
+            nav.style.padding = 'clamp(0.75rem, 2vw, 2rem)';
+        }
+    }
+
+    setupResponsiveForms() {
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            form.style.width = '100%';
+            form.style.maxWidth = 'min(500px, 95vw)';
+        });
+    }
+
+    setupResponsiveVideos() {
+        const videos = document.querySelectorAll('video');
+        videos.forEach(video => {
+            video.style.width = '100%';
+            video.style.height = 'auto';
+        });
+    }
+
+    // Utility method to check current breakpoint
+    getCurrentBreakpoint() {
+        for (const [key, query] of Object.entries(this.mediaQueries)) {
+            if (query.matches) {
+                return key;
+            }
+        }
+        return 'desktop';
+    }
+
+    // Method to apply responsive spacing
+    applyResponsiveSpacing(element, property = 'padding') {
+        if (element) {
+            element.style[property] = 'clamp(1rem, 3vw, 3rem)';
+        }
+    }
+}
+
+// Enhanced viewport height handling for mobile browsers
+function setResponsiveViewport() {
+    const setVH = () => {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+        
+        // Also set viewport width for responsive calculations
+        const vw = window.innerWidth * 0.01;
+        document.documentElement.style.setProperty('--vw', `${vw}px`);
+    };
+
+    setVH();
+    
+    // Debounced resize handler for better performance
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(setVH, 100);
+    });
+    
+    window.addEventListener('orientationchange', () => {
+        setTimeout(setVH, 500); // Delay for orientation change
+    });
+}
+
+// Touch-friendly interaction improvements
+function enhanceTouchInteractions() {
+    // Improve touch targets
+    const interactiveElements = document.querySelectorAll('button, .btn, .nav-link, .trainer-card, .service-card');
+    
+    interactiveElements.forEach(element => {
+        element.style.minHeight = '44px';
+        element.style.minWidth = '44px';
+        
+        // Add touch feedback
+        element.addEventListener('touchstart', function() {
+            this.style.transform = 'scale(0.98)';
+        }, { passive: true });
+        
+        element.addEventListener('touchend', function() {
+            this.style.transform = 'scale(1)';
+        }, { passive: true });
+    });
+}
+
+// Initialize responsive features
+const responsiveManager = new ResponsiveManager();
+setResponsiveViewport();
+enhanceTouchInteractions();
 
 // Initialize performance optimizations
 optimizePerformance();
