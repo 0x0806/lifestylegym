@@ -61,30 +61,49 @@ function initializeNavigation() {
             hamburger.classList.toggle('active');
             navMenu.classList.toggle('active');
             
-            // Prevent body scroll when menu is open
+            // Only prevent body scroll when menu is open - improved for mobile
             if (navMenu.classList.contains('active')) {
                 document.body.style.overflow = 'hidden';
+                document.body.style.position = 'fixed';
+                document.body.style.width = '100%';
             } else {
                 document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.width = '';
             }
         });
 
-        // Close menu when clicking outside
+        // Close menu when clicking outside - improved touch handling
         document.addEventListener('click', (e) => {
             if (!navMenu.contains(e.target) && !hamburger.contains(e.target)) {
                 hamburger.classList.remove('active');
                 navMenu.classList.remove('active');
                 document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.width = '';
+            }
+        });
+
+        // Better touch handling for mobile
+        document.addEventListener('touchstart', (e) => {
+            if (!navMenu.contains(e.target) && !hamburger.contains(e.target) && navMenu.classList.contains('active')) {
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+                document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.width = '';
             }
         });
     }
 
-    // Close mobile menu when clicking on a link
+    // Close mobile menu when clicking on a link - improved
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', () => {
             if (hamburger) hamburger.classList.remove('active');
             if (navMenu) navMenu.classList.remove('active');
             document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
         });
     });
 }
@@ -334,16 +353,29 @@ if (backToTopBtn) {
     });
 }
 
-// Parallax effect for hero section
-window.addEventListener('scroll', () => {
+// Optimized parallax effect for hero section - better mobile performance
+let ticking = false;
+
+function updateParallax() {
     const scrolled = window.pageYOffset;
     const parallaxElements = document.querySelectorAll('.floating-card');
 
-    parallaxElements.forEach((element, index) => {
-        const speed = 0.5 + (index * 0.1);
-        element.style.transform = `translateY(${scrolled * speed}px)`;
-    });
-});
+    // Only apply parallax on desktop to improve mobile performance
+    if (window.innerWidth > 768) {
+        parallaxElements.forEach((element, index) => {
+            const speed = 0.5 + (index * 0.1);
+            element.style.transform = `translateY(${scrolled * speed}px)`;
+        });
+    }
+    ticking = false;
+}
+
+window.addEventListener('scroll', () => {
+    if (!ticking) {
+        requestAnimationFrame(updateParallax);
+        ticking = true;
+    }
+}, { passive: true });
 
 // Typing animation for hero title
 function typeWriter(element, text, speed = 100) {
@@ -679,18 +711,21 @@ class VirtualTour {
     }
 }
 
-// Performance optimization
+// Performance optimization - improved for mobile
 function optimizePerformance() {
-    // Debounce scroll events
+    // Debounce scroll events with better mobile handling
     let scrollTimer;
-    const originalScrollHandler = window.onscroll;
+    let isScrolling = false;
 
     window.addEventListener('scroll', () => {
-        if (scrollTimer) clearTimeout(scrollTimer);
-        scrollTimer = setTimeout(() => {
-            if (originalScrollHandler) originalScrollHandler();
-        }, 16); // 60fps
-    });
+        if (!isScrolling) {
+            isScrolling = true;
+            requestAnimationFrame(() => {
+                // Handle scroll events here
+                isScrolling = false;
+            });
+        }
+    }, { passive: true });
 
     // Preload critical images
     const criticalImages = [
@@ -701,6 +736,36 @@ function optimizePerformance() {
         const img = new Image();
         img.src = src;
     });
+
+    // Improve touch scrolling on mobile
+    if ('ontouchstart' in window) {
+        document.body.style.webkitOverflowScrolling = 'touch';
+        document.body.style.overflowScrolling = 'touch';
+    }
+}</optimizePerformance>
+
+// Add mobile-specific scroll handling
+function initializeMobileScrollFix() {
+    // Prevent iOS bounce scroll interference
+    document.addEventListener('touchmove', function(e) {
+        // Only prevent default if we're not in a scrollable container
+        const target = e.target;
+        const scrollableParent = target.closest('.nav-menu, .modal, textarea, input');
+        
+        if (!scrollableParent && document.body.style.overflow === 'hidden') {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    // Fix for mobile viewport height
+    const setVH = () => {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+
+    setVH();
+    window.addEventListener('resize', setVH);
+    window.addEventListener('orientationchange', setVH);
 }
 
 // Initialize performance optimizations
@@ -1179,6 +1244,9 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
         // Check for success messages first
         checkForSuccessMessage();
+
+        // Initialize mobile scroll fixes first
+        initializeMobileScrollFix();
 
         // Initialize safe event listeners first
         initializeSafeEventListeners();
