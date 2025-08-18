@@ -754,12 +754,16 @@ let demoCaptcha, contactCaptcha;
 function refreshDemoCaptcha() {
     if(demoCaptcha) {
         demoCaptcha.refresh();
+    } else {
+        console.log('Demo CAPTCHA not initialized');
     }
 }
 
 function refreshContactCaptcha() {
     if(contactCaptcha) {
         contactCaptcha.refresh();
+    } else {
+        console.log('Contact CAPTCHA not initialized');
     }
 }
 
@@ -867,6 +871,33 @@ function showImmediateSuccess(formType) {
 
 function showErrorFeedback(formType, errorMessage) {
     const form = formType === 'demo' ? demoForm : contactForm;
+    if (!form) return;
+    
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'form-error-message';
+    errorDiv.innerHTML = `
+        <div class="error-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>${errorMessage}</span>
+        </div>
+    `;
+    
+    // Insert error message at top of form
+    form.insertBefore(errorDiv, form.firstChild);
+    
+    // Remove error message after 5 seconds
+    setTimeout(() => {
+        if (errorDiv.parentNode) {
+            errorDiv.remove();
+        }
+    }, 5000);
+    
+    // Scroll to error message
+    errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function showErrorFeedback(formType, errorMessage) {
+    const form = formType === 'demo' ? demoForm : contactForm;
     const errorDiv = document.createElement('div');
     errorDiv.className = 'form-error-message';
     errorDiv.innerHTML = `
@@ -913,7 +944,13 @@ if (demoForm) {
         });
 
         // Validate CAPTCHA
-        if (!demoCaptcha || !demoCaptcha.validate()) {
+        if (!demoCaptcha) {
+            showErrorFeedback('demo', 'CAPTCHA not loaded. Please refresh the page.');
+            allValid = false;
+            return false;
+        }
+        
+        if (!demoCaptcha.validate()) {
             allValid = false;
             const captchaContainer = document.getElementById('demoCaptchaContainer');
             if (captchaContainer) {
@@ -966,7 +1003,13 @@ if (contactForm) {
         });
 
         // Validate CAPTCHA
-        if (!contactCaptcha || !contactCaptcha.validate()) {
+        if (!contactCaptcha) {
+            showErrorFeedback('contact', 'CAPTCHA not loaded. Please refresh the page.');
+            allValid = false;
+            return false;
+        }
+        
+        if (!contactCaptcha.validate()) {
             allValid = false;
             const captchaContainer = document.getElementById('contactCaptchaContainer');
             if (captchaContainer) {
@@ -2166,9 +2209,19 @@ document.addEventListener('DOMContentLoaded', () => {
             dateInput.min = today;
         }
 
-        // Initialize Advanced CAPTCHA
-        demoCaptcha = new AdvancedCaptcha('demoCaptchaContainer', 'mixed');
-        contactCaptcha = new AdvancedCaptcha('contactCaptchaContainer', 'mixed');
+        // Initialize Advanced CAPTCHA with delay to ensure containers exist
+        setTimeout(() => {
+            const demoCaptchaContainer = document.getElementById('demoCaptchaContainer');
+            const contactCaptchaContainer = document.getElementById('contactCaptchaContainer');
+            
+            if (demoCaptchaContainer) {
+                demoCaptcha = new AdvancedCaptcha('demoCaptchaContainer', 'mixed');
+            }
+            
+            if (contactCaptchaContainer) {
+                contactCaptcha = new AdvancedCaptcha('contactCaptchaContainer', 'mixed');
+            }
+        }, 100);
 
         // Initialize autoplay videos immediately for seamless playback
         initializeAutoplayVideos();
