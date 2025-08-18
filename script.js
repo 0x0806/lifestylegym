@@ -1041,8 +1041,6 @@ function showErrorFeedback(formType, errorMessage) {
 // Add loading states to forms
 if (demoForm) {
     demoForm.addEventListener('submit', (e) => {
-        e.preventDefault(); // Always prevent default first
-        
         // Check required fields first
         const requiredFields = demoForm.querySelectorAll('[required]');
         let allValid = true;
@@ -1060,6 +1058,7 @@ if (demoForm) {
         });
 
         if (!allValid) {
+            e.preventDefault();
             showErrorFeedback('demo', 'Please fill in all required fields correctly.');
             return false;
         }
@@ -1080,17 +1079,13 @@ if (demoForm) {
             demoForm.appendChild(hiddenInput);
         }
 
-        // Submit the form naturally
-        setTimeout(() => {
-            demoForm.submit();
-        }, 500);
+        // Allow form to submit naturally
+        return true;
     });
 }
 
 if (contactForm) {
     contactForm.addEventListener('submit', (e) => {
-        e.preventDefault(); // Always prevent default first
-        
         // Check required fields first
         const requiredFields = contactForm.querySelectorAll('[required]');
         let allValid = true;
@@ -1108,6 +1103,7 @@ if (contactForm) {
         });
 
         if (!allValid) {
+            e.preventDefault();
             showErrorFeedback('contact', 'Please fill in all required fields correctly.');
             return false;
         }
@@ -1128,10 +1124,8 @@ if (contactForm) {
             contactForm.appendChild(hiddenInput);
         }
 
-        // Submit the form naturally
-        setTimeout(() => {
-            contactForm.submit();
-        }, 500);
+        // Allow form to submit naturally
+        return true;
     });
 }
 
