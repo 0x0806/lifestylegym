@@ -1,880 +1,4413 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="theme-color" content="#ff6b35">
-    <meta name="color-scheme" content="light">
-    <title>New Lifestyle Gym - 24/7 Personal Training in Sharjah, UAE</title>
-    <meta name="description" content="Transform your fitness journey at New Lifestyle Gym in Sharjah, UAE. 24/7 access, expert personal trainers, ladies-only sections. Book your demo today!">
-    <meta name="keywords" content="gym Sharjah, personal training UAE, 24 hour gym, ladies gym, fitness center Sharjah, personal trainer">
-    <meta name="author" content="New Lifestyle Gym">
-    <link rel="canonical" href="https://newlifestylegym.ae">
+/* Performance Optimizations */
+html {
+    scroll-behavior: smooth;
+    height: 100%;
+    overflow-x: hidden;
+}
 
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="New Lifestyle Gym - 24/7 Personal Training in Sharjah">
-    <meta property="og:description" content="Transform your fitness journey with expert personal training and 24/7 access">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://newlifestylegym.ae">
+* {
+    box-sizing: border-box;
+}
 
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+/* Mobile scroll fixes */
+body {
+    height: 100%;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+}
 
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <!-- Navigation -->
-    <nav class="Navbar" id="Navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <div class="Logo-3D">
-                    <img src="Screenshot 2025-07-30 091817.png" alt="New Lifestyle Gym Logo" class="logo-image">
-                    <span>New Lifestyle</span>
-                </div>
-            </div>
-            <ul class="nav-menu" id="nav-menu">
-                <li class="nav-item"><a href="#home" class="nav-link">Home</a></li>
-                <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
-                <li class="nav-item"><a href="#services" class="nav-link">Services</a></li>
-                <li class="nav-item"><a href="#trainers" class="nav-link">Trainers</a></li>
-                <li class="nav-item"><a href="#media" class="nav-link">Media</a></li>
-                <li class="nav-item"><a href="#plans" class="nav-link">Plans</a></li>
-                <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
-                <li class="nav-item"><a href="#demo" class="nav-link cta-btn">Book Demo</a></li>
-            </ul>
-            <div class="hamburger" id="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
-        </div>
-    </nav>
+/* Optimize animations for better performance */
+.hero-video,
+.gym-video {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    will-change: transform;
+}
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-background">
-            <div class="hero-overlay"></div>
-        </div>
-        <div class="hero-content">
-            <div class="hero-text">
-                <h1 class="hero-title">
-                    Transform Your <span class="gradient-text">Lifestyle</span>
-                    <br>Train Like a <span class="gradient-text">Champion</span>
-                </h1>
-                <p class="hero-subtitle">
-                    Where Fitness Fits Your Life! Train 24/7 in our premium gym with a dedicated ladies' section, or bring the workout home with our expert personal trainers. Your goals, your space, your results — anytime, anywhere.
-                </p>
-                <div class="hero-stats">
-                    <div class="stat">
-                        <div class="stat-number">24/7</div>
-                        <div class="stat-label">Open Hours</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-number">1500+</div>
-                        <div class="stat-label">Trained Customers</div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-number">15</div>
-                        <div class="stat-label">Years Experience</div>
-                    </div>
-                </div>
-                <div class="hero-buttons">
-                    <button class="btn btn-primary" onclick="scrollToSection('demo')">
-                        <i class="fas fa-calendar-alt"></i>
-                        Book Free Demo
-                    </button>
-                    <button class="btn btn-secondary" onclick="scrollToSection('services')">
-                        <i class="fas fa-play"></i>
-                        Explore Services
-                    </button>
-                </div>
-            </div>
-            <div class="hero-visual">
-                <div class="workout-gifs-grid">
-                    <div class="workout-gif-container">
-                        <video class="workout-gif hero-video" muted autoplay loop playsinline preload="auto" loading="eager">
-                            <source src="g1.mp4" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                    </div>
-                    <div class="workout-gif-container">
-                        <video class="workout-gif hero-video" muted autoplay loop playsinline preload="auto">
-                            <source src="g2.mp4" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                    </div>
-                    <div class="workout-gif-container">
-                        <video class="workout-gif hero-video" muted autoplay loop playsinline preload="auto">
-                            <source src="g3.mp4" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="scroll-indicator">
-            <div class="scroll-arrow"></div>
-        </div>
-    </section>
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
 
-    <!-- About Section -->
-    <section id="about" class="about">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">About New Lifestyle Way Gym</h2>
-                <p class="section-subtitle">"We are more than just a gym"</p>
-            </div>
-            <div class="about-content">
-                <div class="about-text">
-                    <div class="about-card">
-                        <div class="about-icon">
-                            <i class="fas fa-trophy"></i>
-                        </div>
-                        <h3>15 Years of Excellence</h3>
-                        <p>New lifestyle way is the first fitness gym in Alnahada Sharjah. We've trained more than 20 thousand customers in Alnahada over the last 15 years.</p>
-                    </div>
-                    <div class="about-card">
-                        <div class="about-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <h3>Community Focused</h3>
-                        <p>We're a community of like-minded individuals dedicated to fitness, wellness, and self-improvement. Our expert trainers provide the perfect environment to help you achieve your fitness goals.</p>
-                    </div>
-                    <div class="about-card">
-                        <div class="about-icon">
-                            <i class="fas fa-heart"></i>
-                        </div>
-                        <h3>Fitness for Everyone</h3>
-                        <p>We believe fitness is for everyone, regardless of age, fitness level, or background. Our certified trainers provide personalized guidance to help you achieve your goals.</p>
-                    </div>
-                </div>
-                <div class="about-visual">
-                    <div class="gym-stats">
-                        <div class="stat-circle">
-                            <div class="circle-progress" data-percent="95">
-                                <span class="percent">95%</span>
-                            </div>
-                            <h4>Member Satisfaction</h4>
-                        </div>
-                        <div class="stat-circle">
-                            <div class="circle-progress" data-percent="88">
-                                <span class="percent">88%</span>
-                            </div>
-                            <h4>Goal Achievement</h4>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Services Section -->
-    <section id="services" class="services">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Our Premium Services</h2>
-                <p class="section-subtitle">Comprehensive fitness solutions tailored for you</p>
-            </div>
-            <div class="services-grid">
-                <div class="service-card featured">
-                    <div class="service-badge">Popular</div>
-                    <div class="service-icon">
-                        <i class="fas fa-home"></i>
-                    </div>
-                    <h3>Personal Trainer at Home</h3>
-                    <p>Our personal trainers and fitness services available in Sharjah that will come to your home to conduct exercise sessions.</p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> Convenient home workouts</li>
-                        <li><i class="fas fa-check"></i> Customized fitness experience</li>
-                        <li><i class="fas fa-check"></i> Trainers bring equipment</li>
-                        <li><i class="fas fa-check"></i> Tailored to your goals</li>
-                    </ul>
-                    <button class="btn btn-primary" onclick="scrollToSection('contact')">Book Home Session</button>
-                </div>
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-user-tie"></i>
-                    </div>
-                    <h3>Personal Training</h3>
-                    <p>One-on-one training sessions offer a personalized fitness experience with certified trainers who design customized workout plans.</p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> Customized workout plans</li>
-                        <li><i class="fas fa-check"></i> Individual goals & needs</li>
-                        <li><i class="fas fa-check"></i> Tailored guidance</li>
-                        <li><i class="fas fa-check"></i> Progress tracking</li>
-                    </ul>
-                    <button class="btn btn-outline" onclick="scrollToSection('contact')">Learn More</button>
-                </div>
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h3>Group Classes</h3>
-                    <p>Diverse group fitness classes including Yoga, Circuit Training, Strength Training, BodyPump, and Bootcamp.</p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> Yoga - flexibility & mental clarity</li>
-                        <li><i class="fas fa-check"></i> Circuit Training - minimal rest</li>
-                        <li><i class="fas fa-check"></i> Strength Training - muscle building</li>
-                        <li><i class="fas fa-check"></i> Bootcamp - high-intensity</li>
-                    </ul>
-                    <button class="btn btn-outline" onclick="scrollToSection('contact')">Join Classes</button>
-                </div>
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-dumbbell"></i>
-                    </div>
-                    <h3>Weight Training</h3>
-                    <p>Weight training involves using weighted objects like dumbbells, barbells, or weight machines to build muscle and improve strength.</p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> Dumbbells & barbells</li>
-                        <li><i class="fas fa-check"></i> Weight machines</li>
-                        <li><i class="fas fa-check"></i> Increased muscle mass</li>
-                        <li><i class="fas fa-check"></i> Better joint function</li>
-                    </ul>
-                    <button class="btn btn-outline" onclick="scrollToSection('contact')">Start Training</button>
-                </div>
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-spa"></i>
-                    </div>
-                    <h3>Wellness Services</h3>
-                    <p>Complete wellness experience with sports massage, recovery therapy, and nutrition consultation.</p>
-                    <ul class="service-features">
-                        <li><i class="fas fa-check"></i> Sports massage</li>
-                        <li><i class="fas fa-check"></i> Recovery therapy</li>
-                        <li><i class="fas fa-check"></i> Nutrition consultation</li>
-                        <li><i class="fas fa-check"></i> Meditation sessions</li>
-                    </ul>
-                    <button class="btn btn-outline" onclick="scrollToSection('contact')">Book Session</button>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Trainers Section -->
-    <section id="trainers" class="trainers">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Meet Our Expert Trainers</h2>
-                <p class="section-subtitle">Certified professionals dedicated to your success</p>
-            </div>
-            <div class="trainers-grid">
-                <div class="trainer-card">
-                    <div class="trainer-image">
-                        <img src="p2.jpg" alt="Aromal" class="trainer-photo">
-                        <div class="trainer-overlay">
-                            <div class="social-links">
-                                <a href="https://www.instagram.com/new_life_style_way_gym" target="_blank"><i class="fab fa-instagram"></i></a>
-                                <a href="#"><i class="fab fa-facebook"></i></a>
-                                <a href="#"><i class="fab fa-linkedin"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="trainer-info">
-                        <h3>Aromal</h3>
-                        <p class="trainer-title">Weight Training Specialist</p>
-                        <div class="trainer-specialties">
-                            <span class="specialty">Weight Training</span>
-                            <span class="specialty">Strength Training</span>
-                            <span class="specialty">Circuit Training</span>
-                        </div>
-                        <div class="trainer-rating">
-                            <div class="stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <span>5.0 (120 reviews)</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="trainer-card">
-                    <div class="trainer-image">
-                        <img src="p3.jpg" alt="Sajith" class="trainer-photo">
-                        <div class="trainer-overlay">
-                            <div class="social-links">
-                                <a href="https://www.instagram.com/new_life_style_way_gym" target="_blank"><i class="fab fa-instagram"></i></a>
-                                <a href="#"><i class="fab fa-facebook"></i></a>
-                                <a href="#"><i class="fab fa-linkedin"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="trainer-info">
-                        <h3>Sajith</h3>
-                        <p class="trainer-title">Nutrition & Training Expert</p>
-                        <div class="trainer-specialties">
-                            <span class="specialty">Nutrition Consultation</span>
-                            <span class="specialty">Advanced Weight Training</span>
-                            <span class="specialty">Meditation</span>
-                        </div>
-                        <div class="trainer-rating">
-                            <div class="stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <span>4.9 (95 reviews)</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="trainer-card">
-                    <div class="trainer-image">
-                        <img src="p1.jpg" alt="Bijo Joseph" class="trainer-photo">
-                        <div class="trainer-overlay">
-                            <div class="social-links">
-                                <a href="https://www.instagram.com/new_life_style_way_gym" target="_blank"><i class="fab fa-instagram"></i></a>
-                                <a href="#"><i class="fab fa-facebook"></i></a>
-                                <a href="#"><i class="fab fa-linkedin"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="trainer-info">
-                        <h3>Bijo Joseph</h3>
-                        <p class="trainer-title">Wellness & Recovery Specialist</p>
-                        <div class="trainer-specialties">
-                            <span class="specialty">Sports Massage</span>
-                            <span class="specialty">Recovery Therapy</span>
-                            <span class="specialty">Yoga</span>
-                        </div>
-                        <div class="trainer-rating">
-                            <div class="stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <span>4.8 (88 reviews)</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="trainer-card">
-                    <div class="trainer-image">
-                        <img src="p4.jpg" alt="Prasanth" class="trainer-photo">
-                        <div class="trainer-overlay">
-                            <div class="social-links">
-                                <a href="https://www.instagram.com/new_life_style_way_gym" target="_blank"><i class="fab fa-instagram"></i></a>
-                                <a href="#"><i class="fab fa-facebook"></i></a>
-                                <a href="#"><i class="fab fa-linkedin"></i></a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="trainer-info">
-                        <h3>Prasanth</h3>
-                        <p class="trainer-title">Cardio & Weight Training Expert</p>
-                        <div class="trainer-specialties">
-                            <span class="specialty">Weight Training</span>
-                            <span class="specialty">Cardio Exercise</span>
-                        </div>
-                        <div class="trainer-rating">
-                            <div class="stars">
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                                <i class="fas fa-star"></i>
-                            </div>
-                            <span>4.7 (75 reviews)</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-    <!-- Media Section -->
-    <section id="media" class="media">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Gym Media Gallery</h2>
-                <p class="section-subtitle">Watch our gym in action - workouts, facilities, and community</p>
-            </div>
-            <div class="media-grid">
-                <div class="video-card">
-                    <div class="video-container">
-                        <video class="gym-video" muted loop playsinline preload="metadata">
-                            <source src="v1.mp4" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                        <div class="video-overlay">
-                            <button class="play-btn">
-                                <i class="fas fa-play"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="video-info">
-                        <h3>Strength Training Session</h3>
-                        <p>Professional strength training techniques with our expert trainers</p>
-                        <div class="video-meta">
-                            <span class="duration">Auto Play</span>
-                            <span class="category">Strength</span>
-                        </div>
-                    </div>
-                </div>
+:root {
+    --primary-color: #ff6b35;
+    --secondary-color: #f7931E;
+    --accent-color: #C5073b;
+    --dark-color: #1A1A1A;
+    --light-color: #ffffff;
+    --gray-color: # 6C757D;
+    --light-gray: #f8f9fa;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
 
-                <div class="video-card">
-                    <div class="video-container">
-                        <video class="gym-video" muted loop playsinline preload="metadata">
-                            <source src="g2.mp4" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                        <div class="video-overlay">
-                            <button class="play-btn">
-                                <i class="fas fa-play"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="video-info">
-                        <h3>High-Intensity Cardio</h3>
-                        <p>Fat-burning cardio workouts that will boost your endurance</p>
-                        <div class="video-meta">
-                            <span class="duration">Auto Play</span>
-                            <span class="category">Cardio</span>
-                        </div>
-                    </div>
-                </div>
+    --gradient-primary: linear-gradient(135deg, #ff6b35 0%, #f7931E 100%);
+    --gradient-secondary: linear-gradient(135deg, #C5073b 0%, #ff6b35 100%);
+    --gradient-dark: linear-gradient(135deg, #1A1A1A 0%, #2d2d2d 100%);
 
-                <div class="video-card">
-                    <div class="video-container">
-                        <video class="gym-video" muted loop playsinline preload="metadata">
-                            <source src="g3.mp4" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                        <div class="video-overlay">
-                            <button class="play-btn">
-                                <i class="fas fa-play"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="video-info">
-                        <h3>Group Fitness Classes</h3>
-                        <p>Join our energetic group classes for motivation and fun</p>
-                        <div class="video-meta">
-                            <span class="duration">Auto Play</span>
-                            <span class="category">Group</span>
-                        </div>
-                    </div>
-                </div>
+    --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 5px 25px rgba(0, 0, 0, 0.15);
+    --shadow-heavy: 0 10px 40px rgba(0, 0, 0, 0.2);
+    --shadow-3d: 0 20px 60px rgba(255, 107, 53, 0.3);
 
-                <div class="video-card">
-                    <div class="video-container">
-                        <video class="gym-video" poster="https://images.unsplash.com/photo-1518611012118-696072aa579a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=225">
-                            <source src="v2.mp4" type="video/mp4">
-                            <source src="https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                        <div class="video-overlay">
-                            <button class="play-btn">
-                                <i class="fas fa-play"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="video-info">
-                        <h3>Ladies Section Tour</h3>
-                        <p>Exclusive look at our dedicated ladies-only workout area</p>
-                        <div class="video-meta">
-                            <span class="duration">4:20</span>
-                            <span class="category">Tour</span>
-                        </div>
-                    </div>
-                </div>
+    --border-radius: 12px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --font-family: 'Poppins', sans-serif;
+}
 
-                <div class="video-card">
-                    <div class="video-container">
-                        <video class="gym-video" poster="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=225">
-                            <source src="v3.mp4" type="video/mp4">
-                            <source src="https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                        <div class="video-overlay">
-                            <button class="play-btn">
-                                <i class="fas fa-play"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="video-info">
-                        <h3>Equipment Showcase</h3>
-                        <p>State-of-the-art equipment and facilities walkthrough</p>
-                        <div class="video-meta">
-                            <span class="duration">7:10</span>
-                            <span class="category">Equipment</span>
-                        </div>
-                    </div>
-                </div>
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+}
 
-                <div class="video-card">
-                    <div class="video-container">
-                        <video class="gym-video" poster="https://images.unsplash.com/photo-1581009146145-5f2cf14b88c8?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=225">
-                            <source src="v4.mp4" type="video/mp4">
-                            <source src="https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4" type="video/mp4">
-                            Your browser does not support the video tag.
-                        </video>
-                        <div class="video-overlay">
-                            <button class="play-btn">
-                                <i class="fas fa-play"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="video-info">
-                        <h3>Member Success Stories</h3>
-                        <p>Inspiring transformation journeys from our gym members</p>
-                        <div class="video-meta">
-                            <span class="duration">9:30</span>
-                            <span class="category">Stories</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+body {
+    font-family: var(--font-family);
+    line-height: 1.6;
+    color: var(--dark-color);
+    overflow-x: hidden;
+}
 
-    <!-- Membership Plans -->
-    <section id="plans" class="plans">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Choose Your Plan</h2>
-                <p class="section-subtitle">Flexible membership options for every fitness goal</p>
-            </div>
-            <div class="plans-grid">
-                <div class="plan-card">
-                    <div class="plan-header">
-                        <h3>Basic</h3>
-                        <div class="plan-price">
-                            <span class="currency">AED</span>
-                            <span class="amount">150</span>
-                            <span class="period">/month</span>
-                        </div>
-                    </div>
-                    <ul class="plan-features">
-                        <li><i class="fas fa-check"></i> 24/7 Gym Access</li>
-                        <li><i class="fas fa-check"></i> Basic equipment</li>
-                        <li><i class="fas fa-check"></i> Locker facility</li>
-                        <li><i class="fas fa-times"></i> Personal training</li>
-                        <li><i class="fas fa-times"></i> Group classes</li>
-                    </ul>
-                    <button class="btn btn-outline" onclick="scrollToSection('demo')">Book Your Demo</button>
-                </div>
-                <div class="plan-card featured">
-                    <div class="plan-badge">Most Popular</div>
-                    <div class="plan-header">
-                        <h3>Premium Package</h3>
-                        <div class="plan-price">
-                            <span class="currency">AED</span>
-                            <span class="amount">750</span>
-                            <span class="period">/month</span>
-                        </div>
-                    </div>
-                    <ul class="plan-features">
-                        <li><i class="fas fa-check"></i> Personal trainer</li>
-                        <li><i class="fas fa-check"></i> 24/7 access</li>
-                        <li><i class="fas fa-check"></i> Locker facility</li>
-                        <li><i class="fas fa-check"></i> All equipment</li>
-                        <li><i class="fas fa-check"></i> Unlimited group classes</li>
-                        <li><i class="fas fa-check"></i> Nutrition consultation</li>
-                    </ul>
-                    <button class="btn btn-primary" onclick="scrollToSection('demo')">Book Your Demo</button>
-                </div>
-                <div class="plan-card">
-                    <div class="plan-header">
-                        <h3>VIP Package</h3>
-                        <div class="plan-price">
-                            <span class="currency">AED</span>
-                            <span class="amount">1000</span>
-                            <span class="period">/person</span>
-                        </div>
-                        <div style="font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.8;">
-                            <span class="currency">AED</span>
-                            <span class="amount">1750</span>
-                            <span class="period">/couple</span>
-                        </div>
-                    </div>
-                    <ul class="plan-features">
-                        <li><i class="fas fa-check"></i> Consultation & health checkup</li>
-                        <li><i class="fas fa-check"></i> Trainer comes to your place</li>
-                        <li><i class="fas fa-check"></i> 24/7 access</li>
-                        <li><i class="fas fa-check"></i> Personal training</li>
-                        <li><i class="fas fa-check"></i> All equipment</li>
-                        <li><i class="fas fa-check"></i> Diet plan</li>
-                        <li><i class="fas fa-check"></i> Nutrition consultation</li>
-                    </ul>
-                    <button class="btn btn-outline" onclick="scrollToSection('demo')">Book Your Demo</button>
-                </div>
-            </div>
-        </div>
-    </section>
+/* Workout GIFs Grid */
+.workout-gifs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
 
-    <!-- Demo Section -->
-    <section id="demo" class="demo">
-        <div class="container">
-            <div class="demo-content">
-                <div class="demo-text">
-                    <h2>Ready to Start Your Fitness Journey?</h2>
-                    <p>Book a free demo session and experience our world-class facilities, meet our expert trainers, and discover the perfect workout plan for you.</p>
-                    <div class="demo-benefits">
-                        <div class="benefit">
-                            <i class="fas fa-user-check"></i>
-                            <span>Complimentary fitness assessment</span>
-                        </div>
-                        <div class="benefit">
-                            <i class="fas fa-handshake"></i>
-                            <span>Meet your potential trainer</span>
-                        </div>
-                        <div class="benefit">
-                            <i class="fas fa-map-marked-alt"></i>
-                            <span>Full facility tour</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="demo-form">
-                    <form id="demoForm" class="booking-form" action="https://formsubmit.co/newlifeconnection1@gmail.com" method="POST">
-                        <h3>Book Your Free Demo</h3>
-                        <input type="hidden" name="_subject" value="New Demo Booking Request - New Lifestyle Gym">
-                        <input type="hidden" name="_captcha" value="false">
-                        <input type="hidden" name="_template" value="table">
-                        <input type="hidden" name="_next" value="https://newlifestylegym.ae/?success=demo">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <input type="text" id="firstName" name="firstName" placeholder="First Name" required>
-                                <label for="firstName">First Name</label>
-                            </div>
-                            <div class="form-group">
-                                <input type="text" id="lastName" name="lastName" placeholder="Last Name" required>
-                                <label for="lastName">Last Name</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <input type="email" id="email" name="email" placeholder="Email Address" required>
-                            <label for="email">Email Address</label>
-                        </div>
-                        <div class="form-group">
-                            <input type="tel" id="phone" name="phone" placeholder="Phone Number" required>
-                            <label for="phone">Phone Number</label>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <select id="service" name="service" required>
-                                    <option value="">Select Service</option>
-                                    <option value="personal-training">Personal Training</option>
-                                    <option value="group-classes">Group Classes</option>
-                                    <option value="ladies-section">Ladies Section</option>
-                                    <option value="general-fitness">General Fitness</option>
-                                </select>
-                                <label for="service">Preferred Service</label>
-                            </div>
-                            <div class="form-group">
-                                <select id="planChoice" name="planChoice" required>
-                                    <option value="">Choose a Plan</option>
-                                    <option value="basic">Basic Plan (AED 150/month)</option>
-                                    <option value="premium">Premium Package (AED 750/month)</option>
-                                    <option value="vip-single">VIP Package Single (AED 1000/person)</option>
-                                    <option value="vip-couple">VIP Package Couple (AED 1750/couple)</option>
-                                </select>
-                                <label for="planChoice">Membership Plan</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <input type="date" id="preferredDate" name="preferredDate" required>
-                            <label for="preferredDate">Preferred Date</label>
-                        </div>
-                        <div class="form-group">
-                            <textarea id="message" name="message" placeholder="Tell us about your fitness goals..."></textarea>
-                            <label for="message">Message (Optional)</label>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary btn-full">
-                            <i class="fas fa-calendar-check"></i>
-                            Book Free Demo
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
+.workout-gif-container {
+    position: relative;
+    width: 200px;
+    height: 356px; /* 9:16 aspect ratio */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-3d);
+    transition: var(--transition);
+    margin: 0 auto;
+}
 
-    <!-- Contact Section -->
-    <section id="contact" class="contact">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Get In Touch</h2>
-                <p class="section-subtitle">Visit us in Sharjah or reach out for any inquiries</p>
-            </div>
-            <div class="contact-content">
-                <div class="contact-info">
-                    <div class="contact-card">
-                        <div class="contact-icon">
-                            <i class="fas fa-map-marker-alt"></i>
-                        </div>
-                        <h3>Visit Our Gym</h3>
-                        <p>Al Tayer​5, 19 street​G Floor<br>Al Nahda, Al Nahdah, Sharjah, 61179<br>25.301111° 55.374061°</p>
-                    </div>
-                    <div class="contact-card">
-                        <div class="contact-icon">
-                            <i class="fas fa-phone-alt"></i>
-                        </div>
-                        <h3>Call Us</h3>
-                        <p>📞 0581790093<br>📱 WhatsApp: 0581790093<br>📞 0509737781</p>
-                    </div>
-                    <div class="contact-card">
-                        <div class="contact-icon">
-                            <i class="fas fa-envelope"></i>
-                        </div>
-                        <h3>Email Us</h3>
-                        <p>newlifeconnection1@gmail.com</p>
-                    </div>
-                    <div class="contact-card">
-                        <div class="contact-icon">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <h3>Operating Hours</h3>
-                        <p>24/7 trainers available</p>
-                    </div>
-                </div>
-                <div class="contact-form-container">
-                    <form id="contactForm" class="contact-form" action="https://formsubmit.co/newlifeconnection1@gmail.com" method="POST">
-                        <h3>Send us a Message</h3>
-                        <input type="hidden" name="_subject" value="New Contact Message - New Lifestyle Gym">
-                        <input type="hidden" name="_captcha" value="false">
-                        <input type="hidden" name="_template" value="table">
-                        <input type="hidden" name="_next" value="https://newlifestylegym.ae/?success=contact">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <input type="text" id="contactName" name="name" placeholder="Your Name" required>
-                                <label for="contactName">Your Name</label>
-                            </div>
-                            <div class="form-group">
-                                <input type="email" id="contactEmail" name="email" placeholder="Your Email" required>
-                                <label for="contactEmail">Your Email</label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" id="subject" name="subject" placeholder="Subject" required>
-                            <label for="subject">Subject</label>
-                        </div>
-                        <div class="form-group">
-                            <textarea id="contactMessage" name="message" placeholder="Your message..." required></textarea>
-                            <label for="contactMessage">Your Message</label>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary btn-full">
-                            <i class="fas fa-paper-plane"></i>
-                            Send Message
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
+.workout-gif-container:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 20px 60px rgba(255, 107, 53, 0.4);
+}
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="footer-logo">
-                        <div class="Logo-3D">
-                            <img src="Screenshot 2025-07-30 091817.png" alt="New Lifestyle Gym Logo" class="logo-image">
-                            <span>New Lifestyle</span>
-                        </div>
-                        <p>Transform your lifestyle with expert fitness guidance and premium facilities in the heart of Sharjah.</p>
-                        <div class="social-links">
-                            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-                            <a href="https://www.instagram.com/new_life_style_way_gym" target="_blank" class="social-link"><i class="fab fa-instagram"></i></a>
-                            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                            <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
-                            <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
-                        </div>
-                    </div>
-                </div>
-                <div class="footer-section">
-                    <h3>Quick Links</h3>
-                    <ul class="footer-links">
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#about">About Us</a></li>
-                        <li><a href="#services">Services</a></li>
-                        <li><a href="#trainers">Trainers</a></li>
-                        <li><a href="#media">Media</a></li>
-                        <li><a href="#plans">Membership</a></li>
-                        <li><a href="#demo">Book Demo</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h3>Services</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Personal Training</a></li>
-                        <li><a href="#">Group Classes</a></li>
-                        <li><a href="#">Ladies Section</a></li>
-                        <li><a href="#">Wellness Services</a></li>
-                        <li><a href="#">Nutrition Consultation</a></li>
-                        <li><a href="#">Recovery Therapy</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h3>Contact Info</h3>
-                    <div class="contact-info">
-                        <div class="contact-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>Al Tayer 5, 19 Street G Floor, Al Nahda, Sharjah, UAE</span>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-phone"></i>
-                            <span>0581790093 / 0509737781</span>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-envelope"></i>
-                            <span>newlifeconnection1@gmail.com</span>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-clock"></i>
-                            <span>24/7 trainers available</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <div class="footer-bottom-content">
-                    <p>© 2025 New Lifestyle Gym. All rights reserved.</p>
-                    <div class="footer-bottom-links">
-                        <a href="#">Privacy Policy</a>
-                        <a href="#">Terms of Service</a>
-                        <a href="#">Cookie Policy</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </footer>
+.workout-gif {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
 
-    <!-- WhatsApp Chat Button -->
-    <a href="https://wa.me/971581790093?text=Hi%2C%20I%27m%20interested%20in%20joining%20New%20Lifestyle%20Gym.%20Can%20you%20provide%20more%20information%3F" 
-       target="_blank" 
-       class="whatsapp-chat" 
-       id="whatsappChat">
-        <i class="fab fa-whatsapp"></i>
-        <span class="chat-text">Chat with us</span>
-    </a>
+.hero-video {
+    background: var(--dark-color);
+}
 
-    <!-- Back to Top Button -->
-    <button id="backtotop" class="back-to-top">
-        <i class="fas fa-chevron-up"></i>
-    </button>
+.workout-gif-container:hover .workout-gif {
+    filter: brightness(1.1) saturate(1.2);
+}
 
-    <!-- Success Modal -->
-    <div id="successModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-icon">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <h3>Success!</h3>
-            <p>Your message has been sent successfully. We'll get back to you soon!</p>
-            <button class="btn btn-primary" onclick="closeModal()">Close</button>
-        </div>
-    </div>
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-    <script src="script.js"></script>
-</body>
-</html>
+
+
+/* Enhanced Mobile Responsive for Workout GIFs Grid */
+@media (max-width: 768px) {
+    .workout-gifs-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        max-width: 100%;
+        padding: 2rem 1rem;
+        justify-items: center;
+    }
+
+    .workout-gif-container {
+        width: min(300px, 90vw);
+        height: auto;
+        aspect-ratio: 9 / 16;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .workout-gifs-grid {
+        gap: 1rem;
+        max-width: 100%;
+        padding: 0 0.5rem;
+    }
+
+    .workout-gif-container {
+        width: 120px;
+        height: 213px; /* 9:16 aspect ratio maintained */
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 400px) {
+    .workout-gifs-grid {
+        gap: 0.75rem;
+        max-width: 100%;
+    }
+
+    .workout-gif-container {
+        width: 100px;
+        height: 178px; /* 9:16 aspect ratio maintained */
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 320px) {
+    .workout-gifs-grid {
+        gap: 0.5rem;
+        max-width: 100%;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .workout-gif-container {
+        width: 90px;
+        height: 160px; /* 9:16 aspect ratio maintained */
+        margin: 0 auto;
+    }
+}
+
+/* Enhanced Responsive Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+}
+
+h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
+h2 { font-size: clamp(1.75rem, 4vw, 2.5rem); }
+h3 { font-size: clamp(1.5rem, 3vw, 2rem); }
+h4 { font-size: clamp(1.25rem, 2.5vw, 1.5rem); }
+h5 { font-size: clamp(1.1rem, 2vw, 1.25rem); }
+h6 { font-size: clamp(1rem, 1.5vw, 1rem); }
+
+p {
+    margin-bottom: 1rem;
+    color: var(--gray-color);
+}
+
+.gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Enhanced Responsive Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 clamp(15px, 4vw, 40px);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Navigation */
+.Navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.98) 0%, rgba(45, 45, 45, 0.98) 100%);
+    backdrop-filter: blur(25px);
+    border-bottom: 1px solid rgba(255, 107, 53, 0.3);
+    z-index: 1000;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3), 0 2px 10px rgba(255, 107, 53, 0.2);
+}
+
+.Navbar.scrolled {
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.99) 0%, rgba(45, 45, 45, 0.99) 100%);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4), 0 4px 20px rgba(255, 107, 53, 0.3);
+    border-bottom: 1px solid var(--primary-color);
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80px;
+}
+
+.nav-logo .Logo-3D {
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--light-color);
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-logo .Logo-3D:hover {
+    background: rgba(255, 107, 53, 0.1);
+    transform: translateY(-2px);
+}
+
+.Logo-3D i {
+    font-size: 2rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-right: 10px;
+    transform: rotateY(20deg);
+    transition: var(--transition);
+}
+
+.Logo-3D:hover i {
+    transform: rotateY(0deg) scale(1.1);
+}
+
+.logo-image {
+    height: 42px;
+    width: auto;
+    margin-right: 12px;
+    border-radius: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: brightness(1.1) contrast(1.05);
+    box-shadow: 0 2px 8px rgba(255, 107, 53, 0.2);
+}
+
+.Logo-3D:hover .logo-image {
+    transform: scale(1.08);
+    filter: brightness(1.3) contrast(1.1);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-item {
+    position: relative;
+}
+
+.nav-link {
+    color: var(--light-color);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 12px 16px;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    font-size: 0.95rem;
+    letter-spacing: 0.3px;
+}
+
+.nav-link::before {
+    content: '';
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--gradient-primary);
+    border-radius: 1px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(-50%);
+}
+
+.nav-link:hover {
+    color: var(--primary-color);
+    background: rgba(255, 107, 53, 0.08);
+    transform: translateY(-1px);
+}
+
+.nav-link:hover::before {
+    width: 30px;
+}
+
+.nav-link.cta-btn {
+    background: var(--gradient-primary);
+    padding: 12px 24px;
+    border-radius: 25px;
+    color: var(--light-color);
+    font-weight: 600;
+    margin-left: 1rem;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+}
+
+.nav-link.cta-btn::before {
+    display: none;
+}
+
+.nav-link.cta-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 25px rgba(255, 107, 53, 0.5);
+    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 50%, #c5073b 100%);
+    color: var(--light-color);
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hamburger:hover {
+    background: rgba(255, 107, 53, 0.1);
+}
+
+.hamburger .bar {
+    width: 25px;
+    height: 3px;
+    background: var(--light-color);
+    margin: 3px 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 2px;
+}
+
+.hamburger:hover .bar {
+    background: var(--primary-color);
+}
+
+.hamburger.active .bar:nth-child(1) {
+    transform: rotate(45deg) translate(6px, 6px);
+}
+
+.hamburger.active .bar:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active .bar:nth-child(3) {
+    transform: rotate(-45deg) translate(6px, -6px);
+}
+
+/* Hero Section */
+.hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    background: var(--gradient-dark);
+    overflow: hidden;
+}
+
+.hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="gym-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="2" fill="%23ff6b35" opacity="0.1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23gym-pattern)"/></svg>');
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(197, 7, 59, 0.1) 100%);
+}
+
+.hero-content {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 4rem 20px;
+    z-index: 2;
+}
+
+.hero-text {
+    color: var(--light-color);
+}
+
+.hero-title {
+    font-size: 4rem;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    animation: fadeInUp 1s ease-out;
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+    animation: fadeInUp 1s ease-out 0.2s both;
+}
+
+.hero-description {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.6;
+    animation: fadeInUp 1s ease-out 0.3s both;
+}
+
+.hero-stats {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    animation: fadeInUp 1s ease-out 0.4s both;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: block;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    animation: fadeInUp 1s ease-out 0.6s both;
+}
+
+.hero-visual {
+    position: relative;
+    height: 500px;
+    animation: fadeInRight 1s ease-out 0.8s both;
+    padding: 2rem 0;
+}
+
+.floating-card {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    color: var(--light-color);
+    animation: float 3s ease-in-out infinite;
+}
+
+.floating-card.card-2 {
+    top: 100px;
+    right: 50px;
+    animation-delay: -1s;
+}
+
+.floating-card.card-3 {
+    bottom: 100px;
+    left: 50px;
+    animation-delay: -2s;
+}
+
+.card-icon {
+    font-size: 2rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.progress {
+    height: 100%;
+    background: var(--gradient-primary);
+    border-radius: 3px;
+    animation: progressFill 2s ease-out;
+}
+
+.counter {
+    font-size: 1.5rem;
+    font-weight: 700;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.badge {
+    background: var(--gradient-secondary);
+    color: var(--light-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes progressFill {
+    from { width: 0; }
+    to { width: 85%; }
+}
+
+.scroll-indicator {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: bounce 2s infinite;
+}
+
+.scroll-arrow {
+    width: 20px;
+    height: 20px;
+    border-right: 2px solid var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+    transform: rotate(45deg);
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+    40% { transform: translateX(-50%) translateY(-10px); }
+    60% { transform: translateX(-50%) translateY(-5px); }
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 12px 24px;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: center;
+    justify-content: center;
+}
+
+.btn-primary {
+    background: var(--gradient-primary);
+    color: var(--light-color);
+    box-shadow: var(--shadow-light);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-3d);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--light-color);
+    border: 2px solid var(--primary-color);
+}
+
+.btn-secondary:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+}
+
+.btn-outline:hover {
+    background: var(--primary-color);
+    color: var(--light-color);
+    transform: translateY(-2px);
+}
+
+.btn-full {
+    width: 100%;
+}
+
+/* Section Styles */
+section {
+    padding: 100px 0;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.section-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+}
+
+.section-subtitle {
+    font-size: 1.2rem;
+    color: var(--gray-color);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* About Section */
+.about {
+    background: var(--light-gray);
+}
+
+.about-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.about-text {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.about-card {
+    background: var(--light-color);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    text-align: center;
+    transition: var(--transition);
+}
+
+.about-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-medium);
+}
+
+.about-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 2rem;
+    color: var(--light-color);
+}
+
+.gym-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.stat-circle {
+    text-align: center;
+}
+
+.circle-progress {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    background: conic-gradient(var(--primary-color) 0deg, var(--light-gray) 0deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.circle-progress::before {
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: var(--light-color);
+    border-radius: 50%;
+}
+
+.percent {
+    position: relative;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* Enhanced Responsive Services Section */
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+    gap: clamp(1.5rem, 3vw, 2rem);
+    width: 100%;
+    padding: 0;
+}
+
+.service-card {
+    background: var(--light-color);
+    padding: 2.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    text-align: center;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.service-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 4px;
+    background: var(--gradient-primary);
+    transition: var(--transition);
+}
+
+.service-card:hover::before {
+    left: 0;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-medium);
+}
+
+.service-card.featured {
+    background: var(--gradient-primary);
+    color: var(--light-color);
+    transform: scale(1.05);
+}
+
+.service-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--light-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.service-icon {
+    width: 100px;
+    height: 100px;
+    background: var(--gradient-secondary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2.5rem;
+    color: var(--light-color);
+}
+
+.service-card.featured .service-icon {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.service-features {
+    list-style: none;
+    margin: 1.5rem 0;
+    text-align: left;
+}
+
+.service-features li {
+    padding: 0.5rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.service-features i {
+    color: var(--success-color);
+    font-size: 0.9rem;
+}
+
+.service-card.featured .service-features i {
+    color: var(--light-color);
+}
+
+/* Trainers Section */
+.trainers {
+    background: var(--light-gray);
+}
+
+.trainers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.trainer-card {
+    background: var(--light-color);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-light);
+    transition: var(--transition);
+}
+
+.trainer-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-medium);
+}
+
+.trainer-image {
+    position: relative;
+    height: auto;
+    min-height: 250px;
+    background: var(--gradient-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.trainer-photo {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    transition: var(--transition);
+}
+
+.trainer-card:hover .trainer-photo {
+    transform: scale(1.1);
+}
+
+.trainer-avatar {
+    font-size: 4rem;
+    color: var(--light-color);
+    opacity: 0.7;
+}
+
+.trainer-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: var(--transition);
+}
+
+.trainer-card:hover .trainer-overlay {
+    opacity: 1;
+}
+
+.social-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.social-links a {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--light-color);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.social-links a:hover {
+    background: var(--secondary-color);
+    transform: scale(1.1);
+}
+
+.trainer-info {
+    padding: 1.5rem;
+}
+
+.trainer-title {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.trainer-specialties {
+    margin: 1rem 0;
+}
+
+.specialty {
+    display: inline-block;
+    background: var(--light-gray);
+    color: var(--gray-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    margin: 0.25rem 0.5rem 0.25rem 0;
+}
+
+.trainer-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.stars {
+    color: var(--warning-color);
+}
+
+/* Enhanced Media Section */
+.media {
+    background: var(--dark-color);
+    color: var(--light-color);
+}
+
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+    gap: clamp(1.5rem, 3vw, 2rem);
+    width: 100%;
+    justify-content: center;
+}
+
+.video-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: var(--transition);
+}
+
+.video-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-heavy);
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    height: 225px;
+    overflow: hidden;
+}
+
+.gym-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: var(--transition);
+}
+
+.video-overlay.playing {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.play-btn {
+    width: 70px;
+    height: 70px;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: 50%;
+    color: var(--light-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow-medium);
+}
+
+.play-btn:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-3d);
+}
+
+.video-info {
+    padding: 1.5rem;
+}
+
+.video-info h3 {
+    margin-bottom: 0.5rem;
+    color: var(--light-color);
+}
+
+.video-info p {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.video-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.duration {
+    background: var(--primary-color);
+    color: var(--light-color);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.category {
+    color: var(--secondary-color);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Video Player Controls */
+.video-controls {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 8px;
+    padding: 10px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+}
+
+.video-controls.show {
+    display: flex;
+}
+
+.control-btn {
+    background: none;
+    border: none;
+    color: var(--light-color);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    transition: var(--transition);
+}
+
+.control-btn:hover {
+    background: var(--primary-color);
+}
+
+.progress-container {
+    flex: 1;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+}
+
+.progress-filled {
+    height: 100%;
+    background: var(--primary-color);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.1s ease;
+}
+
+.time-display {
+    color: var(--light-color);
+    font-size: 0.8rem;
+    font-weight: 500;
+    min-width: 70px;
+    text-align: right;
+}
+
+.volume-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.volume-slider {
+    width: 60px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    width: 12px;
+    height: 12px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    cursor: pointer;
+    -webkit-appearance: none;
+}
+
+.fullscreen-btn {
+    background: none;
+    border: none;
+    color: var(--light-color);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 5px;
+}
+
+/* Plans Section */
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.plan-card {
+    background: var(--light-color);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: var(--shadow-light);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.plan-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-medium);
+}
+
+.plan-card.featured {
+    background: var(--gradient-primary);
+    color: var(--light-color);
+    transform: scale(1.05);
+}
+
+.plan-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--accent-color);
+    color: var(--light-color);
+    padding: 0.5rem 1rem;
+    border-bottom-left-radius: var(--border-radius);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.plan-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.plan-header h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.plan-price {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.currency {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.amount {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--primary-color);
+}
+
+.plan-card.featured .amount {
+    color: var(--light-color);
+}
+
+.period {
+    font-size: 1rem;
+    color: var(--gray-color);
+}
+
+.plan-card.featured .period {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.plan-features {
+    list-style: none;
+    margin-bottom: 2rem;
+}
+
+.plan-features li {
+    padding: 0.75rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.plan-card.featured .plan-features li {
+    border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.plan-features i {
+    font-size: 1rem;
+}
+
+.plan-features .fa-check {
+    color: var(--success-color);
+}
+
+.plan-features .fa-times {
+    color: var(--gray-color);
+}
+
+.plan-card.featured .plan-features .fa-check {
+    color: var(--light-color);
+}
+
+/* Demo Section */
+.demo {
+    background: var(--gradient-dark);
+    color: var(--light-color);
+}
+
+.demo-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.demo-text h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.demo-benefits {
+    margin-top: 2rem;
+}
+
+.benefit {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius);
+}
+
+.benefit i {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.demo-form {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+}
+
+.booking-form h3 {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+/* Form Styles */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+/* Advanced CAPTCHA Styles */
+.advanced-captcha-container {
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    margin: 1rem 0;
+}
+
+.advanced-captcha-container.captcha-success {
+    border-color: #28a745;
+    background: rgba(40, 167, 69, 0.1);
+}
+
+.advanced-captcha-container.captcha-error {
+    border-color: #dc3545;
+    background: rgba(220, 53, 69, 0.1);
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+    20%, 40%, 60%, 80% { transform: translateX(3px); }
+}
+
+.captcha-challenge {
+    width: 100%;
+}
+
+.captcha-label {
+    display: block;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Math Challenge Styles */
+.math-challenge .captcha-question-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.math-question {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-size: 1.1rem;
+    color: white;
+}
+
+.captcha-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.captcha-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.captcha-refresh {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.captcha-refresh:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: var(--primary-color);
+}
+
+.captcha-attempts {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+.captcha-success-message {
+    color: #28a745;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+.captcha-error-message {
+    color: #dc3545;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(220, 53, 69, 0.1);
+    border-radius: 4px;
+}
+
+/* Image Challenge Styles */
+.captcha-instruction {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: white;
+}
+
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.image-grid-item {
+    aspect-ratio: 1;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.image-grid-item:hover {
+    border-color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.image-grid-item.selected {
+    border-color: #28a745;
+    background: rgba(40, 167, 69, 0.2);
+}
+
+.image-grid-item.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: var(--success-color);
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.gym-icon {
+    font-size: 2rem;
+    color: white;
+}
+
+.captcha-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.captcha-verify {
+    background: var(--primary-color);
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+}
+
+.captcha-verify:hover {
+    background: #e55a2b;
+}
+
+/* Drag Challenge Styles */
+.drag-container {
+    margin: 1rem 0;
+}
+
+.drag-source {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    justify-content: center;
+}
+
+.draggable-letter {
+    width: 50px;
+    height: 50px;
+    background: var(--primary-color);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.5rem;
+    cursor: grab;
+    transition: all 0.3s ease;
+}
+
+.draggable-letter:active {
+    cursor: grabbing;
+    transform: scale(1.1);
+}
+
+.drag-target {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.drop-zone {
+    width: 60px;
+    height: 60px;
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+}
+
+.drop-zone.drag-over {
+    border-color: var(--primary-color);
+    background: rgba(255, 107, 53, 0.1);
+}
+
+.drop-zone.filled {
+    border-color: #28a745;
+    background: rgba(40, 167, 69, 0.2);
+    color: white;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* Text Challenge Styles */
+.captcha-canvas-container {
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0;
+}
+
+.captcha-canvas {
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .math-challenge .captcha-question-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .image-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.25rem;
+    }
+
+    .draggable-letter, .drop-zone {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+    }
+
+    .captcha-controls {
+        flex-direction: column;
+    }
+}
+
+.captcha-instruction {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--light-color);
+    font-weight: 500;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.captcha-instruction i {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+/* Math Challenge Styles */
+.math-challenge .captcha-question-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.math-question {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.math-question i {
+    color: var(--primary-color);
+    font-size: 1.2rem;
+}
+
+.question-text {
+    font-size: 1.2rem;
+    color: var(--light-color);
+    font-weight: 600;
+}
+
+.captcha-refresh {
+    background: var(--primary-color);
+    border: none;
+    color: white;
+    padding: 0.6rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.9rem;
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+}
+
+.captcha-refresh:hover {
+    background: var(--secondary-color);
+    transform: rotate(180deg) scale(1.05);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+}
+
+.captcha-input {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--light-color);
+    font-size: 1.1rem;
+    transition: var(--transition);
+    margin-bottom: 1rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+.captcha-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.captcha-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: normal;
+}
+
+/* Image Challenge Styles */
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.image-grid-item {
+    aspect-ratio: 1;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+    background: rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.image-grid-item:hover {
+    border-color: var(--primary-color);
+    background: rgba(255, 107, 53, 0.1);
+    transform: scale(1.05);
+}
+
+.image-grid-item.selected {
+    border-color: var(--success-color);
+    background: rgba(40, 167, 69, 0.2);
+    box-shadow: 0 0 0 2px var(--success-color);
+}
+
+.image-grid-item.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: var(--success-color);
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.gym-icon {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+    transition: var(--transition);
+}
+
+.image-grid-item:hover .gym-icon {
+    transform: scale(1.2);
+    color: var(--light-color);
+}
+
+/* Drag Challenge Styles */
+.drag-container {
+    margin-bottom: 1rem;
+}
+
+.drag-source {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.draggable-letter {
+    width: 60px;
+    height: 60px;
+    background: var(--gradient-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: grab;
+    transition: var(--transition);
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+    user-select: none;
+}
+
+.draggable-letter:hover {
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 6px 16px rgba(255, 107, 53, 0.4);
+}
+
+.draggable-letter:active {
+    cursor: grabbing;
+    transform: scale(0.95);
+}
+
+.drag-target {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.drop-zone {
+    width: 60px;
+    height: 60px;
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    transition: var(--transition);
+    text-align: center;
+    line-height: 1.2;
+}
+
+.drop-zone.drag-over {
+    border-color: var(--primary-color);
+    background: rgba(255, 107, 53, 0.1);
+    color: var(--primary-color);
+}
+
+.drop-zone.filled {
+    border-color: var(--success-color);
+    background: var(--gradient-primary);
+    color: white;
+    font-size: 1.8rem;
+    font-weight: bold;
+    border-style: solid;
+}
+
+/* Text Challenge Styles */
+.captcha-canvas-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.captcha-canvas {
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Controls and Messages */
+.captcha-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.captcha-verify {
+    background: var(--success-color);
+    border: none;
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.captcha-verify:hover {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+.captcha-attempts {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
+}
+
+.captcha-success-message {
+    color: var(--success-color);
+    text-align: center;
+    font-weight: 600;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: rgba(40, 167, 69, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.captcha-success-message i {
+    margin-right: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.captcha-error-message {
+    color: var(--danger-color);
+    text-align: center;
+    font-weight: 600;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: rgba(220, 53, 69, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    animation: fadeInOut 3s ease-in-out;
+}
+
+.captcha-error-message i {
+    margin-right: 0.5rem;
+    font-size: 1.1rem;
+}
+
+/* Form Success and Error Messages */
+.form-success-message {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    animation: slideInFromTop 0.5s ease-out;
+}
+
+.form-error-message {
+    background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    animation: slideInFromTop 0.5s ease-out, shake 0.5s ease-in-out 0.1s;
+}
+
+.success-content,
+.error-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.success-content i {
+    font-size: 1.2rem;
+    color: #d4edda;
+}
+
+.error-content i {
+    font-size: 1.2rem;
+    color: #f8d7da;
+}
+
+@keyframes slideInFromTop {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Enhanced field validation styles */
+.form-group input.field-error,
+.form-group textarea.field-error,
+.form-group select.field-error {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2) !important;
+    animation: fieldShake 0.3s ease-in-out;
+}
+
+.form-group input:valid,
+.form-group textarea:valid,
+.form-group select:valid {
+    border-color: #28a745;
+    box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.1);
+}
+
+@keyframes fieldShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+}
+
+/* Loading button styles */
+.btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn:disabled:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Success state for submit button */
+.btn-success-state {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    animation: successPulse 0.6s ease-in-out;
+}
+
+@keyframes successPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Mobile responsive adjustments for messages */
+@media (max-width: 768px) {
+    .form-success-message,
+    .form-error-message {
+        padding: 0.875rem 1rem;
+        margin-bottom: 1.5rem;
+        border-radius: 10px;
+    }
+
+    .success-content,
+    .error-content {
+        gap: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .success-content i,
+    .error-content i {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-success-message,
+    .form-error-message {
+        padding: 0.75rem 0.875rem;
+        margin-bottom: 1.25rem;
+        border-radius: 8px;
+    }
+
+    .success-content,
+    .error-content {
+        gap: 0.4rem;
+        font-size: 0.85rem;
+    }
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-10px); }
+    20%, 80% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-10px); }
+}
+
+/* Contact Form CAPTCHA Styles */
+.contact-form .advanced-captcha-container {
+    border: 2px solid var(--light-gray);
+    background: var(--light-color);
+    color: var(--dark-color);
+    padding: 1.5rem;
+}
+
+.contact-form .captcha-label {
+    color: var(--primary-color);
+}
+
+.contact-form .captcha-instruction {
+    background: var(--light-gray);
+    color: var(--dark-color);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.contact-form .captcha-instruction i {
+    color: var(--primary-color);
+}
+
+.contact-form .math-challenge .captcha-question-container,
+.contact-form .image-grid,
+.contact-form .drag-source,
+.contact-form .drag-target,
+.contact-form .captcha-canvas-container {
+    background: var(--light-gray);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.contact-form .question-text,
+.contact-form .captcha-input {
+    color: var(--dark-color);
+}
+
+.contact-form .captcha-input {
+    background: white;
+    border: 2px solid var(--light-gray);
+}
+
+.contact-form .captcha-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+
+.contact-form .captcha-attempts {
+    color: var(--gray-color);
+}
+
+.contact-form .drop-zone {
+    border-color: rgba(0, 0, 0, 0.3);
+    color: var(--gray-color);
+}
+
+.contact-form .drop-zone.drag-over {
+    border-color: var(--primary-color);
+    background: rgba(255, 107, 53, 0.1);
+}
+
+/* Responsive CAPTCHA Styles */
+@media (max-width: 768px) {
+    .advanced-captcha-container {
+        padding: 1rem;
+    }
+
+    .image-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+        padding: 0.75rem;
+    }
+
+    .image-grid-item {
+        min-height: 60px;
+    }
+
+    .gym-icon {
+        font-size: 1.2rem;
+    }
+
+    .draggable-letter,
+    .drop-zone {
+        width: 50px;
+        height: 50px;
+        font-size: 1.4rem;
+    }
+
+    .drag-source,
+    .drag-target {
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .captcha-canvas {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .captcha-controls {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .captcha-verify,
+    .captcha-refresh {
+        width: 100%;
+        max-width: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .image-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.4rem;
+        padding: 0.5rem;
+    }
+
+    .image-grid-item {
+        min-height: 50px;
+    }
+
+    .gym-icon {
+        font-size: 1rem;
+    }
+
+    .draggable-letter,
+    .drop-zone {
+        width: 45px;
+        height: 45px;
+        font-size: 1.2rem;
+    }
+
+    .drag-source,
+    .drag-target {
+        gap: 0.5rem;
+        padding: 0.5rem;
+    }
+
+    .captcha-instruction {
+        font-size: 0.9rem;
+        padding: 0.6rem;
+    }
+
+    .question-text {
+        font-size: 1rem;
+    }
+
+    .captcha-input {
+        font-size: 1rem;
+        padding: 0.8rem;
+    }
+}
+
+/* Accessibility improvements */
+.draggable-letter:focus,
+.image-grid-item:focus,
+.drop-zone:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Animation for challenge transitions */
+.captcha-challenge {
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 1.25rem 1rem 0.75rem 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--light-color);
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+}
+
+.form-group label {
+    position: absolute;
+    top: -0.5rem;
+    left: 0.75rem;
+    color: var(--primary-color);
+    font-size: 0.8rem;
+    transition: var(--transition);
+    pointer-events: none;
+    background: var(--dark-color);
+    padding: 0 0.5rem;
+    z-index: 1;
+}
+
+.form-group input:focus + label,
+.form-group input:not(:placeholder-shown) + label,
+.form-group select:focus + label,
+.form-group select:not([value=""]) + label,
+.form-group textarea:focus + label,
+.form-group textarea:not(:placeholder-shown) + label {
+    top: -0.75rem;
+    left: 1rem;
+    font-size: 0.8rem;
+    color: var(--primary-color);
+    background: var(--dark-color);
+    padding: 0 0.5rem;
+    z-index: 2;
+    transform: translateY(0);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Contact Section */
+.contact {
+    background: var(--light-gray);
+    padding: 80px 0;
+}
+
+.contact-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.contact-info {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.contact-card {
+    background: var(--light-color);
+    padding: 2rem 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    text-align: center;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 107, 53, 0.1);
+    height: fit-content;
+}
+
+.contact-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--gradient-primary);
+    transform: scaleX(0);
+    transition: var(--transition);
+}
+
+.contact-card:hover::before {
+    transform: scaleX(1);
+}
+
+.contact-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-medium);
+    border-color: rgba(255, 107, 53, 0.2);
+}
+
+.contact-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.5rem;
+    color: var(--light-color);
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+}
+
+.contact-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+    color: var(--dark-color);
+    font-weight: 600;
+}
+
+.contact-card p {
+    color: var(--gray-color);
+    line-height: 1.6;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.contact-form-container {
+    background: var(--light-color);
+    padding: 0;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    border: 1px solid rgba(255, 107, 53, 0.1);
+    height: fit-content;
+}
+
+.contact-form {
+    background: var(--light-color);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    width: 100%;
+}
+
+.contact-form h3 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: var(--dark-color);
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.contact-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.contact-form .form-group input,
+.contact-form .form-group textarea {
+    border: 2px solid var(--light-gray);
+    background: var(--light-color);
+    color: var(--dark-color);
+    padding: 1rem 1rem 0.5rem 1rem;
+    min-height: 50px;
+}
+
+.contact-form .form-group label {
+    color: var(--primary-color);
+    background: var(--light-color);
+    padding: 0 0.5rem;
+    z-index: 1;
+    top: -0.5rem;
+    left: 0.75rem;
+    font-size: 0.8rem;
+}
+
+.contact-form .form-group input:focus + label,
+.contact-form .form-group input:not(:placeholder-shown) + label,
+.contact-form .form-group textarea:focus + label,
+.contact-form .form-group textarea:not(:placeholder-shown) + label {
+    background: var(--light-color);
+    color: var(--primary-color);
+    top: -0.5rem;
+    left: 0.75rem;
+    font-size: 0.8rem;
+    padding: 0 0.5rem;
+    z-index: 1;
+}
+
+.contact-form .form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* Footer */
+.footer {
+    background: var(--gradient-dark);
+    color: var(--light-color);
+    padding: 4rem 0 2rem;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    gap: 3rem;
+    margin-bottom: 3rem;
+}
+
+.footer-section h3 {
+    margin-bottom: 1.5rem;
+    color: var(--primary-color);
+}
+
+.footer-logo .Logo-3D {
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--light-color);
+    text-decoration: none;
+    margin-bottom: 1rem;
+}
+
+.footer-logo .logo-image {
+    height: 40px;
+    width: auto;
+    margin-right: 10px;
+    border-radius: 8px;
+    transition: var(--transition);
+    filter: brightness(1.1);
+}
+
+.footer-logo p {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1.5rem;
+}
+
+.social-links {
+    display: flex;
+    gap: 1rem;
+}
+
+.social-link {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--light-color);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.social-link:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.footer-links {
+    list-style: none;
+}
+
+.footer-links li {
+    margin-bottom: 0.5rem;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.footer-links a:hover {
+    color: var(--primary-color);
+}
+
+.contact-info .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.contact-item i {
+    color: var(--primary-color);
+    width: 20px;
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 2rem;
+}
+
+.footer-bottom-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.footer-bottom-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.footer-bottom-links a {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.footer-bottom-links a:hover {
+    color: var(--primary-color);
+}
+
+/* WhatsApp Chat Button */
+.whatsapp-chat {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    background: #25D366;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 50px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 999;
+    animation: whatsappPulse 2s infinite;
+}
+
+.whatsapp-chat:hover {
+    background: #128C7E;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 30px rgba(37, 211, 102, 0.6);
+    color: white;
+    text-decoration: none;
+}
+
+.whatsapp-chat i {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.chat-text {
+    white-space: nowrap;
+    font-family: var(--font-family);
+}
+
+@keyframes whatsappPulse {
+    0%, 100% {
+        box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(37, 211, 102, 0.6), 0 0 0 10px rgba(37, 211, 102, 0.1);
+    }
+}
+
+/* Back to Top Button */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: 50%;
+    color: var(--light-color);
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+    z-index: 1000;
+}
+
+.back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.back-to-top:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-3d);
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 10000;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--light-color);
+    padding: 3rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+}
+
+.modal-icon {
+    font-size: 4rem;
+    color: var(--success-color);
+    margin-bottom: 1rem;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .container {
+        padding: 0 20px;
+        max-width: 100%;
+    }
+
+    .hero-title {
+        font-size: 3rem;
+    }
+
+    .services-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .trainers-grid {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .media-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .plans-grid {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .hero-content {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        text-align: center;
+        padding: 2rem 0;
+    }
+
+    .hero-title {
+        font-size: 3rem;
+    }
+
+    .hero-visual {
+        height: auto;
+        margin-top: 2rem;
+    }
+
+    .workout-gifs-grid {
+        max-width: 600px;
+        gap: 2.5rem;
+        padding: 2rem 0;
+    }
+
+    .workout-gif-container {
+        width: 150px;
+        height: 267px; /* 9:16 aspect ratio */
+    }
+
+    .floating-card {
+        position: relative;
+        margin: 1rem;
+        display: inline-block;
+    }
+
+    .about-content {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .about-text {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+
+    .demo-content {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .contact-content {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .footer-content {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+
+    .nav-container {
+        padding: 0 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    * {
+        box-sizing: border-box;
+    }
+
+    html, body {
+        overflow-x: hidden;
+        max-width: 100vw;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        font-size: 16px;
+        line-height: 1.8;
+    }
+
+    /* WhatsApp Chat Button - Mobile */
+    .whatsapp-chat {
+        bottom: 90px;
+        right: 20px;
+        padding: 12px 16px;
+        border-radius: 40px;
+        font-size: 0.9rem;
+    }
+
+    .whatsapp-chat i {
+        font-size: 1.3rem;
+    }
+
+    .chat-text {
+        font-size: 0.9rem;
+    }
+
+    .container {
+        padding: 0 25px;
+        max-width: 100%;
+        width: 100%;
+        overflow-x: hidden;
+        margin: 0 auto;
+    }
+
+    /* Navigation - FIXED */
+    .nav-container {
+        padding: 0 15px;
+        height: 70px;
+        width: 100%;
+        max-width: 100vw;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+    }
+
+    .nav-logo {
+        flex: 0 1 auto;
+        min-width: 0;
+        max-width: calc(100vw - 60px);
+    }
+
+    .nav-logo .Logo-3D {
+        font-size: 1rem;
+        padding: 4px 8px;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        max-width: 100%;
+    }
+
+    .logo-image {
+        height: 32px;
+        width: auto;
+        margin-right: 8px;
+        flex-shrink: 0;
+    }
+
+    .hamburger {
+        display: flex;
+        position: relative;
+        z-index: 1001;
+        padding: 8px;
+        flex-shrink: 0;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .hamburger:hover {
+        background: rgba(255, 107, 53, 0.2);
+    }
+
+    .hamburger .bar {
+        width: 22px;
+        height: 3px;
+        margin: 3px 0;
+        background: var(--light-color);
+        border-radius: 2px;
+        transition: all 0.3s ease;
+    }
+
+    .nav-menu {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        width: 100vw;
+        height: calc(100vh - 70px);
+        height: calc(var(--vh, 1vh) * 100 - 70px);
+        background: linear-gradient(135deg, rgba(26, 26, 26, 0.98) 0%, rgba(45, 45, 45, 0.98) 100%);
+        backdrop-filter: blur(30px);
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 2rem 1rem;
+        transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
+        gap: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        border-right: 1px solid rgba(255, 107, 53, 0.3);
+        touch-action: pan-y;
+    }
+
+    .nav-menu.active {
+        left: 0;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .nav-item {
+        margin: 0.5rem 0;
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .nav-link {
+        display: block;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        border-radius: 12px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .nav-link::before {
+        display: none;
+    }
+
+    .nav-link:hover {
+        background: rgba(255, 107, 53, 0.15);
+        border-color: rgba(255, 107, 53, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .nav-link.cta-btn {
+        background: var(--gradient-primary);
+        border: none;
+        margin-top: 1rem;
+        font-weight: 700;
+        color: white;
+    }
+
+    /* Hero Section - COMPLETELY FIXED */
+    .hero {
+        min-height: 100vh;
+        padding: 80px 0 3rem;
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .hero-content {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        padding: 2rem 25px;
+        max-width: 100%;
+        width: 100%;
+        text-align: center;
+        margin: 0 auto;
+    }
+
+    .hero-text {
+        width: 100%;
+        max-width: 100%;
+        order: 1;
+        padding: 0 10px;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+        line-height: 1.4;
+        margin-bottom: 2rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+        text-align: center;
+        letter-spacing: -0.02em;
+        padding: 0 10px;
+    }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        line-height: 1.8;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        padding: 0 20px;
+    }
+
+    .hero-description {
+        font-size: 1rem;
+        margin-bottom: 2.5rem;
+        line-height: 1.9;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        padding: 0 20px;
+        text-align: center;
+    }
+
+    .hero-stats {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+        padding: 0 10px;
+    }
+
+    .stat {
+        text-align: center;
+        flex: 1;
+        min-width: 80px;
+        max-width: 120px;
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+        font-weight: 800;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .hero-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+        align-items: center;
+        padding: 0 20px;
+    }
+
+    .hero-buttons .btn {
+        width: 100%;
+        max-width: 300px;
+        padding: 12px 20px;
+        font-size: 0.95rem;
+        white-space: nowrap;
+    }
+
+    /* Hero Videos - FIXED */
+    .hero-visual {
+        order: 2;
+        width: 100%;
+        max-width: 100%;
+        padding: 1rem 15px;
+        height: auto;
+    }
+
+    .workout-gifs-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        max-width: 100%;
+        width: 100%;
+        justify-items: center;
+        padding: 0;
+    }
+
+    .workout-gif-container {
+        width: 100%;
+        max-width: 300px;
+        height: 200px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: var(--shadow-medium);
+        margin: 0 auto;
+    }
+
+    .workout-gif, .hero-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 12px;
+    }
+
+    /* Sections - FIXED */
+    section {
+        padding: 80px 0;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .section-header {
+        text-align: center;
+        margin-bottom: 4rem;
+        padding: 0 25px;
+        width: 100%;
+    }
+
+    .section-title {
+        font-size: 2.3rem;
+        margin-bottom: 2rem;
+        line-height: 1.5;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        text-align: center;
+        letter-spacing: -0.01em;
+        padding: 0 10px;
+    }
+
+    .section-subtitle {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        padding: 0 20px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        text-align: center;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* About Section - FIXED */
+    .about-content {
+        grid-template-columns: 1fr;
+        gap: 4rem;
+    }
+
+    .about-text {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        width: 100%;
+        padding: 0;
+    }
+
+    .about-card {
+        padding: 2.5rem 2rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        text-align: center;
+        width: 100%;
+        margin: 0 auto;
+        max-width: 450px;
+    }
+
+    .about-card h3 {
+        font-size: 1.4rem;
+        line-height: 1.5;
+        margin-bottom: 1.8rem;
+        letter-spacing: -0.01em;
+        padding: 0 10px;
+    }
+
+    .about-card p {
+        font-size: 1rem;
+        line-height: 1.9;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        margin-bottom: 1rem;
+        padding: 0 10px;
+    }
+
+    .about-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Services Section - FIXED */
+    .services-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        width: 100%;
+        padding: 0;
+    }
+
+    .service-card {
+        padding: 2.5rem 2rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        width: 100%;
+        text-align: center;
+        margin: 0 auto;
+        max-width: 450px;
+    }
+
+    .service-card h3 {
+        font-size: 1.5rem;
+        line-height: 1.5;
+        margin-bottom: 2rem;
+        letter-spacing: -0.01em;
+        padding: 0 10px;
+    }
+
+    .service-card p {
+        font-size: 1rem;
+        line-height: 1.9;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        margin-bottom: 2.5rem;
+        padding: 0 10px;
+    }
+
+    .service-icon {
+        width: 70px;
+        height: 70px;
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .service-features {
+        text-align: left;
+        margin: 1.5rem 0;
+    }
+
+    .service-features li {
+        padding: 0.75rem 0;
+        font-size: 0.9rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* Trainers Section - FIXED */
+    .trainers-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .trainer-card {
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .trainer-image {
+        height: 300px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--light-gray);
+    }
+
+    .trainer-photo {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        border-radius: 12px;
+    }
+
+    .trainer-info {
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .trainer-info h3 {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Media Section - FIXED */
+    .media-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        width: 100%;
+        padding: 0;
+    }
+
+    .video-card {
+        width: 100%;
+        margin: 0 auto;
+        max-width: 400px;
+    }
+
+    .video-container {
+        height: 225px;
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+    }
+
+    .gym-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .play-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 1.2rem;
+    }
+
+    .video-info {
+        padding: 1rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .video-info h3 {
+        font-size: 1.1rem;
+        line-height: 1.3;
+        margin-bottom: 0.5rem;
+    }
+
+    .video-info p {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+    }
+
+    /* Plans Section - FIXED */
+    .plans-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .plan-card {
+        padding: 2rem 1.5rem;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .plan-card h3 {
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+    }
+
+    .plan-price .amount {
+        font-size: 2.5rem;
+    }
+
+    .plan-features li {
+        padding: 0.75rem 0;
+        font-size: 0.9rem;
+    }
+
+    /* Demo Section - FIXED */
+    .demo-content {
+        grid-template-columns: 1fr;
+        gap: 4rem;
+    }
+
+    .demo-text h2 {
+        font-size: 2.3rem;
+        margin-bottom: 2rem;
+        text-align: center;
+        line-height: 1.4;
+        letter-spacing: -0.01em;
+        padding: 0 20px;
+    }
+
+    .demo-text p {
+        font-size: 1.1rem;
+        line-height: 1.9;
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 0 25px;
+    }
+
+    .demo-form {
+        padding: 2rem 1rem;
+        width: 100%;
+        margin: 0 auto;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .booking-form h3 {
+        font-size: 1.6rem;
+        margin-bottom: 2.5rem;
+        text-align: center;
+        line-height: 1.3;
+    }
+
+    .form-row {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        width: 100%;
+    }
+
+    .form-row .form-group {
+        width: 100%;
+        margin-bottom: 3rem;
+    }
+
+    .form-group {
+        margin-bottom: 3rem;
+        width: 100%;
+        position: relative;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        width: 100%;
+        padding: 2rem 1rem 1rem 1rem;
+        font-size: 1rem;
+        border-radius: 10px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--light-color);
+        box-sizing: border-box;
+        line-height: 1.5;
+        min-height: 60px;
+    }
+
+    .form-group label {
+        position: absolute;
+        top: -1rem;
+        left: 1.2rem;
+        font-size: 0.85rem;
+        color: var(--primary-color);
+        background: var(--dark-color);
+        padding: 0.2rem 0.6rem;
+        z-index: 3;
+        pointer-events: none;
+        transition: all 0.3s ease;
+        border-radius: 4px;
+    }
+
+    .form-group textarea {
+        min-height: 140px;
+        padding-top: 2rem;
+        resize: vertical;
+    }
+
+    .booking-form h3 {
+        font-size: 1.5rem;
+        margin-bottom: 2.5rem;
+        text-align: center;
+        line-height: 1.3;
+        padding: 0 10px;
+    }
+
+    /* Contact Section - ENHANCED MOBILE */
+    .contact {
+        padding: 60px 0;
+    }
+
+    .contact-content {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+        width: 100%;
+        padding: 0;
+        max-width: 100%;
+    }
+
+    .contact-info {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        width: 100%;
+        margin-bottom: 0;
+    }
+
+    .contact-card {
+        padding: 1.8rem 1.5rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        text-align: center;
+        width: 100%;
+        margin: 0 auto;
+        max-width: 450px;
+        border-radius: 12px;
+    }
+
+    .contact-card h3 {
+        font-size: 1.2rem;
+        margin-bottom: 0.8rem;
+        line-height: 1.4;
+        color: var(--dark-color);
+        font-weight: 600;
+    }
+
+    .contact-card p {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        color: var(--gray-color);
+        margin: 0;
+    }
+
+    .contact-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .contact-form-container {
+        padding: 0;
+        width: 100%;
+        margin: 0 auto;
+        max-width: 450px;
+        border-radius: 12px;
+    }
+
+    .contact-form {
+        padding: 2rem 1.5rem;
+        width: 100%;
+        border-radius: 12px;
+    }
+
+    .contact-form h3 {
+        font-size: 1.3rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .contact-form .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .contact-form .form-group input,
+    .contact-form .form-group textarea {
+        width: 100%;
+        padding: 1rem 0.8rem;
+        font-size: 0.95rem;
+        box-sizing: border-box;
+        border-radius: 8px;
+        border: 2px solid var(--light-gray);
+        min-height: 48px;
+    }
+
+    .contact-form .form-group textarea {
+        min-height: 90px;
+    }
+
+    .contact-form .form-group input:focus,
+    .contact-form .form-group textarea:focus {
+        border-color: var(--primary-color);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+    }
+
+    /* Footer - FIXED */
+    .footer {
+        padding: 5rem 0 3rem;
+        width: 100%;
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 4rem;
+        text-align: center;
+        width: 100%;
+    }
+
+    .footer-section {
+        width: 100%;
+        max-width: 450px;
+        margin: 0 auto;
+    }
+
+    .footer-logo .Logo-3D {
+        justify-content: center;
+        font-size: 1.3rem;
+    }
+
+    .footer-logo .logo-image {
+        height: 38px;
+    }
+
+    .footer-logo p {
+        font-size: 1rem;
+        line-height: 1.9;
+        margin-bottom: 2.5rem;
+        padding: 0 20px;
+    }
+
+    .footer-section h3 {
+        font-size: 1.4rem;
+        margin-bottom: 2.5rem;
+        line-height: 1.4;
+        padding: 0 10px;
+    }
+
+    .footer-links li {
+        margin-bottom: 1.2rem;
+    }
+
+    .footer-links a {
+        font-size: 1rem;
+        line-height: 1.7;
+        padding: 8px 0;
+        display: block;
+    }
+
+    .contact-item {
+        justify-content: center;
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 0 20px;
+    }
+
+    .contact-item span {
+        font-size: 1rem;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        line-height: 1.8;
+    }
+
+    .footer-bottom {
+        padding-top: 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 2rem;
+    }
+
+    .footer-bottom-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .footer-bottom-links {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .footer-bottom-links a {
+        font-size: 0.9rem;
+    }
+
+    /* Utility Classes */
+    .back-to-top {
+        bottom: 20px;
+        right: 20px;
+        width: 45px;
+        height: 45px;
+        font-size: 1rem;
+    }
+
+    .modal-content {
+        padding: 2rem 1.5rem;
+        margin: 1rem;
+        width: calc(100% - 2rem);
+        max-width: 400px;
+    }
+
+    .modal-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+
+    .modal-content h3 {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+    }
+
+    .modal-content p {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 12px;
+    }
+
+    /* WhatsApp Chat Button - Small screens */
+    .whatsapp-chat {
+        bottom: 80px;
+        right: 15px;
+        padding: 10px 14px;
+        gap: 8px;
+    }
+
+    .whatsapp-chat i {
+        font-size: 1.2rem;
+    }
+
+    .chat-text {
+        font-size: 0.85rem;
+    }
+
+    .nav-container {
+        padding: 0 12px;
+        height: 70px;
+    }
+
+    .nav-logo .Logo-3D {
+        font-size: 0.9rem;
+        padding: 4px 6px;
+    }
+
+    .logo-image {
+        height: 30px;
+        margin-right: 6px;
+    }
+
+    .hamburger {
+        padding: 6px;
+    }
+
+    .hamburger .bar {
+        width: 20px;
+        height: 2.5px;
+        margin: 3px 0;
+    }
+
+    .nav-menu {
+        top: 70px;
+        height: calc(100vh - 70px);
+        padding: 1.5rem 1rem;
+    }
+
+    .nav-item {
+        margin: 0.4rem 0;
+        width: 100%;
+        max-width: 280px;
+    }
+
+    .nav-link {
+        padding: 1rem 1.2rem;
+        font-size: 0.95rem;
+    }
+
+    .hero {
+        padding: 70px 0 2rem;
+    }
+
+    .hero-content {
+        padding: 1rem 12px;
+        gap: 2rem;
+    }
+
+    .hero-title {
+        font-size: 1.9rem;
+        line-height: 1.2;
+        margin-bottom: 1rem;
+    }
+
+    .hero-subtitle {
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+        padding: 0 5px;
+    }
+
+    .hero-description {
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+        padding: 0 5px;
+    }
+
+    .hero-stats {
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .stat {
+        flex: 1;
+        min-width: 70px;
+        max-width: 100px;
+    }
+
+    .stat-number {
+        font-size: 1.6rem;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+    }
+
+    .hero-buttons {
+        padding: 0 12px;
+        gap: 1rem;
+    }
+
+    .hero-buttons .btn {
+        padding: 12px 18px;
+        font-size: 0.9rem;
+        max-width: 280px;
+    }
+
+    .hero-visual {
+        padding: 1rem 12px;
+    }
+
+    .workout-gif-container {
+        width: 100%;
+        max-width: 280px;
+        height: 180px;
+    }
+
+    .section-title {
+        font-size: 1.7rem;
+        line-height: 1.3;
+        padding: 0 5px;
+    }
+
+    .section-subtitle {
+        font-size: 0.9rem;
+        padding: 0 5px;
+    }
+
+    .about-card,
+    .service-card,
+    .contact-card {
+        padding: 1.5rem 1rem;
+        max-width: 350px;
+    }
+
+    .about-card h3,
+    .service-card h3,
+    .contact-card h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .about-card p,
+    .service-card p,
+    .contact-card p {
+        font-size: 0.8rem;
+        line-height: 1.5;
+    }
+
+    .about-icon,
+    .service-icon,
+    .contact-icon {
+        width: 55px;
+        height: 55px;
+        font-size: 1.3rem;
+    }
+
+    .trainer-card {
+        max-width: 350px;
+    }
+
+    .trainer-image {
+        height: 280px;
+        background: var(--light-gray);
+    }
+
+    .trainer-info {
+        padding: 1.25rem;
+    }
+
+    .video-container {
+        height: 200px;
+    }
+
+    .video-card {
+        max-width: 350px;
+    }
+
+    .plan-card {
+        padding: 1.5rem;
+        max-width: 350px;
+    }
+
+    .plan-price .amount {
+        font-size: 2.3rem;
+    }
+
+    .demo-text h2 {
+        font-size: 1.8rem;
+        padding: 0 5px;
+    }
+
+    .demo-form,
+    .contact-form {
+        padding: 1.5rem 1rem;
+        max-width: 450px;
+    }
+
+    .booking-form h3,
+    .contact-form h3 {
+        font-size: 1.3rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 2.5rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        padding: 1.8rem 1rem 0.8rem 1rem;
+        font-size: 1rem;
+        box-sizing: border-box;
+        min-height: 56px;
+    }
+
+    .form-group label {
+        font-size: 0.8rem;
+        top: -0.8rem;
+        left: 1rem;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+    }
+
+    /* Mobile CAPTCHA Styles */
+    .captcha-container {
+        padding: 0.875rem;
+    }
+
+    .captcha-question {
+        flex-direction: row;
+        gap: 0.5rem;
+        padding: 0.625rem;
+    }
+
+    .captcha-question span {
+        font-size: 1rem;
+        flex: 1;
+    }
+
+    .captcha-refresh {
+        min-width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+        padding: 0.4rem;
+    }
+
+    .captcha-container input[type="text"] {
+        padding: 0.625rem;
+        font-size: 0.95rem;
+    }
+
+    .captcha-label {
+        font-size: 0.85rem;
+        margin-bottom: 0.625rem;
+    }
+
+    .form-group textarea {
+        min-height: 120px;
+        padding-top: 1.8rem;
+    }
+
+    .booking-form h3 {
+        font-size: 1.4rem;
+        margin-bottom: 2rem;
+        text-align: center;
+        line-height: 1.3;
+        padding: 0 5px;
+    }
+
+    .btn {
+        padding: 10px 16px;
+        font-size: 0.85rem;
+    }
+
+    /* Contact Section - Small Screens */
+    .contact-card {
+        padding: 1.5rem 1.2rem;
+        max-width: 380px;
+    }
+
+    .contact-card h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .contact-card p {
+        font-size: 0.85rem;
+        line-height: 1.6;
+    }
+
+    .contact-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
+    }
+
+    .contact-form {
+        padding: 1.8rem 1.2rem;
+    }
+
+    .contact-form h3 {
+        font-size: 1.2rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .contact-form .form-group {
+        margin-bottom: 1.3rem;
+    }
+
+    .contact-form .form-group input,
+    .contact-form .form-group textarea {
+        padding: 0.9rem 0.7rem;
+        font-size: 0.9rem;
+        min-height: 45px;
+    }
+
+    .contact-form .form-group textarea {
+        min-height: 85px;
+    }
+
+    .footer-section {
+        max-width: 350px;
+    }
+
+    .footer-section h3 {
+        font-size: 1.1rem;
+    }
+
+    .footer-logo .Logo-3D {
+        font-size: 1rem;
+    }
+
+    .footer-logo p {
+        font-size: 0.8rem;
+    }
+
+    .footer-links a,
+    .contact-item span {
+        font-size: 0.8rem;
+    }
+
+    .back-to-top {
+        bottom: 15px;
+        right: 15px;
+        width: 40px;
+        height: 40px;
+        font-size: 0.9rem;
+    }
+
+    .modal-content {
+        padding: 1.25rem 1rem;
+        width: calc(100% - 1rem);
+        max-width: 300px;
+    }
+
+    .modal-content h3 {
+        font-size: 1.2rem;
+    }
+
+    .modal-content p {
+        font-size: 0.8rem;
+    }
+
+    .modal-icon {
+        font-size: 2.5rem;
+    }
+}
+
+/* Responsive Utility Classes */
+.container-fluid {
+    width: 100%;
+    max-width: 100vw;
+    padding: 0 clamp(1rem, 3vw, 2rem);
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.text-responsive {
+    font-size: clamp(0.875rem, 1.5vw, 1.125rem);
+    line-height: clamp(1.4, 1.6, 1.8);
+}
+
+.aspect-ratio-16-9 {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    height: auto;
+}
+
+.aspect-ratio-9-16 {
+    aspect-ratio: 9 / 16;
+    width: 100%;
+    height: auto;
+}
+
+.aspect-ratio-1-1 {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    height: auto;
+}
+
+/* Responsive visibility utilities */
+@media (max-width: 768px) {
+    .hide-mobile { display: none !important; }
+    .show-mobile { display: block !important; }
+}
+
+@media (min-width: 769px) {
+    .hide-desktop { display: none !important; }
+    .show-desktop { display: block !important; }
+    .show-mobile { display: none !important; }
+}
+
+@media (max-width: 480px) {
+    .hide-small { display: none !important; }
+    .show-small { display: block !important; }
+}
+
+/* Responsive text alignment */
+.text-center-mobile {
+    text-align: left;
+}
+
+@media (max-width: 768px) {
+    .text-center-mobile {
+        text-align: center;
+    }
+}
+
+/* Responsive margins and padding */
+.p-responsive {
+    padding: clamp(1rem, 3vw, 2.5rem);
+}
+
+.m-responsive {
+    margin: clamp(0.5rem, 2vw, 2rem);
+}
+
+.gap-responsive {
+    gap: clamp(1rem, 2vw, 2rem);
+}
+
+/* Responsive widths */
+.w-full { width: 100%; }
+.w-auto { width: auto; }
+.w-fit { width: fit-content; }
+
+.max-w-responsive {
+    max-width: min(600px, 95vw);
+    margin: 0 auto;
+}
+
+/* Responsive flex utilities */
+.flex-column-mobile {
+    display: flex;
+    flex-direction: row;
+}
+
+@media (max-width: 768px) {
+    .flex-column-mobile {
+        flex-direction: column;
+    }
+}
+
+.flex-wrap-responsive {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(0.75rem, 2vw, 1.5rem);
+    align-items: center;
+}
+
+.flex-wrap-responsive > * {
+    flex: 1 1 auto;
+    min-width: min-content;
+}
+
+/* Image responsiveness */
+.img-responsive {
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: clamp(8px, 1vw, 12px);
+}
+
+/* Button responsiveness */
+.btn-responsive {
+    padding: clamp(0.75rem, 2vw, 1rem) clamp(1.5rem, 3vw, 2rem);
+    font-size: clamp(0.875rem, 1.5vw, 1rem);
+    border-radius: clamp(8px, 1vw, 12px);
+    width: 100%;
+    max-width: min(300px, 100%);
+    margin: 0 auto;
+}
+
+@media (min-width: 769px) {
+    .btn-responsive {
+        width: auto;
+        max-width: none;
+    }
+}
+
+/* Card responsiveness */
+.card-responsive {
+    width: 100%;
+    max-width: min(400px, 95vw);
+    margin: 0 auto;
+    padding: clamp(1rem, 3vw, 2rem);
+    border-radius: clamp(8px, 1vw, 12px);
+}
+
+/* Enhanced mobile touch targets */
+.touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Scrollable horizontal containers */
+.scroll-horizontal {
+    display: flex;
+    overflow-x: auto;
+    gap: 1rem;
+    padding: 1rem 0;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+}
+
+.scroll-horizontal > * {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+}
+
+.scroll-horizontal::-webkit-scrollbar {
+    height: 4px;
+}
+
+.scroll-horizontal::-webkit-scrollbar-track {
+    background: var(--light-gray);
+    border-radius: 2px;
+}
+
+.scroll-horizontal::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 2px;
+}
+
+.scroll-horizontal::-webkit-scrollbar-thumb:hover {
+    background: our(--gradient-secondary);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--light-gray);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--gradient-primary);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: our(--gradient-secondary);
+}
+
+/* Mobile scrollbar */
+@media (max-width: 768px) {
+    ::-webkit-scrollbar {
+        width: 4px;
+    }
+}
+
+/* Selection */
+::selection {
+    background: our(--primary-color);
+    color: our(--light-color);
+}
+
+/* Focus styles for accessibility */
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid our(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
