@@ -684,6 +684,11 @@ class AdvancedCaptcha {
             return false;
         }
 
+        // If already verified, return true
+        if (this.isVerified) {
+            return true;
+        }
+
         switch(this.currentChallenge.type) {
             case 'math':
                 const mathInput = this.container.querySelector('.captcha-input');
@@ -937,60 +942,14 @@ const demoForm = document.getElementById('demoForm');
 const contactForm = document.getElementById('contactForm');
 const modal = document.getElementById('successModal');
 
-// Enhanced form submission with immediate feedback
-function submitFormWithFeedback(form, formType) {
-    return new Promise((resolve, reject) => {
-        const formData = new FormData(form);
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-
-        // Show loading state
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-        submitBtn.disabled = true;
-
-        // Add timestamp and form type
-        formData.append('_timestamp', new Date().toISOString());
-        formData.append('_form_type', formType);
-        formData.append('_source', 'New Lifestyle Gym Website');
-
-        // Submit via fetch for better control
-        fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                // Show immediate success feedback
-                showImmediateSuccess(formType);
-                // Reset form
-                form.reset();
-                // Reset CAPTCHA
-                if (formType === 'demo' && demoCaptcha) {
-                    demoCaptcha.refresh();
-                } else if (formType === 'contact' && contactCaptcha) {
-                    contactCaptcha.refresh();
-                }
-                resolve('Success');
-            } else {
-                throw new Error('Network response was not ok');
-            }
-        })
-        .catch(error => {
-            console.error('Form submission error:', error);
-            showErrorFeedback(formType, 'There was an error sending your message. Please try again.');
-            reject(error);
-        })
-        .finally(() => {
-            // Restore button state after delay
-            setTimeout(() => {
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            }, 2000);
-        });
-    });
+// Simple form feedback functions for FormSubmit
+function showImmediateSuccess(formType) {
+    const title = formType === 'demo' ? 'Demo Booking Successful!' : 'Message Sent Successfully!';
+    const message = formType === 'demo' 
+        ? 'Your demo session has been booked successfully. We will contact you soon to confirm the details.'
+        : 'Your message has been sent successfully. We will get back to you soon!';
+    
+    showSuccessMessage(title, message);
 }
 
 function showImmediateSuccess(formType) {
@@ -1080,9 +1039,8 @@ function showErrorFeedback(formType, errorMessage) {
 
 // Add loading states to forms
 if (demoForm) {
-    demoForm.addEventListener('submit', async (e) => {
-        // Always prevent default submission first
-        e.preventDefault();
+    demoForm.addEventListener('submit', (e) => {
+        e.preventDefault(); // Always prevent default first
         
         // Check required fields first
         const requiredFields = demoForm.querySelectorAll('[required]');
@@ -1100,49 +1058,37 @@ if (demoForm) {
             }
         });
 
-        // Validate CAPTCHA
-        if (!demoCaptcha) {
-            showErrorFeedback('demo', 'CAPTCHA not loaded. Please refresh the page.');
-            allValid = false;
-            return false;
-        }
-        
-        if (!demoCaptcha.validate()) {
-            allValid = false;
-            showErrorFeedback('demo', 'Please complete the CAPTCHA verification.');
-            const captchaContainer = document.getElementById('demoCaptchaContainer');
-            if (captchaContainer) {
-                captchaContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-            return false;
-        }
-
         if (!allValid) {
             showErrorFeedback('demo', 'Please fill in all required fields correctly.');
             return false;
         }
 
-        // Add CAPTCHA validation data to form
-        const captchaData = demoCaptcha.getSessionData();
-        const hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = 'captcha_verified';
-        hiddenInput.value = 'true';
-        demoForm.appendChild(hiddenInput);
+        // Show loading state
+        const submitBtn = demoForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+        submitBtn.disabled = true;
 
-        // Submit form with feedback
-        try {
-            await submitFormWithFeedback(demoForm, 'demo');
-        } catch (error) {
-            console.error('Demo form submission failed:', error);
+        // Add form type for tracking
+        let hiddenInput = demoForm.querySelector('input[name="form_type"]');
+        if (!hiddenInput) {
+            hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'form_type';
+            hiddenInput.value = 'Demo Booking Request';
+            demoForm.appendChild(hiddenInput);
         }
+
+        // Submit the form naturally
+        setTimeout(() => {
+            demoForm.submit();
+        }, 500);
     });
 }
 
 if (contactForm) {
-    contactForm.addEventListener('submit', async (e) => {
-        // Always prevent default submission first
-        e.preventDefault();
+    contactForm.addEventListener('submit', (e) => {
+        e.preventDefault(); // Always prevent default first
         
         // Check required fields first
         const requiredFields = contactForm.querySelectorAll('[required]');
@@ -1160,42 +1106,31 @@ if (contactForm) {
             }
         });
 
-        // Validate CAPTCHA
-        if (!contactCaptcha) {
-            showErrorFeedback('contact', 'CAPTCHA not loaded. Please refresh the page.');
-            allValid = false;
-            return false;
-        }
-        
-        if (!contactCaptcha.validate()) {
-            allValid = false;
-            showErrorFeedback('contact', 'Please complete the CAPTCHA verification.');
-            const captchaContainer = document.getElementById('contactCaptchaContainer');
-            if (captchaContainer) {
-                captchaContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-            return false;
-        }
-
         if (!allValid) {
             showErrorFeedback('contact', 'Please fill in all required fields correctly.');
             return false;
         }
 
-        // Add CAPTCHA validation data to form
-        const captchaData = contactCaptcha.getSessionData();
-        const hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = 'captcha_verified';
-        hiddenInput.value = 'true';
-        contactForm.appendChild(hiddenInput);
+        // Show loading state
+        const submitBtn = contactForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+        submitBtn.disabled = true;
 
-        // Submit form with feedback
-        try {
-            await submitFormWithFeedback(contactForm, 'contact');
-        } catch (error) {
-            console.error('Contact form submission failed:', error);
+        // Add form type for tracking
+        let hiddenInput = contactForm.querySelector('input[name="form_type"]');
+        if (!hiddenInput) {
+            hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'form_type';
+            hiddenInput.value = 'Contact Message';
+            contactForm.appendChild(hiddenInput);
         }
+
+        // Submit the form naturally
+        setTimeout(() => {
+            contactForm.submit();
+        }, 500);
     });
 }
 
@@ -2368,44 +2303,7 @@ document.addEventListener('DOMContentLoaded', () => {
             dateInput.min = today;
         }
 
-        // Initialize Advanced CAPTCHA with proper error handling
-        setTimeout(() => {
-            try {
-                const demoCaptchaContainer = document.getElementById('demoCaptchaContainer');
-                const contactCaptchaContainer = document.getElementById('contactCaptchaContainer');
-                
-                if (demoCaptchaContainer && !demoCaptcha) {
-                    demoCaptcha = new AdvancedCaptcha('demoCaptchaContainer', 'mixed');
-                    console.log('Demo CAPTCHA initialized successfully');
-                }
-                
-                if (contactCaptchaContainer && !contactCaptcha) {
-                    contactCaptcha = new AdvancedCaptcha('contactCaptchaContainer', 'mixed');
-                    console.log('Contact CAPTCHA initialized successfully');
-                }
-            } catch (error) {
-                console.error('CAPTCHA initialization error:', error);
-                // Retry initialization after a longer delay
-                setTimeout(() => {
-                    try {
-                        if (!demoCaptcha) {
-                            const demoCaptchaContainer = document.getElementById('demoCaptchaContainer');
-                            if (demoCaptchaContainer) {
-                                demoCaptcha = new AdvancedCaptcha('demoCaptchaContainer', 'mixed');
-                            }
-                        }
-                        if (!contactCaptcha) {
-                            const contactCaptchaContainer = document.getElementById('contactCaptchaContainer');
-                            if (contactCaptchaContainer) {
-                                contactCaptcha = new AdvancedCaptcha('contactCaptchaContainer', 'mixed');
-                            }
-                        }
-                    } catch (retryError) {
-                        console.error('CAPTCHA retry initialization failed:', retryError);
-                    }
-                }, 1000);
-            }
-        }, 500);
+        // CAPTCHA initialization removed for better form submission
 
         // Initialize autoplay videos immediately for seamless playback
         initializeAutoplayVideos();
