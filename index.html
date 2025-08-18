@@ -634,28 +634,37 @@
                 <div class="demo-form">
                     <form id="demoForm" class="booking-form" action="https://formsubmit.co/newlifeconnection1@gmail.com" method="POST">
                         <h3>Book Your Free Demo</h3>
-                        <input type="hidden" name="_subject" value="New Demo Booking Request - New Lifestyle Gym">
-                        <input type="hidden" name="_captcha" value="false">
+                        
+                        <!-- Enhanced FormSubmit Configuration -->
+                        <input type="hidden" name="_subject" value="🏋️ New Demo Booking Request - New Lifestyle Gym">
+                        <input type="hidden" name="_captcha" value="true">
                         <input type="hidden" name="_template" value="table">
-                        <input type="hidden" name="_next" value="/">
+                        <input type="hidden" name="_next" value="https://newlifestylegym.ae/?success=demo">
+                        <input type="hidden" name="_autoresponse" value="Thank you for booking a demo session with New Lifestyle Gym! We will contact you within 24 hours to confirm your appointment.">
+                        <input type="hidden" name="_cc" value="backup@newlifestylegym.ae">
+                        
+                        <!-- Form Fields -->
                         <div class="form-row">
                             <div class="form-group">
-                                <input type="text" id="firstName" name="firstName" placeholder="First Name" required>
+                                <input type="text" id="firstName" name="firstName" placeholder="First Name" required maxlength="50" pattern="[A-Za-z\s]+" title="Only letters and spaces allowed">
                                 <label for="firstName">First Name</label>
                             </div>
                             <div class="form-group">
-                                <input type="text" id="lastName" name="lastName" placeholder="Last Name" required>
+                                <input type="text" id="lastName" name="lastName" placeholder="Last Name" required maxlength="50" pattern="[A-Za-z\s]+" title="Only letters and spaces allowed">
                                 <label for="lastName">Last Name</label>
                             </div>
                         </div>
+                        
                         <div class="form-group">
-                            <input type="email" id="email" name="email" placeholder="Email Address" required>
+                            <input type="email" id="email" name="email" placeholder="Email Address" required maxlength="100" autocomplete="email">
                             <label for="email">Email Address</label>
                         </div>
+                        
                         <div class="form-group">
-                            <input type="tel" id="phone" name="phone" placeholder="Phone Number" required>
+                            <input type="tel" id="phone" name="phone" placeholder="Phone Number (UAE: +971...)" required pattern="[\+]?[0-9]{7,15}" maxlength="15" autocomplete="tel">
                             <label for="phone">Phone Number</label>
                         </div>
+                        
                         <div class="form-row">
                             <div class="form-group">
                                 <select id="service" name="service" required>
@@ -663,6 +672,7 @@
                                     <option value="personal-training">Personal Training</option>
                                     <option value="group-classes">Group Classes</option>
                                     <option value="ladies-section">Ladies Section</option>
+                                    <option value="home-training">Home Training</option>
                                     <option value="general-fitness">General Fitness</option>
                                 </select>
                                 <label for="service">Preferred Service</label>
@@ -678,16 +688,34 @@
                                 <label for="planChoice">Membership Plan</label>
                             </div>
                         </div>
+                        
                         <div class="form-group">
                             <input type="date" id="preferredDate" name="preferredDate" required>
                             <label for="preferredDate">Preferred Date</label>
                         </div>
+                        
                         <div class="form-group">
-                            <textarea id="message" name="message" placeholder="Tell us about your fitness goals..."></textarea>
+                            <textarea id="message" name="message" placeholder="Tell us about your fitness goals..." maxlength="500"></textarea>
                             <label for="message">Message (Optional)</label>
                         </div>
+
+                        <!-- Advanced CAPTCHA Container -->
+                        <div class="advanced-captcha-container" id="demoCaptcha">
+                            <label class="captcha-label">
+                                <i class="fas fa-shield-alt"></i> Security Verification
+                            </label>
+                            <div class="captcha-challenge" id="demoCaptchaChallenge">
+                                <!-- CAPTCHA will be dynamically generated here -->
+                            </div>
+                        </div>
                         
-                        <button type="submit" class="btn btn-primary btn-full">
+                        <!-- Hidden fields for security -->
+                        <input type="hidden" name="_form_id" value="demo_booking">
+                        <input type="hidden" name="_timestamp" id="demoTimestamp">
+                        <input type="hidden" name="_user_agent" id="demoUserAgent">
+                        <input type="hidden" name="_referrer" id="demoReferrer">
+                        
+                        <button type="submit" class="btn btn-primary btn-full" id="demoSubmitBtn" disabled>
                             <i class="fas fa-calendar-check"></i>
                             Book Free Demo
                         </button>
@@ -738,30 +766,71 @@
                 <div class="contact-form-container">
                     <form id="contactForm" class="contact-form" action="https://formsubmit.co/newlifeconnection1@gmail.com" method="POST">
                         <h3>Send us a Message</h3>
-                        <input type="hidden" name="_subject" value="New Contact Message - New Lifestyle Gym">
-                        <input type="hidden" name="_captcha" value="false">
+                        
+                        <!-- Enhanced FormSubmit Configuration -->
+                        <input type="hidden" name="_subject" value="💬 New Contact Message - New Lifestyle Gym">
+                        <input type="hidden" name="_captcha" value="true">
                         <input type="hidden" name="_template" value="table">
                         <input type="hidden" name="_next" value="https://newlifestylegym.ae/?success=contact">
+                        <input type="hidden" name="_autoresponse" value="Thank you for contacting New Lifestyle Gym! We have received your message and will respond within 24 hours.">
+                        <input type="hidden" name="_cc" value="backup@newlifestylegym.ae">
+                        
+                        <!-- Form Fields -->
                         <div class="form-row">
                             <div class="form-group">
-                                <input type="text" id="contactName" name="name" placeholder="Your Name" required>
+                                <input type="text" id="contactName" name="name" placeholder="Your Name" required maxlength="100" pattern="[A-Za-z\s]+" title="Only letters and spaces allowed" autocomplete="name">
                                 <label for="contactName">Your Name</label>
                             </div>
                             <div class="form-group">
-                                <input type="email" id="contactEmail" name="email" placeholder="Your Email" required>
+                                <input type="email" id="contactEmail" name="email" placeholder="Your Email" required maxlength="100" autocomplete="email">
                                 <label for="contactEmail">Your Email</label>
                             </div>
                         </div>
+                        
                         <div class="form-group">
-                            <input type="text" id="subject" name="subject" placeholder="Subject" required>
-                            <label for="subject">Subject</label>
-                        </div>
-                        <div class="form-group">
-                            <textarea id="contactMessage" name="message" placeholder="Your message..." required></textarea>
-                            <label for="contactMessage">Your Message</label>
+                            <select id="inquiryType" name="inquiry_type" required>
+                                <option value="">Select Inquiry Type</option>
+                                <option value="membership">Membership Information</option>
+                                <option value="personal-training">Personal Training</option>
+                                <option value="classes">Group Classes</option>
+                                <option value="facilities">Facilities & Equipment</option>
+                                <option value="pricing">Pricing & Packages</option>
+                                <option value="complaint">Complaint or Feedback</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <label for="inquiryType">Inquiry Type</label>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary btn-full">
+                        <div class="form-group">
+                            <input type="text" id="subject" name="subject" placeholder="Subject" required maxlength="150">
+                            <label for="subject">Subject</label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <textarea id="contactMessage" name="message" placeholder="Your message..." required maxlength="1000" rows="5"></textarea>
+                            <label for="contactMessage">Your Message</label>
+                            <div class="character-count">
+                                <span id="messageCount">0</span>/1000 characters
+                            </div>
+                        </div>
+
+                        <!-- Advanced CAPTCHA Container -->
+                        <div class="advanced-captcha-container contact-captcha" id="contactCaptcha">
+                            <label class="captcha-label">
+                                <i class="fas fa-shield-alt"></i> Security Verification
+                            </label>
+                            <div class="captcha-challenge" id="contactCaptchaChallenge">
+                                <!-- CAPTCHA will be dynamically generated here -->
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden fields for security -->
+                        <input type="hidden" name="_form_id" value="contact_message">
+                        <input type="hidden" name="_timestamp" id="contactTimestamp">
+                        <input type="hidden" name="_user_agent" id="contactUserAgent">
+                        <input type="hidden" name="_referrer" id="contactReferrer">
+                        
+                        <button type="submit" class="btn btn-primary btn-full" id="contactSubmitBtn" disabled>
                             <i class="fas fa-paper-plane"></i>
                             Send Message
                         </button>
