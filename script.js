@@ -771,29 +771,8 @@ if (demoForm) {
         // Submit form data to FormSubmit
         const formData = new FormData(demoForm);
         
-        fetch('https://formsubmit.co/newlifeconnection1@gmail.com', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                // Redirect to success page
-                window.location.href = window.location.origin + '/?success=demo';
-            } else {
-                throw new Error('Network response was not ok');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showErrorFeedback('demo', 'There was an error submitting your form. Please try again.');
-            if (submitBtn) {
-                submitBtn.innerHTML = '<i class="fas fa-calendar-check"></i> Book Free Demo';
-                submitBtn.disabled = false;
-            }
-        });
+        // Submit normally to FormSubmit (it will handle the redirect)
+        demoForm.submit();
     });
 }
 
@@ -858,29 +837,8 @@ if (contactForm) {
         // Submit form data to FormSubmit
         const formData = new FormData(contactForm);
         
-        fetch('https://formsubmit.co/newlifeconnection1@gmail.com', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => {
-            if (response.ok) {
-                // Redirect to success page
-                window.location.href = window.location.origin + '/?success=contact';
-            } else {
-                throw new Error('Network response was not ok');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showErrorFeedback('contact', 'There was an error submitting your form. Please try again.');
-            if (submitBtn) {
-                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
-                submitBtn.disabled = false;
-            }
-        });
+        // Submit normally to FormSubmit (it will handle the redirect)
+        contactForm.submit();
     });
 }
 
