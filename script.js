@@ -240,11 +240,22 @@ document.querySelectorAll('.circle-progress').forEach(circle => {
 class AdvancedCaptcha {
     constructor(containerId, type = 'mixed') {
         this.container = document.getElementById(containerId);
-        this.type = type; // 'math', 'image', 'drag', 'mixed'
+        if (!this.container) {
+            throw new Error(`CAPTCHA container with ID '${containerId}' not found`);
+        }
+        
+        this.containerId = containerId;
+        this.type = type; // 'math', 'image', 'drag', 'text', 'mixed'
         this.currentChallenge = null;
         this.attempts = 0;
         this.maxAttempts = 3;
+        this.isVerified = false;
         this.sessionToken = this.generateSessionToken();
+        
+        // Add container identifier for debugging
+        this.container.dataset.captchaId = this.sessionToken;
+        
+        console.log(`Initializing CAPTCHA for container: ${containerId}, type: ${type}`);
         this.init();
     }
 
@@ -663,88 +674,196 @@ class AdvancedCaptcha {
 
     validate() {
         if(this.attempts >= this.maxAttempts) {
-            this.showError('Maximum attempts exceeded. Please refresh.');
+            this.showError('Maximum attempts exceeded. Please refresh the page.');
+            return false;
+        }
+
+        // Check if challenge exists
+        if (!this.currentChallenge) {
+            this.showError('CAPTCHA not properly loaded. Please refresh.');
             return false;
         }
 
         switch(this.currentChallenge.type) {
             case 'math':
                 const mathInput = this.container.querySelector('.captcha-input');
+                if (!mathInput) {
+                    this.showError('CAPTCHA input not found. Please refresh.');
+                    return false;
+                }
                 const userAnswer = mathInput.value.trim();
+                if (!userAnswer) {
+                    this.showError('Please enter your answer.');
+                    mathInput.focus();
+                    return false;
+                }
                 if(userAnswer === this.currentChallenge.answer) {
                     this.showSuccess();
                     return true;
                 } else {
                     this.attempts++;
                     this.showError('Incorrect answer. Try again!');
+                    mathInput.value = '';
+                    mathInput.focus();
+                    this.updateAttemptsDisplay();
                     return false;
                 }
             case 'image':
+                if (this.currentChallenge.selectedPositions.length === 0) {
+                    this.showError('Please select at least one image.');
+                    return false;
+                }
                 return this.verifyImageSelection();
             case 'drag':
+                const dropZones = this.container.querySelectorAll('.drop-zone');
+                const filledCount = Array.from(dropZones).filter(zone => 
+                    zone.textContent !== 'Drop here').length;
+                if (filledCount < 3) {
+                    this.showError('Please drag all letters to complete the word.');
+                    return false;
+                }
                 return this.checkDragCompletion();
             case 'text':
                 const textInput = this.container.querySelector('.captcha-input');
+                if (!textInput) {
+                    this.showError('CAPTCHA input not found. Please refresh.');
+                    return false;
+                }
                 const userCode = textInput.value.trim().toUpperCase();
+                if (!userCode) {
+                    this.showError('Please enter the code from the image.');
+                    textInput.focus();
+                    return false;
+                }
                 if(userCode === this.currentChallenge.code) {
                     this.showSuccess();
                     return true;
                 } else {
                     this.attempts++;
                     this.showError('Incorrect code. Try again!');
+                    textInput.value = '';
+                    textInput.focus();
+                    this.updateAttemptsDisplay();
                     return false;
                 }
         }
         return false;
     }
 
+    updateAttemptsDisplay() {
+        const attemptsEl = this.container.querySelector('.captcha-attempts');
+        if(attemptsEl) {
+            const remaining = this.maxAttempts - this.attempts;
+            attemptsEl.textContent = `${remaining} attempts remaining`;
+            if (remaining <= 1) {
+                attemptsEl.style.color = '#dc3545';
+                attemptsEl.style.fontWeight = 'bold';
+            }
+        }
+    }
+
     showSuccess() {
+        this.container.classList.remove('captcha-error');
         this.container.classList.add('captcha-success');
-        const successMsg = this.container.querySelector('.captcha-attempts') || 
-                          document.createElement('div');
+        
+        // Remove any existing error messages
+        const existingError = this.container.querySelector('.captcha-error-message');
+        if (existingError) {
+            existingError.remove();
+        }
+        
+        // Update or create success message
+        let successMsg = this.container.querySelector('.captcha-success-message');
+        if (!successMsg) {
+            successMsg = document.createElement('div');
+            successMsg.className = 'captcha-success-message';
+            this.container.appendChild(successMsg);
+        }
         successMsg.innerHTML = '<i class="fas fa-check-circle"></i> Verification successful!';
-        successMsg.className = 'captcha-success-message';
+        
+        // Disable all interactive elements
+        const inputs = this.container.querySelectorAll('input, button:not(.captcha-refresh)');
+        inputs.forEach(input => {
+            input.disabled = true;
+            input.style.opacity = '0.6';
+        });
+        
+        // Make verification permanent
+        this.isVerified = true;
     }
 
     showError(message) {
         this.container.classList.add('captcha-error');
         setTimeout(() => this.container.classList.remove('captcha-error'), 2000);
         
-        let errorMsg = this.container.querySelector('.captcha-error-message');
-        if(!errorMsg) {
-            errorMsg = document.createElement('div');
-            errorMsg.className = 'captcha-error-message';
-            this.container.appendChild(errorMsg);
-        }
-        errorMsg.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+        // Remove existing error messages
+        const existingErrors = this.container.querySelectorAll('.captcha-error-message');
+        existingErrors.forEach(error => error.remove());
         
+        // Create new error message
+        const errorMsg = document.createElement('div');
+        errorMsg.className = 'captcha-error-message';
+        errorMsg.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+        this.container.appendChild(errorMsg);
+        
+        // Auto-remove error message
         setTimeout(() => {
             if(errorMsg.parentNode) {
                 errorMsg.remove();
             }
-        }, 3000);
+        }, 4000);
 
         // Update attempts display
-        const attemptsEl = this.container.querySelector('.captcha-attempts');
-        if(attemptsEl) {
-            attemptsEl.textContent = `${this.maxAttempts - this.attempts} attempts remaining`;
+        this.updateAttemptsDisplay();
+        
+        // Refresh CAPTCHA if max attempts exceeded
+        if (this.attempts >= this.maxAttempts) {
+            setTimeout(() => {
+                this.refresh();
+                this.attempts = 0;
+                this.updateAttemptsDisplay();
+            }, 2000);
         }
     }
 
     refresh() {
+        // Reset all states
         this.container.classList.remove('captcha-success', 'captcha-error');
-        const errorMsg = this.container.querySelector('.captcha-error-message');
-        if(errorMsg) errorMsg.remove();
+        this.isVerified = false;
+        
+        // Remove all message elements
+        const messages = this.container.querySelectorAll('.captcha-error-message, .captcha-success-message');
+        messages.forEach(msg => msg.remove());
+        
+        // Re-enable all inputs
+        const inputs = this.container.querySelectorAll('input, button');
+        inputs.forEach(input => {
+            input.disabled = false;
+            input.style.opacity = '1';
+        });
+        
+        // Generate new challenge
         this.generateChallenge();
+        console.log('CAPTCHA refreshed with new challenge:', this.currentChallenge?.type);
+    }
+
+    isComplete() {
+        return this.isVerified === true && this.container.classList.contains('captcha-success');
     }
 
     getSessionData() {
         return {
             token: this.sessionToken,
-            type: this.currentChallenge.type,
-            completed: this.container.classList.contains('captcha-success'),
-            attempts: this.attempts
+            type: this.currentChallenge?.type || 'unknown',
+            completed: this.isComplete(),
+            attempts: this.attempts,
+            timestamp: Date.now()
         };
+    }
+
+    // Public method to check if CAPTCHA is properly validated
+    isValid() {
+        return this.isComplete() && this.currentChallenge !== null;
     }
 }
 
@@ -756,6 +875,11 @@ function refreshDemoCaptcha() {
         demoCaptcha.refresh();
     } else {
         console.log('Demo CAPTCHA not initialized');
+        // Try to reinitialize if container exists
+        const container = document.getElementById('demoCaptchaContainer');
+        if (container) {
+            demoCaptcha = new AdvancedCaptcha('demoCaptchaContainer', 'mixed');
+        }
     }
 }
 
@@ -764,15 +888,48 @@ function refreshContactCaptcha() {
         contactCaptcha.refresh();
     } else {
         console.log('Contact CAPTCHA not initialized');
+        // Try to reinitialize if container exists
+        const container = document.getElementById('contactCaptchaContainer');
+        if (container) {
+            contactCaptcha = new AdvancedCaptcha('contactCaptchaContainer', 'mixed');
+        }
     }
 }
 
 function validateCaptcha(containerId) {
     if(containerId.includes('demo')) {
-        return demoCaptcha ? demoCaptcha.validate() : false;
+        if (!demoCaptcha) {
+            console.error('Demo CAPTCHA not initialized');
+            return false;
+        }
+        return demoCaptcha.validate();
     } else {
-        return contactCaptcha ? contactCaptcha.validate() : false;
+        if (!contactCaptcha) {
+            console.error('Contact CAPTCHA not initialized');
+            return false;
+        }
+        return contactCaptcha.validate();
     }
+}
+
+// Global CAPTCHA status check
+function isCaptchaReady(type) {
+    if (type === 'demo') {
+        return demoCaptcha && demoCaptcha.currentChallenge !== null;
+    } else if (type === 'contact') {
+        return contactCaptcha && contactCaptcha.currentChallenge !== null;
+    }
+    return false;
+}
+
+// Global CAPTCHA validation check
+function isCaptchaValid(type) {
+    if (type === 'demo') {
+        return demoCaptcha && demoCaptcha.isValid();
+    } else if (type === 'contact') {
+        return contactCaptcha && contactCaptcha.isValid();
+    }
+    return false;
 }
 
 // Form handling with immediate feedback and success handling
@@ -952,6 +1109,7 @@ if (demoForm) {
         
         if (!demoCaptcha.validate()) {
             allValid = false;
+            showErrorFeedback('demo', 'Please complete the CAPTCHA verification.');
             const captchaContainer = document.getElementById('demoCaptchaContainer');
             if (captchaContainer) {
                 captchaContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1011,6 +1169,7 @@ if (contactForm) {
         
         if (!contactCaptcha.validate()) {
             allValid = false;
+            showErrorFeedback('contact', 'Please complete the CAPTCHA verification.');
             const captchaContainer = document.getElementById('contactCaptchaContainer');
             if (captchaContainer) {
                 captchaContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -2209,19 +2368,44 @@ document.addEventListener('DOMContentLoaded', () => {
             dateInput.min = today;
         }
 
-        // Initialize Advanced CAPTCHA with delay to ensure containers exist
+        // Initialize Advanced CAPTCHA with proper error handling
         setTimeout(() => {
-            const demoCaptchaContainer = document.getElementById('demoCaptchaContainer');
-            const contactCaptchaContainer = document.getElementById('contactCaptchaContainer');
-            
-            if (demoCaptchaContainer) {
-                demoCaptcha = new AdvancedCaptcha('demoCaptchaContainer', 'mixed');
+            try {
+                const demoCaptchaContainer = document.getElementById('demoCaptchaContainer');
+                const contactCaptchaContainer = document.getElementById('contactCaptchaContainer');
+                
+                if (demoCaptchaContainer && !demoCaptcha) {
+                    demoCaptcha = new AdvancedCaptcha('demoCaptchaContainer', 'mixed');
+                    console.log('Demo CAPTCHA initialized successfully');
+                }
+                
+                if (contactCaptchaContainer && !contactCaptcha) {
+                    contactCaptcha = new AdvancedCaptcha('contactCaptchaContainer', 'mixed');
+                    console.log('Contact CAPTCHA initialized successfully');
+                }
+            } catch (error) {
+                console.error('CAPTCHA initialization error:', error);
+                // Retry initialization after a longer delay
+                setTimeout(() => {
+                    try {
+                        if (!demoCaptcha) {
+                            const demoCaptchaContainer = document.getElementById('demoCaptchaContainer');
+                            if (demoCaptchaContainer) {
+                                demoCaptcha = new AdvancedCaptcha('demoCaptchaContainer', 'mixed');
+                            }
+                        }
+                        if (!contactCaptcha) {
+                            const contactCaptchaContainer = document.getElementById('contactCaptchaContainer');
+                            if (contactCaptchaContainer) {
+                                contactCaptcha = new AdvancedCaptcha('contactCaptchaContainer', 'mixed');
+                            }
+                        }
+                    } catch (retryError) {
+                        console.error('CAPTCHA retry initialization failed:', retryError);
+                    }
+                }, 1000);
             }
-            
-            if (contactCaptchaContainer) {
-                contactCaptcha = new AdvancedCaptcha('contactCaptchaContainer', 'mixed');
-            }
-        }, 100);
+        }, 500);
 
         // Initialize autoplay videos immediately for seamless playback
         initializeAutoplayVideos();
