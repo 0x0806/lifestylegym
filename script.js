@@ -1,5 +1,5 @@
-// Advanced CAPTCHA System
-class AdvancedCaptcha {
+// Text Recognition CAPTCHA
+class SimpleCaptcha {
     constructor(containerId, formId) {
         this.container = document.getElementById(containerId);
         this.formId = formId;
@@ -7,8 +7,9 @@ class AdvancedCaptcha {
         this.isVerified = false;
         this.attempts = 0;
         this.maxAttempts = 3;
-        this.challengeTypes = ['math', 'image', 'drag', 'text'];
-        this.currentChallenge = null;
+        this.currentText = '';
+        this.canvas = null;
+        this.ctx = null;
         
         this.init();
     }
@@ -19,254 +20,28 @@ class AdvancedCaptcha {
     }
 
     generateChallenge() {
-        // Rotate through different challenge types
-        const challengeType = this.challengeTypes[Math.floor(Math.random() * this.challengeTypes.length)];
-        this.currentChallenge = challengeType;
-        
-        // Clear previous challenge
-        this.challengeContainer.innerHTML = '';
-        
-        switch(challengeType) {
-            case 'math':
-                this.createMathChallenge();
-                break;
-            case 'image':
-                this.createImageChallenge();
-                break;
-            case 'drag':
-                this.createDragChallenge();
-                break;
-            case 'text':
-                this.createTextChallenge();
-                break;
-        }
-        
-        this.updateSubmitButton(false);
-    }
-
-    createMathChallenge() {
-        const num1 = Math.floor(Math.random() * 20) + 1;
-        const num2 = Math.floor(Math.random() * 20) + 1;
-        const operations = ['+', '-', '×'];
-        const operation = operations[Math.floor(Math.random() * operations.length)];
-        
-        let answer;
-        let questionText;
-        
-        switch(operation) {
-            case '+':
-                answer = num1 + num2;
-                questionText = `${num1} + ${num2}`;
-                break;
-            case '-':
-                answer = Math.max(num1, num2) - Math.min(num1, num2);
-                questionText = `${Math.max(num1, num2)} - ${Math.min(num1, num2)}`;
-                break;
-            case '×':
-                const smallNum1 = Math.floor(Math.random() * 12) + 1;
-                const smallNum2 = Math.floor(Math.random() * 12) + 1;
-                answer = smallNum1 * smallNum2;
-                questionText = `${smallNum1} × ${smallNum2}`;
-                break;
-        }
-        
-        this.answer = answer;
-        
-        const html = `
-            <div class="math-challenge">
-                <div class="captcha-instruction">
-                    <i class="fas fa-calculator"></i>
-                    Solve this math problem to continue
-                </div>
-                <div class="captcha-question-container">
-                    <div class="math-question">
-                        <i class="fas fa-equals"></i>
-                        <span class="question-text">What is ${questionText}?</span>
-                    </div>
-                    <button type="button" class="captcha-refresh" onclick="this.closest('.advanced-captcha-container').captchaInstance.generateChallenge()">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
-                </div>
-                <input type="number" class="captcha-input" placeholder="Enter your answer" required>
-                <div class="captcha-attempts">Attempts remaining: ${this.maxAttempts - this.attempts}</div>
-            </div>
-        `;
-        
-        this.challengeContainer.innerHTML = html;
-        this.challengeContainer.querySelector('.captcha-input').focus();
-    }
-
-    createImageChallenge() {
-        const gymItems = [
-            { icon: 'fas fa-dumbbell', name: 'Dumbbell', isGym: true },
-            { icon: 'fas fa-running', name: 'Running', isGym: true },
-            { icon: 'fas fa-bicycle', name: 'Exercise Bike', isGym: true },
-            { icon: 'fas fa-swimming-pool', name: 'Pool', isGym: true },
-            { icon: 'fas fa-weight-hanging', name: 'Weights', isGym: true },
-            { icon: 'fas fa-heartbeat', name: 'Cardio', isGym: true },
-            { icon: 'fas fa-car', name: 'Car', isGym: false },
-            { icon: 'fas fa-pizza-slice', name: 'Pizza', isGym: false },
-            { icon: 'fas fa-book', name: 'Book', isGym: false },
-            { icon: 'fas fa-coffee', name: 'Coffee', isGym: false },
-            { icon: 'fas fa-home', name: 'House', isGym: false },
-            { icon: 'fas fa-music', name: 'Music', isGym: false }
-        ];
-        
-        // Select 9 random items with at least 3 gym items
-        const selectedItems = [];
-        const gymItemsFiltered = gymItems.filter(item => item.isGym);
-        const nonGymItems = gymItems.filter(item => !item.isGym);
-        
-        // Add 3-5 gym items
-        const gymCount = 3 + Math.floor(Math.random() * 3);
-        for(let i = 0; i < gymCount; i++) {
-            const randomGymItem = gymItemsFiltered[Math.floor(Math.random() * gymItemsFiltered.length)];
-            if(!selectedItems.includes(randomGymItem)) {
-                selectedItems.push(randomGymItem);
-            }
-        }
-        
-        // Fill remaining with non-gym items
-        while(selectedItems.length < 9) {
-            const randomItem = nonGymItems[Math.floor(Math.random() * nonGymItems.length)];
-            if(!selectedItems.includes(randomItem)) {
-                selectedItems.push(randomItem);
-            }
-        }
-        
-        // Shuffle the array
-        selectedItems.sort(() => Math.random() - 0.5);
-        
-        this.correctAnswers = selectedItems.filter(item => item.isGym).map(item => item.name);
-        this.selectedImages = [];
-        
-        const html = `
-            <div class="image-challenge">
-                <div class="captcha-instruction">
-                    <i class="fas fa-mouse-pointer"></i>
-                    Click on all gym/fitness related items
-                </div>
-                <div class="image-grid">
-                    ${selectedItems.map((item, index) => `
-                        <div class="image-grid-item" data-item="${item.name}" data-index="${index}">
-                            <i class="${item.icon} gym-icon"></i>
-                        </div>
-                    `).join('')}
-                </div>
-                <div class="captcha-controls">
-                    <button type="button" class="captcha-verify">Verify Selection</button>
-                    <button type="button" class="captcha-refresh" onclick="this.closest('.advanced-captcha-container').captchaInstance.generateChallenge()">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
-                </div>
-                <div class="captcha-attempts">Attempts remaining: ${this.maxAttempts - this.attempts}</div>
-            </div>
-        `;
-        
-        this.challengeContainer.innerHTML = html;
-        this.setupImageChallengeEvents();
-    }
-
-    createDragChallenge() {
-        const words = ['FITNESS', 'STRONG', 'HEALTH', 'POWER', 'ENERGY'];
-        const selectedWord = words[Math.floor(Math.random() * words.length)];
-        const letters = selectedWord.split('');
-        const shuffledLetters = [...letters].sort(() => Math.random() - 0.5);
-        
-        this.correctWord = selectedWord;
-        this.draggedLetters = [];
-        
-        const html = `
-            <div class="drag-challenge">
-                <div class="captcha-instruction">
-                    <i class="fas fa-hand-pointer"></i>
-                    Drag the letters to spell: <strong>${selectedWord}</strong>
-                </div>
-                <div class="drag-container">
-                    <div class="drag-source">
-                        ${shuffledLetters.map((letter, index) => `
-                            <div class="draggable-letter" draggable="true" data-letter="${letter}" data-id="${index}">
-                                ${letter}
-                            </div>
-                        `).join('')}
-                    </div>
-                    <div class="drag-target">
-                        ${letters.map((_, index) => `
-                            <div class="drop-zone" data-position="${index}">
-                                ${index + 1}
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-                <div class="captcha-controls">
-                    <button type="button" class="captcha-verify">Verify Word</button>
-                    <button type="button" class="captcha-refresh" onclick="this.closest('.advanced-captcha-container').captchaInstance.generateChallenge()">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
-                </div>
-                <div class="captcha-attempts">Attempts remaining: ${this.maxAttempts - this.attempts}</div>
-            </div>
-        `;
-        
-        this.challengeContainer.innerHTML = html;
-        this.setupDragChallengeEvents();
-    }
-
-    createTextChallenge() {
-        const canvas = document.createElement('canvas');
-        canvas.width = 200;
-        canvas.height = 60;
-        canvas.className = 'captcha-canvas';
-        
-        const ctx = canvas.getContext('2d');
-        
-        // Generate random text
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        const captchaText = Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-        this.captchaText = captchaText;
-        
-        // Draw background with noise
-        ctx.fillStyle = '#f0f0f0';
-        ctx.fillRect(0, 0, 200, 60);
-        
-        // Add noise lines
-        for(let i = 0; i < 10; i++) {
-            ctx.strokeStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.3)`;
-            ctx.beginPath();
-            ctx.moveTo(Math.random() * 200, Math.random() * 60);
-            ctx.lineTo(Math.random() * 200, Math.random() * 60);
-            ctx.stroke();
-        }
-        
-        // Draw text
-        ctx.font = 'bold 24px Arial';
-        ctx.fillStyle = '#333';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        
-        for(let i = 0; i < captchaText.length; i++) {
-            const x = 20 + i * 28;
-            const y = 30 + (Math.random() - 0.5) * 10;
-            const rotation = (Math.random() - 0.5) * 0.5;
-            
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(rotation);
-            ctx.fillText(captchaText[i], 0, 0);
-            ctx.restore();
+        // Generate random text (mix of letters and numbers)
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+        this.currentText = '';
+        for(let i = 0; i < 6; i++) {
+            this.currentText += chars.charAt(Math.floor(Math.random() * chars.length));
         }
         
         const html = `
             <div class="text-challenge">
                 <div class="captcha-instruction">
-                    <i class="fas fa-eye"></i>
-                    Enter the text shown in the image
+                    <i class="fas fa-keyboard"></i>
+                    Type the text you see in the image below
                 </div>
-                <div class="captcha-canvas-container"></div>
-                <input type="text" class="captcha-input" placeholder="Enter the text" maxlength="6" required>
+                <div class="captcha-canvas-container">
+                    <canvas class="captcha-canvas" width="300" height="100" id="${this.container.id}Canvas"></canvas>
+                </div>
+                <div class="captcha-input-container">
+                    <input type="text" class="captcha-input" placeholder="Enter the text above" maxlength="6" autocomplete="off" id="${this.container.id}Input">
+                </div>
                 <div class="captcha-controls">
                     <button type="button" class="captcha-verify">Verify Text</button>
-                    <button type="button" class="captcha-refresh" onclick="this.closest('.advanced-captcha-container').captchaInstance.generateChallenge()">
+                    <button type="button" class="captcha-refresh">
                         <i class="fas fa-sync-alt"></i>
                     </button>
                 </div>
@@ -275,8 +50,9 @@ class AdvancedCaptcha {
         `;
         
         this.challengeContainer.innerHTML = html;
-        this.challengeContainer.querySelector('.captcha-canvas-container').appendChild(canvas);
-        this.challengeContainer.querySelector('.captcha-input').focus();
+        this.setupTextChallengeEvents();
+        this.drawCaptchaText();
+        this.updateSubmitButton(false);
     }
 
     setupEventListeners() {
@@ -288,102 +64,118 @@ class AdvancedCaptcha {
             if(e.target.classList.contains('captcha-verify')) {
                 this.verifyChallenge();
             }
-        });
-        
-        this.challengeContainer.addEventListener('keypress', (e) => {
-            if(e.key === 'Enter' && (this.currentChallenge === 'math' || this.currentChallenge === 'text')) {
-                this.verifyChallenge();
+            if(e.target.classList.contains('captcha-refresh') || e.target.closest('.captcha-refresh')) {
+                this.generateChallenge();
             }
         });
     }
 
-    setupImageChallengeEvents() {
-        const imageItems = this.challengeContainer.querySelectorAll('.image-grid-item');
-        imageItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const itemName = item.dataset.item;
-                if(item.classList.contains('selected')) {
-                    item.classList.remove('selected');
-                    this.selectedImages = this.selectedImages.filter(name => name !== itemName);
-                } else {
-                    item.classList.add('selected');
-                    this.selectedImages.push(itemName);
+    setupTextChallengeEvents() {
+        const input = this.challengeContainer.querySelector('.captcha-input');
+        if(input) {
+            // Allow Enter key to verify
+            input.addEventListener('keypress', (e) => {
+                if(e.key === 'Enter') {
+                    this.verifyChallenge();
                 }
             });
-        });
+            
+            // Auto-verify when user types 6 characters
+            input.addEventListener('input', (e) => {
+                if(e.target.value.length === 6) {
+                    setTimeout(() => this.verifyChallenge(), 500);
+                }
+            });
+        }
     }
 
-    setupDragChallengeEvents() {
-        const draggableLetters = this.challengeContainer.querySelectorAll('.draggable-letter');
-        const dropZones = this.challengeContainer.querySelectorAll('.drop-zone');
+    drawCaptchaText() {
+        this.canvas = this.challengeContainer.querySelector('.captcha-canvas');
+        if(!this.canvas) return;
         
-        draggableLetters.forEach(letter => {
-            letter.addEventListener('dragstart', (e) => {
-                e.dataTransfer.setData('text/plain', e.target.dataset.letter);
-                e.dataTransfer.setData('application/x-letter-id', e.target.dataset.id);
-            });
-        });
+        this.ctx = this.canvas.getContext('2d');
         
-        dropZones.forEach(zone => {
-            zone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                zone.classList.add('drag-over');
-            });
+        // Clear canvas
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Set background
+        const gradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
+        gradient.addColorStop(0, '#f8f9fa');
+        gradient.addColorStop(0.5, '#e9ecef');
+        gradient.addColorStop(1, '#dee2e6');
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Add noise lines
+        this.ctx.strokeStyle = 'rgba(108, 117, 125, 0.3)';
+        this.ctx.lineWidth = 1;
+        for(let i = 0; i < 8; i++) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(Math.random() * this.canvas.width, Math.random() * this.canvas.height);
+            this.ctx.lineTo(Math.random() * this.canvas.width, Math.random() * this.canvas.height);
+            this.ctx.stroke();
+        }
+        
+        // Add noise dots
+        this.ctx.fillStyle = 'rgba(108, 117, 125, 0.4)';
+        for(let i = 0; i < 50; i++) {
+            this.ctx.beginPath();
+            this.ctx.arc(Math.random() * this.canvas.width, Math.random() * this.canvas.height, 1, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
+        
+        // Draw text with distortion
+        const colors = ['#ff6b35', '#28a745', '#007bff', '#6f42c1', '#fd7e14'];
+        const fonts = ['Arial', 'Times New Roman', 'Courier New', 'Verdana'];
+        
+        for(let i = 0; i < this.currentText.length; i++) {
+            const char = this.currentText[i];
+            const x = 20 + (i * 45) + (Math.random() - 0.5) * 10;
+            const y = 60 + (Math.random() - 0.5) * 15;
+            const rotation = (Math.random() - 0.5) * 0.5;
+            const fontSize = 28 + Math.random() * 8;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const font = fonts[Math.floor(Math.random() * fonts.length)];
             
-            zone.addEventListener('dragleave', () => {
-                zone.classList.remove('drag-over');
-            });
+            this.ctx.save();
+            this.ctx.translate(x, y);
+            this.ctx.rotate(rotation);
+            this.ctx.font = `bold ${fontSize}px ${font}`;
+            this.ctx.fillStyle = color;
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText(char, 0, 0);
             
-            zone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                zone.classList.remove('drag-over');
-                
-                const letter = e.dataTransfer.getData('text/plain');
-                const letterId = e.dataTransfer.getData('application/x-letter-id');
-                const position = parseInt(zone.dataset.position);
-                
-                // Remove letter from source
-                const letterElement = this.challengeContainer.querySelector(`[data-id="${letterId}"]`);
-                if(letterElement) {
-                    letterElement.style.display = 'none';
+            // Add shadow effect
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            this.ctx.fillText(char, 2, 2);
+            
+            this.ctx.restore();
+        }
+        
+        // Add wave distortion effect
+        this.ctx.globalCompositeOperation = 'source-over';
+        this.ctx.strokeStyle = 'rgba(255, 107, 53, 0.1)';
+        this.ctx.lineWidth = 2;
+        for(let i = 0; i < 3; i++) {
+            this.ctx.beginPath();
+            for(let x = 0; x < this.canvas.width; x += 2) {
+                const y = this.canvas.height / 2 + Math.sin(x * 0.02 + i) * 15;
+                if(x === 0) {
+                    this.ctx.moveTo(x, y);
+                } else {
+                    this.ctx.lineTo(x, y);
                 }
-                
-                // Add letter to drop zone
-                zone.textContent = letter;
-                zone.classList.add('filled');
-                zone.dataset.letter = letter;
-                
-                this.draggedLetters[position] = letter;
-            });
-        });
+            }
+            this.ctx.stroke();
+        }
     }
 
     verifyChallenge() {
-        let isCorrect = false;
+        const input = this.challengeContainer.querySelector('.captcha-input');
+        if(!input) return;
         
-        switch(this.currentChallenge) {
-            case 'math':
-                const mathInput = this.challengeContainer.querySelector('.captcha-input');
-                isCorrect = parseInt(mathInput.value) === this.answer;
-                break;
-                
-            case 'image':
-                const correctSet = new Set(this.correctAnswers);
-                const selectedSet = new Set(this.selectedImages);
-                isCorrect = correctSet.size === selectedSet.size && 
-                           [...correctSet].every(item => selectedSet.has(item));
-                break;
-                
-            case 'drag':
-                const draggedWord = this.draggedLetters.join('');
-                isCorrect = draggedWord === this.correctWord;
-                break;
-                
-            case 'text':
-                const textInput = this.challengeContainer.querySelector('.captcha-input');
-                isCorrect = textInput.value.toUpperCase() === this.captchaText;
-                break;
-        }
+        const userInput = input.value.trim();
+        const isCorrect = userInput.toLowerCase() === this.currentText.toLowerCase();
         
         if(isCorrect) {
             this.handleSuccess();
@@ -425,7 +217,7 @@ class AdvancedCaptcha {
             const errorMessage = `
                 <div class="captcha-error-message">
                     <i class="fas fa-times-circle"></i>
-                    Incorrect answer. ${this.maxAttempts - this.attempts} attempts remaining.
+                    Incorrect selection. ${this.maxAttempts - this.attempts} attempts remaining.
                 </div>
             `;
             this.challengeContainer.insertAdjacentHTML('afterbegin', errorMessage);
@@ -452,7 +244,6 @@ class AdvancedCaptcha {
         this.isVerified = false;
         this.attempts = 0;
         this.selectedImages = [];
-        this.draggedLetters = [];
         this.container.classList.remove('captcha-success', 'captcha-error');
         this.generateChallenge();
     }
@@ -673,10 +464,14 @@ function checkForSuccessMessage() {
     const success = urlParams.get('success');
 
     if (success === 'demo') {
+        // Scroll to top immediately
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         showSuccessMessage('Demo Booking Successful!', 'Your demo session has been booked successfully. We will contact you soon to confirm the details.');
         // Clear the URL parameter
         window.history.replaceState({}, document.title, window.location.pathname);
     } else if (success === 'contact') {
+        // Scroll to top immediately
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         showSuccessMessage('Message Sent!', 'Your message has been sent successfully. We will get back to you soon!');
         // Clear the URL parameter
         window.history.replaceState({}, document.title, window.location.pathname);
@@ -891,7 +686,7 @@ document.querySelectorAll('.circle-progress').forEach(circle => {
     progressObserver.observe(circle);
 });
 
-// Form handling with enhanced security and CAPTCHA
+// Form handling with simple CAPTCHA
 let demoCaptcha, contactCaptcha, formSecurity;
 
 // Initialize security and CAPTCHA systems
@@ -899,9 +694,9 @@ function initializeFormSecurity() {
     // Initialize form security
     formSecurity = new FormSecurity();
     
-    // Initialize CAPTCHA systems
-    demoCaptcha = new AdvancedCaptcha('demoCaptcha', 'demo');
-    contactCaptcha = new AdvancedCaptcha('contactCaptcha', 'contact');
+    // Initialize simple CAPTCHA systems
+    demoCaptcha = new SimpleCaptcha('demoCaptcha', 'demo');
+    contactCaptcha = new SimpleCaptcha('contactCaptcha', 'contact');
 }
 
 // Enhanced form submission handlers
@@ -911,13 +706,7 @@ const modal = document.getElementById('successModal');
 
 if (demoForm) {
     demoForm.addEventListener('submit', (e) => {
-        // Prevent default submission initially
-        e.preventDefault();
-        
-        // Check rate limiting
-        if (!formSecurity.addRateLimiting()) {
-            return false;
-        }
+        e.preventDefault(); // Prevent default submission
         
         // Validate CAPTCHA
         if (!demoCaptcha.isVerified) {
@@ -975,33 +764,42 @@ if (demoForm) {
         // Show loading state
         const submitBtn = document.getElementById('demoSubmitBtn');
         if (submitBtn) {
-            const originalContent = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Booking Demo...';
             submitBtn.disabled = true;
-            
-            // Record submission for rate limiting
-            formSecurity.recordSubmission();
-            
-            // Add a small delay to show loading state
-            setTimeout(() => {
-                // Submit the form
-                demoForm.submit();
-            }, 500);
         }
-
-        return false; // Prevent default behavior, we'll submit manually
+        
+        // Submit form data to FormSubmit
+        const formData = new FormData(demoForm);
+        
+        fetch('https://formsubmit.co/newlifeconnection1@gmail.com', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                // Redirect to success page
+                window.location.href = window.location.origin + '/?success=demo';
+            } else {
+                throw new Error('Network response was not ok');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showErrorFeedback('demo', 'There was an error submitting your form. Please try again.');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="fas fa-calendar-check"></i> Book Free Demo';
+                submitBtn.disabled = false;
+            }
+        });
     });
 }
 
 if (contactForm) {
     contactForm.addEventListener('submit', (e) => {
-        // Prevent default submission initially
-        e.preventDefault();
-        
-        // Check rate limiting
-        if (!formSecurity.addRateLimiting()) {
-            return false;
-        }
+        e.preventDefault(); // Prevent default submission
         
         // Validate CAPTCHA
         if (!contactCaptcha.isVerified) {
@@ -1053,21 +851,36 @@ if (contactForm) {
         // Show loading state
         const submitBtn = document.getElementById('contactSubmitBtn');
         if (submitBtn) {
-            const originalContent = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending Message...';
             submitBtn.disabled = true;
-            
-            // Record submission for rate limiting
-            formSecurity.recordSubmission();
-            
-            // Add a small delay to show loading state
-            setTimeout(() => {
-                // Submit the form
-                contactForm.submit();
-            }, 500);
         }
-
-        return false; // Prevent default behavior, we'll submit manually
+        
+        // Submit form data to FormSubmit
+        const formData = new FormData(contactForm);
+        
+        fetch('https://formsubmit.co/newlifeconnection1@gmail.com', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                // Redirect to success page
+                window.location.href = window.location.origin + '/?success=contact';
+            } else {
+                throw new Error('Network response was not ok');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showErrorFeedback('contact', 'There was an error submitting your form. Please try again.');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Send Message';
+                submitBtn.disabled = false;
+            }
+        });
     });
 }
 
@@ -2224,6 +2037,9 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('New Lifestyle Gym website loaded successfully!');
 
     try {
+        // Always scroll to top first to ensure page loads at hero section
+        window.scrollTo(0, 0);
+
         // Check for success messages first
         checkForSuccessMessage();
 
@@ -2277,16 +2093,22 @@ function enhanceMobileFormExperience() {
         input.style.minHeight = '48px';
         input.style.fontSize = '16px'; // Prevents zoom on iOS
         
-        // Add better focus handling
+        // Add better focus handling with top scroll
         input.addEventListener('focus', () => {
-            // Slight delay to account for virtual keyboard
-            setTimeout(() => {
-                input.scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'center',
-                    inline: 'nearest'
-                });
-            }, 300);
+            // Prevent auto-scroll to form field, keep at top
+            if (window.innerWidth <= 768) {
+                setTimeout(() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 200);
+            }
+        });
+        
+        // Enhanced validation feedback for mobile
+        input.addEventListener('blur', () => {
+            if (input.validity && !input.validity.valid) {
+                input.style.borderColor = '#dc3545';
+                input.style.boxShadow = '0 0 0 3px rgba(220, 53, 69, 0.2)';
+            }
         });
     });
     
@@ -2295,5 +2117,34 @@ function enhanceMobileFormExperience() {
     captchaContainers.forEach(container => {
         container.style.padding = '1.5rem';
         container.style.marginBottom = '2rem';
+        container.style.borderRadius = '12px';
+        container.style.touchAction = 'manipulation';
+    });
+    
+    // Add honeypot fields for enhanced security
+    addHoneypotSecurity();
+}
+
+// Enhanced security with honeypot fields
+function addHoneypotSecurity() {
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        // Add honeypot field
+        const honeypot = document.createElement('input');
+        honeypot.type = 'text';
+        honeypot.name = 'website';
+        honeypot.style.cssText = 'position: absolute; left: -9999px; opacity: 0; pointer-events: none;';
+        honeypot.tabIndex = -1;
+        honeypot.autocomplete = 'off';
+        form.appendChild(honeypot);
+        
+        // Add another honeypot
+        const honeypot2 = document.createElement('input');
+        honeypot2.type = 'email';
+        honeypot2.name = 'confirm_email';
+        honeypot2.style.cssText = 'position: absolute; left: -9999px; opacity: 0; pointer-events: none;';
+        honeypot2.tabIndex = -1;
+        honeypot2.autocomplete = 'off';
+        form.appendChild(honeypot2);
     });
 }
