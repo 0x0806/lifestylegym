@@ -1524,7 +1524,11 @@ section {
     border-radius: 4px;
 }
 
-/* Image Challenge Styles */
+/* Text Recognition CAPTCHA Styles */
+.text-challenge {
+    width: 100%;
+}
+
 .captcha-instruction {
     display: flex;
     align-items: center;
@@ -1533,64 +1537,74 @@ section {
     padding: 0.75rem;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
-    color: white;
+    color: var(--light-color);
+    font-weight: 500;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.image-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
+.captcha-instruction i {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.captcha-canvas-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.captcha-canvas {
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+    height: auto;
+}
+
+.captcha-input-container {
     margin-bottom: 1rem;
 }
 
-.image-grid-item {
-    aspect-ratio: 1;
+.captcha-input {
+    width: 100%;
+    padding: 1rem;
     border: 2px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.image-grid-item:hover {
-    border-color: var(--primary-color);
+    border-radius: 10px;
     background: rgba(255, 255, 255, 0.1);
+    color: var(--light-color);
+    font-size: 1.1rem;
+    transition: var(--transition);
+    text-align: center;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
-.image-grid-item.selected {
-    border-color: #28a745;
-    background: rgba(40, 167, 69, 0.2);
+.captcha-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+    background: rgba(255, 255, 255, 0.15);
 }
 
-.image-grid-item.selected::after {
-    content: '✓';
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background: var(--success-color);
-    color: white;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.8rem;
-    font-weight: bold;
-}
-
-.gym-icon {
-    font-size: 2rem;
-    color: white;
+.captcha-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: normal;
+    letter-spacing: normal;
+    text-transform: none;
 }
 
 .captcha-controls {
     display: flex;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
 }
 
 .captcha-verify {
@@ -2210,23 +2224,25 @@ section {
     color: var(--primary-color);
 }
 
-.contact-form .math-challenge .captcha-question-container,
-.contact-form .image-grid,
-.contact-form .drag-source,
-.contact-form .drag-target,
 .contact-form .captcha-canvas-container {
     background: var(--light-gray);
     border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.contact-form .question-text,
-.contact-form .captcha-input {
+.contact-form .captcha-instruction {
+    background: var(--light-gray);
     color: var(--dark-color);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.contact-form .captcha-instruction i {
+    color: var(--primary-color);
 }
 
 .contact-form .captcha-input {
     background: white;
     border: 2px solid var(--light-gray);
+    color: var(--dark-color);
 }
 
 .contact-form .captcha-input:focus {
@@ -2234,18 +2250,12 @@ section {
     box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
 }
 
+.contact-form .captcha-input::placeholder {
+    color: var(--gray-color);
+}
+
 .contact-form .captcha-attempts {
     color: var(--gray-color);
-}
-
-.contact-form .drop-zone {
-    border-color: rgba(0, 0, 0, 0.3);
-    color: var(--gray-color);
-}
-
-.contact-form .drop-zone.drag-over {
-    border-color: var(--primary-color);
-    background: rgba(255, 107, 53, 0.1);
 }
 
 /* Responsive CAPTCHA Styles */
@@ -2254,36 +2264,31 @@ section {
         padding: 1rem;
     }
 
-    .image-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 0.5rem;
-        padding: 0.75rem;
-    }
-
-    .image-grid-item {
-        min-height: 60px;
-    }
-
-    .gym-icon {
-        font-size: 1.2rem;
-    }
-
-    .draggable-letter,
-    .drop-zone {
-        width: 50px;
-        height: 50px;
-        font-size: 1.4rem;
-    }
-
-    .drag-source,
-    .drag-target {
-        gap: 0.75rem;
+    .captcha-canvas-container {
         padding: 0.75rem;
     }
 
     .captcha-canvas {
+        width: 280px;
+        height: 90px;
         max-width: 100%;
-        height: auto;
+    }
+
+    .captcha-input {
+        font-size: 1rem;
+        padding: 0.875rem;
+        letter-spacing: 1px;
+    }
+
+    .captcha-controls {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .captcha-verify,
+    .captcha-refresh {
+        width: 100%;
+        min-height: 44px;
     }
 
     .captcha-controls {
