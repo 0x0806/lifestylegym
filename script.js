@@ -1,3 +1,672 @@
+// Advanced CAPTCHA System
+class AdvancedCaptcha {
+    constructor(containerId, formId) {
+        this.container = document.getElementById(containerId);
+        this.formId = formId;
+        this.challengeContainer = document.getElementById(containerId + 'Challenge');
+        this.isVerified = false;
+        this.attempts = 0;
+        this.maxAttempts = 3;
+        this.challengeTypes = ['math', 'image', 'drag', 'text'];
+        this.currentChallenge = null;
+        
+        this.init();
+    }
+
+    init() {
+        this.generateChallenge();
+        this.setupEventListeners();
+    }
+
+    generateChallenge() {
+        // Rotate through different challenge types
+        const challengeType = this.challengeTypes[Math.floor(Math.random() * this.challengeTypes.length)];
+        this.currentChallenge = challengeType;
+        
+        // Clear previous challenge
+        this.challengeContainer.innerHTML = '';
+        
+        switch(challengeType) {
+            case 'math':
+                this.createMathChallenge();
+                break;
+            case 'image':
+                this.createImageChallenge();
+                break;
+            case 'drag':
+                this.createDragChallenge();
+                break;
+            case 'text':
+                this.createTextChallenge();
+                break;
+        }
+        
+        this.updateSubmitButton(false);
+    }
+
+    createMathChallenge() {
+        const num1 = Math.floor(Math.random() * 20) + 1;
+        const num2 = Math.floor(Math.random() * 20) + 1;
+        const operations = ['+', '-', '×'];
+        const operation = operations[Math.floor(Math.random() * operations.length)];
+        
+        let answer;
+        let questionText;
+        
+        switch(operation) {
+            case '+':
+                answer = num1 + num2;
+                questionText = `${num1} + ${num2}`;
+                break;
+            case '-':
+                answer = Math.max(num1, num2) - Math.min(num1, num2);
+                questionText = `${Math.max(num1, num2)} - ${Math.min(num1, num2)}`;
+                break;
+            case '×':
+                const smallNum1 = Math.floor(Math.random() * 12) + 1;
+                const smallNum2 = Math.floor(Math.random() * 12) + 1;
+                answer = smallNum1 * smallNum2;
+                questionText = `${smallNum1} × ${smallNum2}`;
+                break;
+        }
+        
+        this.answer = answer;
+        
+        const html = `
+            <div class="math-challenge">
+                <div class="captcha-instruction">
+                    <i class="fas fa-calculator"></i>
+                    Solve this math problem to continue
+                </div>
+                <div class="captcha-question-container">
+                    <div class="math-question">
+                        <i class="fas fa-equals"></i>
+                        <span class="question-text">What is ${questionText}?</span>
+                    </div>
+                    <button type="button" class="captcha-refresh" onclick="this.closest('.advanced-captcha-container').captchaInstance.generateChallenge()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <input type="number" class="captcha-input" placeholder="Enter your answer" required>
+                <div class="captcha-attempts">Attempts remaining: ${this.maxAttempts - this.attempts}</div>
+            </div>
+        `;
+        
+        this.challengeContainer.innerHTML = html;
+        this.challengeContainer.querySelector('.captcha-input').focus();
+    }
+
+    createImageChallenge() {
+        const gymItems = [
+            { icon: 'fas fa-dumbbell', name: 'Dumbbell', isGym: true },
+            { icon: 'fas fa-running', name: 'Running', isGym: true },
+            { icon: 'fas fa-bicycle', name: 'Exercise Bike', isGym: true },
+            { icon: 'fas fa-swimming-pool', name: 'Pool', isGym: true },
+            { icon: 'fas fa-weight-hanging', name: 'Weights', isGym: true },
+            { icon: 'fas fa-heartbeat', name: 'Cardio', isGym: true },
+            { icon: 'fas fa-car', name: 'Car', isGym: false },
+            { icon: 'fas fa-pizza-slice', name: 'Pizza', isGym: false },
+            { icon: 'fas fa-book', name: 'Book', isGym: false },
+            { icon: 'fas fa-coffee', name: 'Coffee', isGym: false },
+            { icon: 'fas fa-home', name: 'House', isGym: false },
+            { icon: 'fas fa-music', name: 'Music', isGym: false }
+        ];
+        
+        // Select 9 random items with at least 3 gym items
+        const selectedItems = [];
+        const gymItemsFiltered = gymItems.filter(item => item.isGym);
+        const nonGymItems = gymItems.filter(item => !item.isGym);
+        
+        // Add 3-5 gym items
+        const gymCount = 3 + Math.floor(Math.random() * 3);
+        for(let i = 0; i < gymCount; i++) {
+            const randomGymItem = gymItemsFiltered[Math.floor(Math.random() * gymItemsFiltered.length)];
+            if(!selectedItems.includes(randomGymItem)) {
+                selectedItems.push(randomGymItem);
+            }
+        }
+        
+        // Fill remaining with non-gym items
+        while(selectedItems.length < 9) {
+            const randomItem = nonGymItems[Math.floor(Math.random() * nonGymItems.length)];
+            if(!selectedItems.includes(randomItem)) {
+                selectedItems.push(randomItem);
+            }
+        }
+        
+        // Shuffle the array
+        selectedItems.sort(() => Math.random() - 0.5);
+        
+        this.correctAnswers = selectedItems.filter(item => item.isGym).map(item => item.name);
+        this.selectedImages = [];
+        
+        const html = `
+            <div class="image-challenge">
+                <div class="captcha-instruction">
+                    <i class="fas fa-mouse-pointer"></i>
+                    Click on all gym/fitness related items
+                </div>
+                <div class="image-grid">
+                    ${selectedItems.map((item, index) => `
+                        <div class="image-grid-item" data-item="${item.name}" data-index="${index}">
+                            <i class="${item.icon} gym-icon"></i>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="captcha-controls">
+                    <button type="button" class="captcha-verify">Verify Selection</button>
+                    <button type="button" class="captcha-refresh" onclick="this.closest('.advanced-captcha-container').captchaInstance.generateChallenge()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="captcha-attempts">Attempts remaining: ${this.maxAttempts - this.attempts}</div>
+            </div>
+        `;
+        
+        this.challengeContainer.innerHTML = html;
+        this.setupImageChallengeEvents();
+    }
+
+    createDragChallenge() {
+        const words = ['FITNESS', 'STRONG', 'HEALTH', 'POWER', 'ENERGY'];
+        const selectedWord = words[Math.floor(Math.random() * words.length)];
+        const letters = selectedWord.split('');
+        const shuffledLetters = [...letters].sort(() => Math.random() - 0.5);
+        
+        this.correctWord = selectedWord;
+        this.draggedLetters = [];
+        
+        const html = `
+            <div class="drag-challenge">
+                <div class="captcha-instruction">
+                    <i class="fas fa-hand-pointer"></i>
+                    Drag the letters to spell: <strong>${selectedWord}</strong>
+                </div>
+                <div class="drag-container">
+                    <div class="drag-source">
+                        ${shuffledLetters.map((letter, index) => `
+                            <div class="draggable-letter" draggable="true" data-letter="${letter}" data-id="${index}">
+                                ${letter}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="drag-target">
+                        ${letters.map((_, index) => `
+                            <div class="drop-zone" data-position="${index}">
+                                ${index + 1}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="captcha-controls">
+                    <button type="button" class="captcha-verify">Verify Word</button>
+                    <button type="button" class="captcha-refresh" onclick="this.closest('.advanced-captcha-container').captchaInstance.generateChallenge()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="captcha-attempts">Attempts remaining: ${this.maxAttempts - this.attempts}</div>
+            </div>
+        `;
+        
+        this.challengeContainer.innerHTML = html;
+        this.setupDragChallengeEvents();
+    }
+
+    createTextChallenge() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 200;
+        canvas.height = 60;
+        canvas.className = 'captcha-canvas';
+        
+        const ctx = canvas.getContext('2d');
+        
+        // Generate random text
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        const captchaText = Array.from({length: 6}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+        this.captchaText = captchaText;
+        
+        // Draw background with noise
+        ctx.fillStyle = '#f0f0f0';
+        ctx.fillRect(0, 0, 200, 60);
+        
+        // Add noise lines
+        for(let i = 0; i < 10; i++) {
+            ctx.strokeStyle = `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.3)`;
+            ctx.beginPath();
+            ctx.moveTo(Math.random() * 200, Math.random() * 60);
+            ctx.lineTo(Math.random() * 200, Math.random() * 60);
+            ctx.stroke();
+        }
+        
+        // Draw text
+        ctx.font = 'bold 24px Arial';
+        ctx.fillStyle = '#333';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        for(let i = 0; i < captchaText.length; i++) {
+            const x = 20 + i * 28;
+            const y = 30 + (Math.random() - 0.5) * 10;
+            const rotation = (Math.random() - 0.5) * 0.5;
+            
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rotation);
+            ctx.fillText(captchaText[i], 0, 0);
+            ctx.restore();
+        }
+        
+        const html = `
+            <div class="text-challenge">
+                <div class="captcha-instruction">
+                    <i class="fas fa-eye"></i>
+                    Enter the text shown in the image
+                </div>
+                <div class="captcha-canvas-container"></div>
+                <input type="text" class="captcha-input" placeholder="Enter the text" maxlength="6" required>
+                <div class="captcha-controls">
+                    <button type="button" class="captcha-verify">Verify Text</button>
+                    <button type="button" class="captcha-refresh" onclick="this.closest('.advanced-captcha-container').captchaInstance.generateChallenge()">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+                <div class="captcha-attempts">Attempts remaining: ${this.maxAttempts - this.attempts}</div>
+            </div>
+        `;
+        
+        this.challengeContainer.innerHTML = html;
+        this.challengeContainer.querySelector('.captcha-canvas-container').appendChild(canvas);
+        this.challengeContainer.querySelector('.captcha-input').focus();
+    }
+
+    setupEventListeners() {
+        // Store reference to this instance
+        this.container.captchaInstance = this;
+        
+        // Common event listeners
+        this.challengeContainer.addEventListener('click', (e) => {
+            if(e.target.classList.contains('captcha-verify')) {
+                this.verifyChallenge();
+            }
+        });
+        
+        this.challengeContainer.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter' && (this.currentChallenge === 'math' || this.currentChallenge === 'text')) {
+                this.verifyChallenge();
+            }
+        });
+    }
+
+    setupImageChallengeEvents() {
+        const imageItems = this.challengeContainer.querySelectorAll('.image-grid-item');
+        imageItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const itemName = item.dataset.item;
+                if(item.classList.contains('selected')) {
+                    item.classList.remove('selected');
+                    this.selectedImages = this.selectedImages.filter(name => name !== itemName);
+                } else {
+                    item.classList.add('selected');
+                    this.selectedImages.push(itemName);
+                }
+            });
+        });
+    }
+
+    setupDragChallengeEvents() {
+        const draggableLetters = this.challengeContainer.querySelectorAll('.draggable-letter');
+        const dropZones = this.challengeContainer.querySelectorAll('.drop-zone');
+        
+        draggableLetters.forEach(letter => {
+            letter.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', e.target.dataset.letter);
+                e.dataTransfer.setData('application/x-letter-id', e.target.dataset.id);
+            });
+        });
+        
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('drag-over');
+            });
+            
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('drag-over');
+            });
+            
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('drag-over');
+                
+                const letter = e.dataTransfer.getData('text/plain');
+                const letterId = e.dataTransfer.getData('application/x-letter-id');
+                const position = parseInt(zone.dataset.position);
+                
+                // Remove letter from source
+                const letterElement = this.challengeContainer.querySelector(`[data-id="${letterId}"]`);
+                if(letterElement) {
+                    letterElement.style.display = 'none';
+                }
+                
+                // Add letter to drop zone
+                zone.textContent = letter;
+                zone.classList.add('filled');
+                zone.dataset.letter = letter;
+                
+                this.draggedLetters[position] = letter;
+            });
+        });
+    }
+
+    verifyChallenge() {
+        let isCorrect = false;
+        
+        switch(this.currentChallenge) {
+            case 'math':
+                const mathInput = this.challengeContainer.querySelector('.captcha-input');
+                isCorrect = parseInt(mathInput.value) === this.answer;
+                break;
+                
+            case 'image':
+                const correctSet = new Set(this.correctAnswers);
+                const selectedSet = new Set(this.selectedImages);
+                isCorrect = correctSet.size === selectedSet.size && 
+                           [...correctSet].every(item => selectedSet.has(item));
+                break;
+                
+            case 'drag':
+                const draggedWord = this.draggedLetters.join('');
+                isCorrect = draggedWord === this.correctWord;
+                break;
+                
+            case 'text':
+                const textInput = this.challengeContainer.querySelector('.captcha-input');
+                isCorrect = textInput.value.toUpperCase() === this.captchaText;
+                break;
+        }
+        
+        if(isCorrect) {
+            this.handleSuccess();
+        } else {
+            this.handleFailure();
+        }
+    }
+
+    handleSuccess() {
+        this.isVerified = true;
+        this.container.classList.add('captcha-success');
+        this.challengeContainer.innerHTML = `
+            <div class="captcha-success-message">
+                <i class="fas fa-check-circle"></i>
+                Verification successful! You may now submit the form.
+            </div>
+        `;
+        this.updateSubmitButton(true);
+    }
+
+    handleFailure() {
+        this.attempts++;
+        this.container.classList.add('captcha-error');
+        
+        setTimeout(() => {
+            this.container.classList.remove('captcha-error');
+        }, 500);
+        
+        if(this.attempts >= this.maxAttempts) {
+            this.challengeContainer.innerHTML = `
+                <div class="captcha-error-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Too many failed attempts. Please refresh the page and try again.
+                </div>
+            `;
+            this.updateSubmitButton(false);
+        } else {
+            // Show error message briefly then regenerate
+            const errorMessage = `
+                <div class="captcha-error-message">
+                    <i class="fas fa-times-circle"></i>
+                    Incorrect answer. ${this.maxAttempts - this.attempts} attempts remaining.
+                </div>
+            `;
+            this.challengeContainer.insertAdjacentHTML('afterbegin', errorMessage);
+            
+            setTimeout(() => {
+                this.generateChallenge();
+            }, 2000);
+        }
+    }
+
+    updateSubmitButton(enabled) {
+        const submitBtn = document.getElementById(this.formId + 'SubmitBtn');
+        if(submitBtn) {
+            submitBtn.disabled = !enabled;
+            if(enabled) {
+                submitBtn.classList.add('btn-success-state');
+            } else {
+                submitBtn.classList.remove('btn-success-state');
+            }
+        }
+    }
+
+    reset() {
+        this.isVerified = false;
+        this.attempts = 0;
+        this.selectedImages = [];
+        this.draggedLetters = [];
+        this.container.classList.remove('captcha-success', 'captcha-error');
+        this.generateChallenge();
+    }
+}
+
+// Form Security Enhancement
+class FormSecurity {
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        this.addSecurityFields();
+        this.setupFormValidation();
+        this.addRateLimiting();
+        this.setupCSRFProtection();
+    }
+
+    addSecurityFields() {
+        // Add timestamp
+        const timestampFields = document.querySelectorAll('[id$="Timestamp"]');
+        timestampFields.forEach(field => {
+            field.value = Date.now();
+        });
+
+        // Add user agent
+        const userAgentFields = document.querySelectorAll('[id$="UserAgent"]');
+        userAgentFields.forEach(field => {
+            field.value = navigator.userAgent.substring(0, 200); // Limit length
+        });
+
+        // Add referrer
+        const referrerFields = document.querySelectorAll('[id$="Referrer"]');
+        referrerFields.forEach(field => {
+            field.value = document.referrer || 'direct';
+        });
+    }
+
+    setupFormValidation() {
+        // Email validation
+        const emailInputs = document.querySelectorAll('input[type="email"]');
+        emailInputs.forEach(input => {
+            input.addEventListener('blur', (e) => {
+                const email = e.target.value;
+                if(email && !this.isValidEmail(email)) {
+                    this.showFieldError(e.target, 'Please enter a valid email address');
+                } else {
+                    this.clearFieldError(e.target);
+                }
+            });
+        });
+
+        // Phone validation
+        const phoneInputs = document.querySelectorAll('input[type="tel"]');
+        phoneInputs.forEach(input => {
+            input.addEventListener('blur', (e) => {
+                const phone = e.target.value;
+                if(phone && !this.isValidPhone(phone)) {
+                    this.showFieldError(e.target, 'Please enter a valid phone number');
+                } else {
+                    this.clearFieldError(e.target);
+                }
+            });
+        });
+
+        // Character counter for textarea
+        const messageTextarea = document.getElementById('contactMessage');
+        if(messageTextarea) {
+            const counter = document.getElementById('messageCount');
+            messageTextarea.addEventListener('input', (e) => {
+                const count = e.target.value.length;
+                counter.textContent = count;
+                if(count > 1000) {
+                    counter.style.color = 'var(--danger-color)';
+                } else {
+                    counter.style.color = '';
+                }
+            });
+        }
+    }
+
+    addRateLimiting() {
+        const formSubmissions = JSON.parse(localStorage.getItem('formSubmissions') || '[]');
+        const now = Date.now();
+        const fiveMinutesAgo = now - (5 * 60 * 1000);
+        
+        // Clean old submissions
+        const recentSubmissions = formSubmissions.filter(time => time > fiveMinutesAgo);
+        localStorage.setItem('formSubmissions', JSON.stringify(recentSubmissions));
+        
+        // Check if too many recent submissions
+        if(recentSubmissions.length >= 3) {
+            this.showRateLimitError();
+            return false;
+        }
+        
+        return true;
+    }
+
+    setupCSRFProtection() {
+        // Generate a simple CSRF token
+        const csrfToken = this.generateCSRFToken();
+        sessionStorage.setItem('csrfToken', csrfToken);
+        
+        // Add CSRF token to forms
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = '_csrf_token';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+        });
+    }
+
+    generateCSRFToken() {
+        return 'csrf_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now().toString(36);
+    }
+
+    isValidEmail(email) {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email) && email.length <= 100;
+    }
+
+    isValidPhone(phone) {
+        const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+        const regex = /^[\+]?[1-9][\d]{6,14}$/;
+        return regex.test(cleanPhone);
+    }
+
+    showFieldError(field, message) {
+        this.clearFieldError(field);
+        field.classList.add('field-error');
+        
+        const errorElement = document.createElement('div');
+        errorElement.className = 'field-error-message';
+        errorElement.textContent = message;
+        errorElement.style.cssText = `
+            color: var(--danger-color);
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: block;
+        `;
+        
+        field.parentElement.appendChild(errorElement);
+    }
+
+    clearFieldError(field) {
+        field.classList.remove('field-error');
+        const errorElement = field.parentElement.querySelector('.field-error-message');
+        if(errorElement) {
+            errorElement.remove();
+        }
+    }
+
+    showRateLimitError() {
+        showErrorFeedback('rate-limit', 'Too many form submissions. Please wait 5 minutes before trying again.');
+    }
+
+    recordSubmission() {
+        const formSubmissions = JSON.parse(localStorage.getItem('formSubmissions') || '[]');
+        formSubmissions.push(Date.now());
+        localStorage.setItem('formSubmissions', JSON.stringify(formSubmissions));
+    }
+}
+
+// Enhanced Error and Success Feedback
+function showErrorFeedback(formType, message) {
+    const container = formType === 'demo' ? 
+        document.querySelector('#demo .demo-form') : 
+        document.querySelector('#contact .contact-form-container');
+    
+    // Remove existing messages
+    const existingError = container.querySelector('.form-error-message');
+    if(existingError) existingError.remove();
+    
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'form-error-message';
+    errorDiv.innerHTML = `
+        <div class="error-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    container.insertBefore(errorDiv, container.firstChild);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if(errorDiv.parentElement) {
+            errorDiv.remove();
+        }
+    }, 5000);
+}
+
+function showSuccessMessage(title, message) {
+    const modal = document.getElementById('successModal');
+    if (modal) {
+        const modalTitle = modal.querySelector('h3');
+        const modalMessage = modal.querySelector('p');
+
+        if (modalTitle) modalTitle.textContent = title;
+        if (modalMessage) modalMessage.textContent = message;
+
+        modal.style.display = 'flex';
+        modal.style.opacity = '1';
+
+        // Auto-hide after 5 seconds
+        setTimeout(() => {
+            closeModal();
+        }, 5000);
+    }
+}
+
 // Check for success parameter in URL and show success message
 function checkForSuccessMessage() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -222,77 +891,183 @@ document.querySelectorAll('.circle-progress').forEach(circle => {
     progressObserver.observe(circle);
 });
 
-// Form handling with FormSubmit - safe initialization
+// Form handling with enhanced security and CAPTCHA
+let demoCaptcha, contactCaptcha, formSecurity;
+
+// Initialize security and CAPTCHA systems
+function initializeFormSecurity() {
+    // Initialize form security
+    formSecurity = new FormSecurity();
+    
+    // Initialize CAPTCHA systems
+    demoCaptcha = new AdvancedCaptcha('demoCaptcha', 'demo');
+    contactCaptcha = new AdvancedCaptcha('contactCaptcha', 'contact');
+}
+
+// Enhanced form submission handlers
 const demoForm = document.getElementById('demoForm');
 const contactForm = document.getElementById('contactForm');
 const modal = document.getElementById('successModal');
 
-// Add loading states to forms
 if (demoForm) {
     demoForm.addEventListener('submit', (e) => {
-        // Check required fields first
+        // Prevent default submission initially
+        e.preventDefault();
+        
+        // Check rate limiting
+        if (!formSecurity.addRateLimiting()) {
+            return false;
+        }
+        
+        // Validate CAPTCHA
+        if (!demoCaptcha.isVerified) {
+            showErrorFeedback('demo', 'Please complete the security verification first.');
+            return false;
+        }
+        
+        // Validate all required fields
         const requiredFields = demoForm.querySelectorAll('[required]');
         let allValid = true;
+        let firstInvalidField = null;
 
         requiredFields.forEach(field => {
-            if (!field.value.trim()) {
+            const value = field.value.trim();
+            
+            if (!value) {
                 allValid = false;
-                field.style.borderColor = '#e74c3c';
-                field.focus();
+                field.classList.add('field-error');
+                if (!firstInvalidField) firstInvalidField = field;
             } else {
-                field.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                field.classList.remove('field-error');
+                
+                // Additional validation based on field type
+                if (field.type === 'email' && !formSecurity.isValidEmail(value)) {
+                    allValid = false;
+                    formSecurity.showFieldError(field, 'Please enter a valid email address');
+                    if (!firstInvalidField) firstInvalidField = field;
+                } else if (field.type === 'tel' && !formSecurity.isValidPhone(value)) {
+                    allValid = false;
+                    formSecurity.showFieldError(field, 'Please enter a valid phone number');
+                    if (!firstInvalidField) firstInvalidField = field;
+                } else if (field.type === 'date') {
+                    const selectedDate = new Date(value);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    if (selectedDate < today) {
+                        allValid = false;
+                        formSecurity.showFieldError(field, 'Please select a future date');
+                        if (!firstInvalidField) firstInvalidField = field;
+                    }
+                }
             }
         });
 
         if (!allValid) {
-            e.preventDefault();
             showErrorFeedback('demo', 'Please fill in all required fields correctly.');
+            if (firstInvalidField) {
+                firstInvalidField.focus();
+                firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
             return false;
         }
 
         // Show loading state
-        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const submitBtn = document.getElementById('demoSubmitBtn');
         if (submitBtn) {
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            const originalContent = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Booking Demo...';
             submitBtn.disabled = true;
+            
+            // Record submission for rate limiting
+            formSecurity.recordSubmission();
+            
+            // Add a small delay to show loading state
+            setTimeout(() => {
+                // Submit the form
+                demoForm.submit();
+            }, 500);
         }
 
-        // Form will submit to FormSubmit
-        return true;
+        return false; // Prevent default behavior, we'll submit manually
     });
 }
 
 if (contactForm) {
     contactForm.addEventListener('submit', (e) => {
-        // Check required fields first
+        // Prevent default submission initially
+        e.preventDefault();
+        
+        // Check rate limiting
+        if (!formSecurity.addRateLimiting()) {
+            return false;
+        }
+        
+        // Validate CAPTCHA
+        if (!contactCaptcha.isVerified) {
+            showErrorFeedback('contact', 'Please complete the security verification first.');
+            return false;
+        }
+        
+        // Validate all required fields
         const requiredFields = contactForm.querySelectorAll('[required]');
         let allValid = true;
+        let firstInvalidField = null;
 
         requiredFields.forEach(field => {
-            if (!field.value.trim()) {
+            const value = field.value.trim();
+            
+            if (!value) {
                 allValid = false;
-                field.style.borderColor = '#e74c3c';
-                if (allValid) field.focus(); // Focus first invalid field
+                field.classList.add('field-error');
+                if (!firstInvalidField) firstInvalidField = field;
             } else {
-                field.style.borderColor = '#f8f9fa';
+                field.classList.remove('field-error');
+                
+                // Additional validation
+                if (field.type === 'email' && !formSecurity.isValidEmail(value)) {
+                    allValid = false;
+                    formSecurity.showFieldError(field, 'Please enter a valid email address');
+                    if (!firstInvalidField) firstInvalidField = field;
+                }
             }
         });
 
+        // Check message length
+        const messageField = document.getElementById('contactMessage');
+        if (messageField && messageField.value.length > 1000) {
+            allValid = false;
+            formSecurity.showFieldError(messageField, 'Message must be 1000 characters or less');
+            if (!firstInvalidField) firstInvalidField = messageField;
+        }
+
         if (!allValid) {
-            e.preventDefault();
             showErrorFeedback('contact', 'Please fill in all required fields correctly.');
+            if (firstInvalidField) {
+                firstInvalidField.focus();
+                firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
             return false;
         }
 
         // Show loading state
-        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const submitBtn = document.getElementById('contactSubmitBtn');
         if (submitBtn) {
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            const originalContent = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending Message...';
             submitBtn.disabled = true;
+            
+            // Record submission for rate limiting
+            formSecurity.recordSubmission();
+            
+            // Add a small delay to show loading state
+            setTimeout(() => {
+                // Submit the form
+                contactForm.submit();
+            }, 500);
         }
 
-        // Form will submit to FormSubmit
-        return true;
+        return false; // Prevent default behavior, we'll submit manually
     });
 }
 
@@ -1458,6 +2233,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialize safe event listeners first
         initializeSafeEventListeners();
 
+        // Initialize form security and CAPTCHA systems
+        initializeFormSecurity();
+
         // Set minimum date for demo booking to today
         const dateInput = document.getElementById('preferredDate');
         if (dateInput) {
@@ -1479,7 +2257,43 @@ document.addEventListener('DOMContentLoaded', () => {
         // Enhance keyboard navigation
         enhanceKeyboardNavigation();
 
+        // Add mobile-specific enhancements
+        if (window.innerWidth <= 768) {
+            enhanceMobileFormExperience();
+        }
+
     } catch (error) {
         console.warn('Non-critical initialization error:', error);
     }
 });
+
+// Mobile form experience enhancements
+function enhanceMobileFormExperience() {
+    // Add touch-friendly improvements for mobile
+    const formInputs = document.querySelectorAll('input, select, textarea');
+    
+    formInputs.forEach(input => {
+        // Increase touch target size on mobile
+        input.style.minHeight = '48px';
+        input.style.fontSize = '16px'; // Prevents zoom on iOS
+        
+        // Add better focus handling
+        input.addEventListener('focus', () => {
+            // Slight delay to account for virtual keyboard
+            setTimeout(() => {
+                input.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center',
+                    inline: 'nearest'
+                });
+            }, 300);
+        });
+    });
+    
+    // Improve CAPTCHA touch experience
+    const captchaContainers = document.querySelectorAll('.advanced-captcha-container');
+    captchaContainers.forEach(container => {
+        container.style.padding = '1.5rem';
+        container.style.marginBottom = '2rem';
+    });
+}
