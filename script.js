@@ -2541,43 +2541,8 @@ const modal = document.getElementById('successModal');
 // Add loading states to forms
 if (demoForm) {
     demoForm.addEventListener('submit', (e) => {
-        // Always prevent default submission first
-        e.preventDefault();
-        
         // Check required fields first
         const requiredFields = demoForm.querySelectorAll('[required]');
-        let allValid = true;
-
-        requiredFields.forEach(field => {
-            if (!field.value.trim()) {
-                allValid = false;
-                field.style.borderColor = '#e74c3c';
-                field.focus();
-            } else {
-                field.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-            }
-        });
-
-        if (!allValid) {
-            return false;
-        }
-
-        // Show loading state
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-        submitBtn.disabled = true;
-
-        // Only submit if user explicitly clicks submit - no auto-submission
-        // Form will be submitted naturally to FormSubmit when user clicks submit
-        demoForm.submit();
-    });
-}
-
-if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
-        // Check required fields first
-        const requiredFields = contactForm.querySelectorAll('[required]');
         let allValid = true;
 
         requiredFields.forEach(field => {
@@ -2595,13 +2560,47 @@ if (contactForm) {
             return false;
         }
 
+        // Show loading state but don't prevent submission
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            submitBtn.disabled = true;
+        }
+
+        // Allow natural form submission for mobile compatibility
+        return true;
+    });
+}
+
+if (contactForm) {
+    contactForm.addEventListener('submit', (e) => {
+        // Check required fields first
+        const requiredFields = contactForm.querySelectorAll('[required]');
+        let allValid = true;
+
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                allValid = false;
+                field.style.borderColor = '#e74c3c';
+                if (allValid) field.focus(); // Focus first invalid field
+            } else {
+                field.style.borderColor = '#f8f9fa';
+            }
+        });
+
+        if (!allValid) {
+            e.preventDefault();
+            return false;
+        }
+
         // Show loading state but don't prevent form submission
         const submitBtn = e.target.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-        submitBtn.disabled = true;
+        if (submitBtn) {
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            submitBtn.disabled = true;
+        }
 
-        // Allow form to submit naturally to FormSubmit
+        // Allow natural form submission for mobile compatibility
         return true;
     });
 }
