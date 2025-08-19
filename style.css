@@ -34,13 +34,13 @@ body {
 @media (max-width: 768px) {
     .mobile-only { display: block; }
     .desktop-only { display: none; }
-    
+
     /* Force mobile layout improvements */
     * {
         max-width: 100%;
         box-sizing: border-box;
     }
-    
+
     /* Better mobile typography */
     body {
         font-size: 16px; /* Prevent zoom on iOS */
@@ -145,7 +145,7 @@ body {
         height: 300px;
         margin: 2rem 0;
     }
-    
+
     .hero-background-video {
         border-radius: 12px;
     }
@@ -1614,7 +1614,11 @@ section {
 .captcha-canvas-container {
     display: flex;
     justify-content: center;
-    margin: 1rem 0;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .captcha-canvas {
@@ -2011,14 +2015,10 @@ section {
     font-size: 1rem;
 }
 
-.success-content i {
-    font-size: 1.2rem;
-    color: #d4edda;
-}
-
+.success-content i,
 .error-content i {
     font-size: 1.2rem;
-    color: #f8d7da;
+    color: #d4edda;
 }
 
 @keyframes slideInFromTop {
@@ -2175,10 +2175,6 @@ section {
 }
 
 .contact-form .captcha-input::placeholder {
-    color: var(--gray-color);
-}
-
-.contact-form .captcha-attempts {
     color: var(--gray-color);
 }
 
@@ -2992,7 +2988,7 @@ section {
         will-change: scroll-position;
         transform: translateZ(0);
     }
-    
+
     /* Mobile video optimizations */
     .hero-background-video {
         /* Better mobile video performance */
@@ -3030,7 +3026,6 @@ section {
         margin-bottom: clamp(1.5rem, 4vw, 2rem);
         word-wrap: break-word;
         overflow-wrap: break-word;
-        hyphens: auto;
         text-align: center;
         letter-spacing: -0.02em;
         padding: 0 clamp(8px, 2vw, 16px);
@@ -3457,12 +3452,13 @@ section {
     .form-group textarea,
     .form-group select {
         width: 100%;
-        padding: 1rem;
-        font-size: 16px; /* Prevent iOS zoom */
-        border-radius: clamp(8px, 2vw, 12px);
+        padding: 1.25rem 1rem 0.75rem 1rem;
         border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: var(--border-radius);
         background: rgba(255, 255, 255, 0.1);
         color: var(--light-color);
+        font-size: 1rem;
+        transition: var(--transition);
         box-sizing: border-box;
         line-height: 1.5;
         min-height: 56px;
@@ -3474,7 +3470,7 @@ section {
         transition: all 0.3s ease;
         text-align: left;
     }
-    
+
     .form-group input:focus,
     .form-group textarea:focus,
     .form-group select:focus {
@@ -3743,7 +3739,7 @@ section {
     .form-group {
         margin-bottom: clamp(1.5rem, 4vw, 2rem);
     }
-    
+
     .form-group input,
     .form-group textarea,
     .form-group select {
@@ -3789,7 +3785,7 @@ section {
         font-size: clamp(0.7rem, 3vw, 0.8rem);
         line-height: 1.3;
     }
-    
+
     /* Enhanced button responsiveness */
     .btn {
         padding: clamp(12px, 3vw, 16px) clamp(20px, 5vw, 24px);
@@ -3800,14 +3796,14 @@ section {
         -webkit-tap-highlight-color: transparent;
         touch-action: manipulation;
     }
-    
+
     /* Improved mobile video containers */
     .video-container {
         height: clamp(180px, 50vw, 220px);
         border-radius: clamp(8px, 2vw, 12px);
         overflow: hidden;
     }
-    
+
     /* Better mobile modal */
     .modal-content {
         padding: clamp(1rem, 4vw, 1.5rem);
@@ -3822,21 +3818,21 @@ section {
     .hero-title {
         font-size: clamp(1.4rem, 9vw, 2rem);
     }
-    
+
     .section-title {
         font-size: clamp(1.2rem, 8vw, 1.6rem);
     }
-    
+
     .nav-container {
         height: 60px;
         padding: 0 12px;
     }
-    
+
     .hero-buttons .btn {
         padding: 14px 20px;
         font-size: 15px;
     }
-    
+
     .service-card,
     .contact-card {
         padding: 1rem 0.8rem;
@@ -3849,15 +3845,15 @@ section {
         min-height: 100vh;
         padding: 60px 0 2rem;
     }
-    
+
     .nav-container {
         height: 60px;
     }
-    
+
     .hero-content {
         padding: 1rem 20px;
     }
-    
+
     .hero-stats {
         margin: 1rem 0;
     }
@@ -4097,39 +4093,6 @@ section {
         border-radius: 4px;
     }
 
-    /* Mobile CAPTCHA Styles */
-    .captcha-container {
-        padding: 0.875rem;
-    }
-
-    .captcha-question {
-        flex-direction: row;
-        gap: 0.5rem;
-        padding: 0.625rem;
-    }
-
-    .captcha-question span {
-        font-size: 1rem;
-        flex: 1;
-    }
-
-    .captcha-refresh {
-        min-width: 32px;
-        height: 32px;
-        font-size: 0.8rem;
-        padding: 0.4rem;
-    }
-
-    .captcha-container input[type="text"] {
-        padding: 0.625rem;
-        font-size: 0.95rem;
-    }
-
-    .captcha-label {
-        font-size: 0.85rem;
-        margin-bottom: 0.625rem;
-    }
-
     .form-group textarea {
         min-height: 120px;
         padding-top: 1.8rem;
@@ -4141,11 +4104,6 @@ section {
         text-align: center;
         line-height: 1.3;
         padding: 0 5px;
-    }
-
-    .btn {
-        padding: 10px 16px;
-        font-size: 0.85rem;
     }
 
     /* Contact Section - Small Screens */
@@ -4550,7 +4508,7 @@ section {
         outline-offset: 2px;
         box-shadow: 0 0 0 5px rgba(255, 107, 53, 0.2);
     }
-    
+
     /* Mobile-specific hover states (for devices that support hover) */
     @media (hover: hover) {
         .service-card:hover,
@@ -4587,11 +4545,11 @@ textarea:focus {
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
-    
+
     .mobile-visible {
         animation: none !important;
     }
-    
+
     .touch-active {
         transform: none !important;
     }
