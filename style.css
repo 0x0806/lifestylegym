@@ -82,49 +82,15 @@ body {
     overflow-x: hidden;
 }
 
-/* Workout GIFs Grid */
-.workout-gifs-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 3rem;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 2rem 0;
-}
-
-.workout-gif-container {
-    position: relative;
-    width: 200px;
-    height: 356px; /* 9:16 aspect ratio */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    box-shadow: var(--shadow-3d);
-    transition: var(--transition);
-    margin: 0 auto;
-}
-
-.workout-gif-container:hover {
-    transform: translateY(-10px) scale(1.05);
-    box-shadow: 0 20px 60px rgba(255, 107, 53, 0.4);
-}
-
-.workout-gif {
+/* Hero Background Video */
+.hero-background-video {
     width: 100%;
     height: 100%;
     object-fit: cover;
     border-radius: var(--border-radius);
+    box-shadow: var(--shadow-3d);
+    filter: brightness(0.8) contrast(1.1);
     transition: var(--transition);
-}
-
-.hero-video {
-    background: var(--dark-color);
-}
-
-.workout-gif-container:hover .workout-gif {
-    filter: brightness(1.1) saturate(1.2);
 }
 
 /* Animations */
@@ -141,62 +107,23 @@ body {
 
 
 
-/* Enhanced Mobile Responsive for Workout GIFs Grid */
+/* Hero Background Video Mobile Responsive */
 @media (max-width: 768px) {
-    .workout-gifs-grid {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
+    .hero-visual {
         max-width: 100%;
-        padding: 2rem 1rem;
-        justify-items: center;
+        height: 300px;
+        margin: 2rem 0;
     }
-
-    .workout-gif-container {
-        width: min(300px, 90vw);
-        height: auto;
-        aspect-ratio: 9 / 16;
-        margin: 0 auto;
+    
+    .hero-background-video {
+        border-radius: 12px;
     }
 }
 
 @media (max-width: 480px) {
-    .workout-gifs-grid {
-        gap: 1rem;
-        max-width: 100%;
-        padding: 0 0.5rem;
-    }
-
-    .workout-gif-container {
-        width: 120px;
-        height: 213px; /* 9:16 aspect ratio maintained */
-        margin: 0 auto;
-    }
-}
-
-@media (max-width: 400px) {
-    .workout-gifs-grid {
-        gap: 0.75rem;
-        max-width: 100%;
-    }
-
-    .workout-gif-container {
-        width: 100px;
-        height: 178px; /* 9:16 aspect ratio maintained */
-        margin: 0 auto;
-    }
-}
-
-@media (max-width: 320px) {
-    .workout-gifs-grid {
-        gap: 0.5rem;
-        max-width: 100%;
-        grid-template-columns: 1fr 1fr 1fr;
-    }
-
-    .workout-gif-container {
-        width: 90px;
-        height: 160px; /* 9:16 aspect ratio maintained */
-        margin: 0 auto;
+    .hero-visual {
+        height: 250px;
+        margin: 1rem 0;
     }
 }
 
@@ -422,7 +349,6 @@ p {
     min-height: 100vh;
     display: flex;
     align-items: center;
-    background: var(--gradient-dark);
     overflow: hidden;
 }
 
@@ -432,7 +358,20 @@ p {
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><pattern id="gym-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="2" fill="%23ff6b35" opacity="0.1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23gym-pattern)"/></svg>');
+    z-index: 1;
+}
+
+.hero-background-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    z-index: 1;
 }
 
 .hero-overlay {
@@ -441,7 +380,8 @@ p {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(26, 26, 26, 0.8) 0%, rgba(197, 7, 59, 0.1) 100%);
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.6) 0%, rgba(26, 26, 26, 0.4) 50%, rgba(197, 7, 59, 0.3) 100%);
+    z-index: 2;
 }
 
 .hero-content {
@@ -453,7 +393,7 @@ p {
     max-width: 1400px;
     margin: 0 auto;
     padding: 4rem 20px;
-    z-index: 2;
+    z-index: 3;
 }
 
 .hero-text {
@@ -515,74 +455,7 @@ p {
 }
 
 .hero-visual {
-    position: relative;
-    height: 500px;
-    animation: fadeInRight 1s ease-out 0.8s both;
-    padding: 2rem 0;
-}
-
-.floating-card {
-    position: absolute;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    color: var(--light-color);
-    animation: float 3s ease-in-out infinite;
-}
-
-.floating-card.card-2 {
-    top: 100px;
-    right: 50px;
-    animation-delay: -1s;
-}
-
-.floating-card.card-3 {
-    bottom: 100px;
-    left: 50px;
-    animation-delay: -2s;
-}
-
-.card-icon {
-    font-size: 2rem;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 1rem;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 6px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 3px;
-    overflow: hidden;
-    margin-top: 0.5rem;
-}
-
-.progress {
-    height: 100%;
-    background: var(--gradient-primary);
-    border-radius: 3px;
-    animation: progressFill 2s ease-out;
-}
-
-.counter {
-    font-size: 1.5rem;
-    font-weight: 700;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.badge {
-    background: var(--gradient-secondary);
-    color: var(--light-color);
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
+    display: none;
 }
 
 @keyframes float {
@@ -2867,28 +2740,6 @@ section {
         font-size: 3rem;
     }
 
-    .hero-visual {
-        height: auto;
-        margin-top: 2rem;
-    }
-
-    .workout-gifs-grid {
-        max-width: 600px;
-        gap: 2.5rem;
-        padding: 2rem 0;
-    }
-
-    .workout-gif-container {
-        width: 150px;
-        height: 267px; /* 9:16 aspect ratio */
-    }
-
-    .floating-card {
-        position: relative;
-        margin: 1rem;
-        display: inline-block;
-    }
-
     .about-content {
         grid-template-columns: 1fr;
         gap: 3rem;
@@ -3183,40 +3034,9 @@ section {
         white-space: nowrap;
     }
 
-    /* Hero Videos - FIXED */
-    .hero-visual {
-        order: 2;
-        width: 100%;
-        max-width: 100%;
-        padding: 1rem 15px;
-        height: auto;
-    }
-
-    .workout-gifs-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 1rem;
-        max-width: 100%;
-        width: 100%;
-        justify-items: center;
-        padding: 0;
-    }
-
-    .workout-gif-container {
-        width: 100%;
-        max-width: 300px;
-        height: 200px;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: var(--shadow-medium);
-        margin: 0 auto;
-    }
-
-    .workout-gif, .hero-video {
-        width: 100%;
-        height: 100%;
+    /* Hero background video covers full section on mobile */
+    .hero-background-video {
         object-fit: cover;
-        border-radius: 12px;
     }
 
     /* Sections - FIXED */
