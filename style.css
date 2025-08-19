@@ -122,6 +122,52 @@ body {
     box-shadow: var(--shadow-3d);
     filter: brightness(0.8) contrast(1.1);
     transition: var(--transition);
+    /* Hide all video controls for background video */
+    pointer-events: none;
+}
+
+.hero-background-video::-webkit-media-controls {
+    display: none !important;
+}
+
+.hero-background-video::-webkit-media-controls-panel {
+    display: none !important;
+}
+
+.hero-background-video::-webkit-media-controls-play-button {
+    display: none !important;
+}
+
+.hero-background-video::-webkit-media-controls-start-playback-button {
+    display: none !important;
+}
+
+.hero-background-video::-webkit-media-controls-timeline {
+    display: none !important;
+}
+
+.hero-background-video::-webkit-media-controls-current-time-display {
+    display: none !important;
+}
+
+.hero-background-video::-webkit-media-controls-time-remaining-display {
+    display: none !important;
+}
+
+.hero-background-video::-webkit-media-controls-mute-button {
+    display: none !important;
+}
+
+.hero-background-video::-webkit-media-controls-volume-slider {
+    display: none !important;
+}
+
+.hero-background-video::-webkit-media-controls-fullscreen-button {
+    display: none !important;
+}
+
+.hero-background-video::-webkit-media-controls-toggle-closed-captions-button {
+    display: none !important;
 }
 
 /* Animations */
