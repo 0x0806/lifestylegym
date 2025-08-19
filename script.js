@@ -2067,11 +2067,25 @@ function initializeAutoplayVideos() {
     // Play hero background video
     const heroVideo = document.querySelector('.hero-background-video');
     if (heroVideo) {
+        // Remove any existing controls
+        heroVideo.removeAttribute('controls');
+        heroVideo.controls = false;
+        
+        // Set all required attributes for background video
         heroVideo.muted = true;
         heroVideo.playsInline = true;
         heroVideo.autoplay = true;
         heroVideo.loop = true;
         heroVideo.preload = 'auto';
+        
+        // Additional mobile-specific attributes
+        heroVideo.setAttribute('playsinline', '');
+        heroVideo.setAttribute('webkit-playsinline', '');
+        heroVideo.setAttribute('disableremoteplayback', '');
+        heroVideo.setAttribute('disablepictureinpicture', '');
+        
+        // Ensure no controls are shown
+        heroVideo.style.pointerEvents = 'none';
 
         const playVideo = () => {
             heroVideo.currentTime = 0;
@@ -2085,6 +2099,12 @@ function initializeAutoplayVideos() {
         } else {
             heroVideo.addEventListener('loadeddata', playVideo, { once: true });
         }
+        
+        // Prevent context menu on video
+        heroVideo.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            return false;
+        });
     }
 
     // Media section videos - disable autoplay, show controls
