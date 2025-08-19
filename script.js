@@ -1484,43 +1484,154 @@ function setResponsiveViewport() {
         // Set safe area insets for newer mobile devices
         document.documentElement.style.setProperty('--safe-area-inset-top', 'env(safe-area-inset-top, 0px)');
         document.documentElement.style.setProperty('--safe-area-inset-bottom', 'env(safe-area-inset-bottom, 0px)');
+        document.documentElement.style.setProperty('--safe-area-inset-left', 'env(safe-area-inset-left, 0px)');
+        document.documentElement.style.setProperty('--safe-area-inset-right', 'env(safe-area-inset-right, 0px)');
+        
+        // Add device pixel ratio for high-DPI displays
+        const dpr = window.devicePixelRatio || 1;
+        document.documentElement.style.setProperty('--device-pixel-ratio', dpr);
     };
 
     setVH();
 
     // Debounced resize handler for better performance
     let resizeTimer;
-    window.addEventListener('resize', () => {
+    const debouncedResize = () => {
         clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(setVH, 100);
-    }, { passive: true });
+        resizeTimer = setTimeout(setVH, 150);
+    };
 
+    window.addEventListener('resize', debouncedResize, { passive: true });
     window.addEventListener('orientationchange', () => {
-        setTimeout(setVH, 500); // Delay for orientation change
+        // Longer delay for orientation change to ensure accurate measurements
+        setTimeout(setVH, 600);
     }, { passive: true });
 
     // Handle mobile keyboard appearance
     if (window.visualViewport) {
         window.visualViewport.addEventListener('resize', setVH, { passive: true });
     }
+    
+    // Handle page visibility changes for better mobile performance
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) {
+            setTimeout(setVH, 100);
+        }
+    });
 }
 
-// Touch-friendly interaction improvements
+// Enhanced touch-friendly interaction improvements
 function enhanceTouchInteractions() {
-    // Improve touch targets
-    const interactiveElements = document.querySelectorAll('button, .btn, .nav-link, .trainer-card, .service-card');
+    // Improve touch targets with better size requirements
+    const interactiveElements = document.querySelectorAll('button, .btn, .nav-link, .trainer-card, .service-card, .plan-card, .contact-card');
 
     interactiveElements.forEach(element => {
-        element.style.minHeight = '44px';
-        element.style.minWidth = '44px';
-
-        // Add touch feedback
-        element.addEventListener('touchstart', function() {
-            this.style.transform = 'scale(0.98)';
+        // Ensure minimum touch target size (48x48px for accessibility)
+        element.style.minHeight = '48px';
+        element.style.minWidth = '48px';
+        
+        // Add enhanced touch feedback with haptics
+        let touchStartTime = 0;
+        
+        element.addEventListener('touchstart', function(e) {
+            touchStartTime = Date.now();
+            this.style.transform = 'scale(0.96)';
+            this.style.transition = 'transform 0.1s ease-out';
+            
+            // Add haptic feedback if supported
+            if (navigator.vibrate) {
+                navigator.vibrate(10);
+            }
+            
+            // Add visual feedback
+            this.classList.add('touch-active');
         }, { passive: true });
 
-        element.addEventListener('touchend', function() {
+        element.addEventListener('touchend', function(e) {
+            const touchDuration = Date.now() - touchStartTime;
+            
+            // Smooth transition back
             this.style.transform = 'scale(1)';
+            this.style.transition = 'transform 0.2s ease-out';
+            
+            // Remove visual feedback after a delay
+            setTimeout(() => {
+                this.classList.remove('touch-active');
+            }, 200);
+        }, { passive: true });
+        
+        element.addEventListener('touchcancel', function() {
+            this.style.transform = 'scale(1)';
+            this.classList.remove('touch-active');
+        }, { passive: true });
+    });
+    
+    // Add advanced gesture support for cards
+    addAdvancedGestureSupport();
+}
+
+// Advanced gesture support for mobile
+function addAdvancedGestureSupport() {
+    const cards = document.querySelectorAll('.service-card, .trainer-card, .plan-card, .video-card');
+    
+    cards.forEach(card => {
+        let startX = 0;
+        let startY = 0;
+        let startTime = 0;
+        let isScrolling = false;
+        
+        card.addEventListener('touchstart', function(e) {
+            if (e.touches.length === 1) {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                startTime = Date.now();
+                isScrolling = false;
+            }
+        }, { passive: true });
+        
+        card.addEventListener('touchmove', function(e) {
+            if (e.touches.length === 1 && !isScrolling) {
+                const currentX = e.touches[0].clientX;
+                const currentY = e.touches[0].clientY;
+                const deltaX = currentX - startX;
+                const deltaY = currentY - startY;
+                
+                // Determine if user is scrolling vertically
+                if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 10) {
+                    isScrolling = true;
+                    return;
+                }
+                
+                // Add subtle parallax effect for horizontal movement
+                if (Math.abs(deltaX) > 5 && !isScrolling) {
+                    const translateX = deltaX * 0.1;
+                    this.style.transform = `translateX(${translateX}px) scale(1.02)`;
+                    this.style.transition = 'none';
+                }
+            }
+        }, { passive: true });
+        
+        card.addEventListener('touchend', function(e) {
+            const endTime = Date.now();
+            const touchDuration = endTime - startTime;
+            
+            // Reset transform
+            this.style.transform = '';
+            this.style.transition = 'transform 0.3s ease-out';
+            
+            // Handle quick tap (less than 300ms)
+            if (touchDuration < 300 && !isScrolling) {
+                // Add quick tap animation
+                this.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            }
+            
+            startX = 0;
+            startY = 0;
+            startTime = 0;
+            isScrolling = false;
         }, { passive: true });
     });
 }
@@ -2214,9 +2325,9 @@ function improveMobileTouchInteractions() {
     });
 }
 
-// Mobile performance optimization
+// Comprehensive mobile performance optimization
 function optimizeMobilePerformance() {
-    // Lazy load images when they're near viewport
+    // Enhanced lazy loading with intersection observer
     const imageObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -2224,16 +2335,19 @@ function optimizeMobilePerformance() {
                 if (img.dataset.src) {
                     img.src = img.dataset.src;
                     img.removeAttribute('data-src');
+                    img.classList.add('loaded');
                 }
                 imageObserver.unobserve(img);
             }
         });
     }, {
-        rootMargin: '50px'
+        rootMargin: '50px',
+        threshold: 0.1
     });
 
     // Observe all images with data-src
     document.querySelectorAll('img[data-src]').forEach(img => {
+        img.classList.add('lazy-load');
         imageObserver.observe(img);
     });
 
@@ -2247,12 +2361,131 @@ function optimizeMobilePerformance() {
         });
     }
 
-    // Optimize video loading on mobile
+    // Enhanced mobile video optimization
     const videos = document.querySelectorAll('video');
     videos.forEach(video => {
         if (window.innerWidth <= 768) {
             video.preload = 'metadata';
             video.setAttribute('playsinline', '');
+            video.muted = true; // Ensure autoplay works on mobile
+            
+            // Add mobile video optimization attributes
+            video.setAttribute('webkit-playsinline', '');
+            video.setAttribute('controls', false);
+            
+            // Optimize video for mobile performance
+            video.style.willChange = 'transform';
+            video.style.backfaceVisibility = 'hidden';
         }
+    });
+    
+    // Mobile-specific optimizations
+    optimizeMobileScrolling();
+    optimizeMobileRendering();
+    optimizeMobileMemory();
+}
+
+// Optimize mobile scrolling performance
+function optimizeMobileScrolling() {
+    // Throttle scroll events for better performance
+    let scrollTimer = null;
+    let isScrolling = false;
+    
+    const handleScroll = () => {
+        if (!isScrolling) {
+            requestAnimationFrame(() => {
+                // Perform scroll-based operations here
+                updateScrollIndicators();
+                isScrolling = false;
+            });
+            isScrolling = true;
+        }
+    };
+    
+    window.addEventListener('scroll', handleScroll, { 
+        passive: true,
+        capture: false 
+    });
+    
+    // Optimize touch scrolling
+    if ('ontouchstart' in window) {
+        document.body.style.webkitOverflowScrolling = 'touch';
+        document.body.style.overscrollBehavior = 'contain';
+    }
+}
+
+// Optimize mobile rendering
+function optimizeMobileRendering() {
+    // Use will-change property for animated elements
+    const animatedElements = document.querySelectorAll(
+        '.hero-title, .service-card, .trainer-card, .plan-card, .btn'
+    );
+    
+    animatedElements.forEach(el => {
+        el.style.willChange = 'transform, opacity';
+    });
+    
+    // Optimize images for mobile
+    const images = document.querySelectorAll('img');
+    images.forEach(img => {
+        img.style.imageRendering = 'auto';
+        img.loading = 'lazy';
+        
+        // Add intersection observer for performance
+        if ('IntersectionObserver' in window) {
+            const imgObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.willChange = 'auto';
+                    }
+                });
+            });
+            imgObserver.observe(img);
+        }
+    });
+}
+
+// Optimize mobile memory usage
+function optimizeMobileMemory() {
+    // Clean up unused event listeners on mobile
+    if (window.innerWidth <= 768) {
+        // Disable non-essential animations on mobile
+        const heavyAnimations = document.querySelectorAll('.floating-card');
+        heavyAnimations.forEach(el => {
+            el.style.animation = 'none';
+            el.style.transform = 'none';
+        });
+        
+        // Optimize intersection observers for mobile
+        const observerOptions = {
+            rootMargin: '20px',
+            threshold: 0.1
+        };
+        
+        // Use single observer for all animated elements
+        const mobileAnimationObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('mobile-visible');
+                } else {
+                    entry.target.classList.remove('mobile-visible');
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.about-card, .service-card, .trainer-card').forEach(el => {
+            mobileAnimationObserver.observe(el);
+        });
+    }
+}
+
+// Update scroll indicators for mobile
+function updateScrollIndicators() {
+    const scrollProgress = window.pageYOffset / (document.documentElement.scrollHeight - window.innerHeight);
+    
+    // Update any scroll progress indicators
+    const progressElements = document.querySelectorAll('.scroll-progress');
+    progressElements.forEach(el => {
+        el.style.width = `${scrollProgress * 100}%`;
     });
 }
