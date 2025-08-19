@@ -237,6 +237,8 @@ p {
     justify-content: space-between;
     align-items: center;
     height: 80px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .nav-logo .Logo-3D {
@@ -844,19 +846,20 @@ section {
 
 .trainer-image {
     position: relative;
-    height: auto;
-    min-height: 250px;
-    background: var(--gradient-primary);
+    height: 350px;
+    background: var(--light-gray);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
 .trainer-photo {
     width: 100%;
-    height: auto;
-    object-fit: contain;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
     transition: var(--transition);
 }
 
@@ -2510,24 +2513,21 @@ section {
 .footer {
     background: var(--gradient-dark);
     color: var(--light-color);
-    padding: 4rem 0 2rem;
+    padding: 3rem 0 2rem;
 }
 
 .footer-content {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1.5fr;
-    gap: 3rem;
-    margin-bottom: 3rem;
-}
-
-.footer-section h3 {
-    margin-bottom: 1.5rem;
-    color: var(--primary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 2rem;
 }
 
 .footer-logo .Logo-3D {
     display: flex;
     align-items: center;
+    justify-content: center;
     font-size: 1.5rem;
     font-weight: 800;
     color: var(--light-color);
@@ -2547,11 +2547,16 @@ section {
 .footer-logo p {
     color: rgba(255, 255, 255, 0.8);
     margin-bottom: 1.5rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
 }
 
 .social-links {
     display: flex;
     gap: 1rem;
+    justify-content: center;
 }
 
 .social-link {
@@ -2570,37 +2575,6 @@ section {
 .social-link:hover {
     background: var(--primary-color);
     transform: translateY(-2px);
-}
-
-.footer-links {
-    list-style: none;
-}
-
-.footer-links li {
-    margin-bottom: 0.5rem;
-}
-
-.footer-links a {
-    color: rgba(255, 255, 255, 0.8);
-    text-decoration: none;
-    transition: var(--transition);
-}
-
-.footer-links a:hover {
-    color: var(--primary-color);
-}
-
-.contact-info .contact-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.contact-item i {
-    color: var(--primary-color);
-    width: 20px;
 }
 
 .footer-bottom {
@@ -3314,13 +3288,15 @@ section {
         align-items: center;
         justify-content: center;
         background: var(--light-gray);
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+        overflow: hidden;
     }
 
     .trainer-photo {
         width: 100%;
         height: 100%;
-        object-fit: contain;
-        border-radius: 12px;
+        object-fit: cover;
+        object-position: center top;
     }
 
     .trainer-info {
@@ -3645,25 +3621,16 @@ section {
 
     /* Footer - FIXED */
     .footer {
-        padding: 5rem 0 3rem;
+        padding: 3rem 0 2rem;
         width: 100%;
     }
 
     .footer-content {
-        grid-template-columns: 1fr;
-        gap: 3rem;
         text-align: center;
         width: 100%;
         display: flex;
-        flex-direction: column;
-        align-items: center;
         justify-content: center;
-    }
-
-    .footer-section {
-        width: 100%;
-        max-width: 450px;
-        margin: 0 auto;
+        align-items: center;
     }
 
     .footer-logo .Logo-3D {
@@ -3677,41 +3644,9 @@ section {
 
     .footer-logo p {
         font-size: 1rem;
-        line-height: 1.9;
-        margin-bottom: 2.5rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
         padding: 0 20px;
-    }
-
-    .footer-section h3 {
-        font-size: 1.4rem;
-        margin-bottom: 2.5rem;
-        line-height: 1.4;
-        padding: 0 10px;
-    }
-
-    .footer-links li {
-        margin-bottom: 1.2rem;
-    }
-
-    .footer-links a {
-        font-size: 1rem;
-        line-height: 1.7;
-        padding: 8px 0;
-        display: block;
-    }
-
-    .contact-item {
-        justify-content: center;
-        text-align: center;
-        margin-bottom: 2rem;
-        padding: 0 20px;
-    }
-
-    .contact-item span {
-        font-size: 1rem;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-        line-height: 1.8;
     }
 
     .footer-bottom {
