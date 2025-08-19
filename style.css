@@ -15,6 +15,10 @@ body {
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior-y: contain;
+    /* Better mobile text rendering */
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 /* Optimize animations for better performance */
@@ -132,14 +136,18 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     line-height: 1.2;
     margin-bottom: 1rem;
+    /* Better mobile text wrapping */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
-h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
-h2 { font-size: clamp(1.75rem, 4vw, 2.5rem); }
-h3 { font-size: clamp(1.5rem, 3vw, 2rem); }
-h4 { font-size: clamp(1.25rem, 2.5vw, 1.5rem); }
-h5 { font-size: clamp(1.1rem, 2vw, 1.25rem); }
-h6 { font-size: clamp(1rem, 1.5vw, 1rem); }
+h1 { font-size: clamp(1.8rem, 6vw, 3.5rem); }
+h2 { font-size: clamp(1.6rem, 5vw, 2.5rem); }
+h3 { font-size: clamp(1.4rem, 4vw, 2rem); }
+h4 { font-size: clamp(1.2rem, 3vw, 1.5rem); }
+h5 { font-size: clamp(1.1rem, 2.5vw, 1.25rem); }
+h6 { font-size: clamp(1rem, 2vw, 1rem); }
 
 p {
     margin-bottom: 1rem;
@@ -157,9 +165,22 @@ p {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 clamp(15px, 4vw, 40px);
+    padding: 0 clamp(16px, 5vw, 40px);
     width: 100%;
     box-sizing: border-box;
+}
+
+/* Mobile-specific container adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 clamp(16px, 4vw, 24px);
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 clamp(12px, 3vw, 20px);
+    }
 }
 
 /* Navigation */
@@ -2848,20 +2869,27 @@ section {
         display: flex;
         position: relative;
         z-index: 1001;
-        padding: 8px;
+        padding: 12px;
         flex-shrink: 0;
         background: rgba(255, 255, 255, 0.1);
-        border-radius: 6px;
+        border-radius: 8px;
         cursor: pointer;
         transition: all 0.3s ease;
+        /* Better touch target */
+        min-width: 44px;
+        min-height: 44px;
+        align-items: center;
+        justify-content: center;
     }
 
-    .hamburger:hover {
+    .hamburger:hover,
+    .hamburger:active {
         background: rgba(255, 107, 53, 0.2);
+        transform: scale(1.05);
     }
 
     .hamburger .bar {
-        width: 22px;
+        width: 24px;
         height: 3px;
         margin: 3px 0;
         background: var(--light-color);
@@ -2881,7 +2909,7 @@ section {
         flex-direction: column;
         justify-content: flex-start;
         align-items: center;
-        padding: 2rem 1rem;
+        padding: clamp(1rem, 4vw, 2rem) 1rem;
         transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         z-index: 1000;
         gap: 0;
@@ -2890,6 +2918,14 @@ section {
         overscroll-behavior: contain;
         border-right: 1px solid rgba(255, 107, 53, 0.3);
         touch-action: pan-y;
+        /* Better mobile scrolling */
+        scroll-behavior: smooth;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .nav-menu::-webkit-scrollbar {
+        display: none;
     }
 
     .nav-menu.active {
@@ -2905,14 +2941,21 @@ section {
 
     .nav-link {
         display: block;
-        padding: 1rem 1.5rem;
-        font-size: 1rem;
+        padding: 1.2rem 1.5rem;
+        font-size: clamp(1rem, 3vw, 1.1rem);
         border-radius: 12px;
         text-align: center;
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
         width: 100%;
         transition: all 0.3s ease;
+        /* Better touch targets */
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 500;
+        letter-spacing: 0.5px;
     }
 
     .nav-link::before {
@@ -2959,15 +3002,17 @@ section {
     }
 
     .hero-title {
-        font-size: 2.5rem;
-        line-height: 1.4;
-        margin-bottom: 2rem;
+        font-size: clamp(2rem, 8vw, 2.8rem);
+        line-height: 1.3;
+        margin-bottom: clamp(1.5rem, 4vw, 2rem);
         word-wrap: break-word;
         overflow-wrap: break-word;
         hyphens: auto;
         text-align: center;
         letter-spacing: -0.02em;
-        padding: 0 10px;
+        padding: 0 clamp(8px, 2vw, 16px);
+        /* Better mobile readability */
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     }
 
     .hero-subtitle {
@@ -3028,10 +3073,19 @@ section {
 
     .hero-buttons .btn {
         width: 100%;
-        max-width: 300px;
-        padding: 12px 20px;
-        font-size: 0.95rem;
+        max-width: clamp(280px, 80vw, 320px);
+        padding: clamp(14px, 4vw, 16px) clamp(20px, 5vw, 24px);
+        font-size: clamp(0.95rem, 4vw, 1.1rem);
         white-space: nowrap;
+        /* Better touch targets */
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border-radius: clamp(8px, 2vw, 12px);
+        font-weight: 600;
+        letter-spacing: 0.3px;
     }
 
     /* Hero background video covers full section on mobile */
@@ -3131,13 +3185,16 @@ section {
     }
 
     .service-card {
-        padding: 2.5rem 2rem;
+        padding: clamp(1.5rem, 5vw, 2.5rem) clamp(1rem, 4vw, 2rem);
         word-wrap: break-word;
         overflow-wrap: break-word;
         width: 100%;
         text-align: center;
         margin: 0 auto;
-        max-width: 450px;
+        max-width: min(450px, 95vw);
+        border-radius: clamp(12px, 3vw, 16px);
+        /* Better mobile shadows */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
 
     .service-card h3 {
@@ -3230,11 +3287,19 @@ section {
     }
 
     .video-container {
-        height: 225px;
+        height: clamp(200px, 50vw, 250px);
         width: 100%;
         position: relative;
         overflow: hidden;
-        border-radius: 12px;
+        border-radius: clamp(8px, 2vw, 12px);
+        /* Better mobile video experience */
+        touch-action: manipulation;
+    }
+
+    .video-container video {
+        /* Improve mobile video performance */
+        will-change: transform;
+        backface-visibility: hidden;
     }
 
     .gym-video {
@@ -3355,15 +3420,21 @@ section {
     .form-group textarea,
     .form-group select {
         width: 100%;
-        padding: 2rem 1rem 1rem 1rem;
-        font-size: 1rem;
-        border-radius: 10px;
+        padding: clamp(1.5rem, 4vw, 2rem) 1rem 1rem 1rem;
+        font-size: clamp(1rem, 4vw, 1.1rem);
+        border-radius: clamp(8px, 2vw, 12px);
         border: 2px solid rgba(255, 255, 255, 0.2);
         background: rgba(255, 255, 255, 0.1);
         color: var(--light-color);
         box-sizing: border-box;
         line-height: 1.5;
-        min-height: 60px;
+        min-height: clamp(56px, 12vw, 64px);
+        /* Better mobile input experience */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        /* Prevent zoom on iOS */
+        font-size: max(1rem, 16px);
     }
 
     .form-group label {
@@ -3619,8 +3690,66 @@ section {
 
 @media (max-width: 480px) {
     .container {
-        padding: 0 12px;
+        padding: 0 clamp(8px, 3vw, 16px);
     }
+
+    /* Ultra-mobile optimizations */
+    .hero-title {
+        font-size: clamp(1.6rem, 8vw, 2.2rem);
+        line-height: 1.2;
+    }
+
+    .section-title {
+        font-size: clamp(1.4rem, 7vw, 1.8rem);
+        line-height: 1.3;
+    }
+
+    /* Compact mobile cards */
+    .service-card,
+    .trainer-card,
+    .plan-card,
+    .contact-card {
+        padding: clamp(1rem, 4vw, 1.5rem);
+        margin-bottom: clamp(1rem, 3vw, 1.5rem);
+    }
+
+    /* Better mobile forms */
+    .form-group {
+        margin-bottom: clamp(1rem, 4vw, 1.5rem);
+    }
+
+    /* Compact mobile navigation */
+    .nav-container {
+        height: clamp(60px, 15vw, 70px);
+        padding: 0 clamp(8px, 3vw, 16px);
+    }
+
+    .logo-image {
+        height: clamp(28px, 8vw, 32px);
+    }
+
+    /* Mobile-friendly hero stats */
+    .hero-stats {
+        flex-direction: row;
+        gap: clamp(0.5rem, 3vw, 1rem);
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+
+    .stat {
+        flex: 1;
+        min-width: clamp(60px, 20vw, 80px);
+        max-width: clamp(80px, 25vw, 100px);
+    }
+
+    .stat-number {
+        font-size: clamp(1.2rem, 5vw, 1.6rem);
+    }
+
+    .stat-label {
+        font-size: clamp(0.7rem, 3vw, 0.8rem);
+    }
+}
 
     /* WhatsApp Chat Button - Small screens */
     .whatsapp-chat {
@@ -4200,13 +4329,60 @@ section {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: our(--gradient-secondary);
+    background: var(--gradient-secondary);
 }
 
 /* Mobile scrollbar */
 @media (max-width: 768px) {
     ::-webkit-scrollbar {
-        width: 4px;
+        width: 3px;
+    }
+}
+
+/* Mobile-specific utilities */
+@media (max-width: 768px) {
+    /* Better mobile touch targets */
+    button, .btn, a, .nav-link, .service-card, .trainer-card {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    /* Improve mobile text selection */
+    * {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    input, textarea, [contenteditable] {
+        -webkit-user-select: text;
+        -khtml-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+    }
+
+    /* Better mobile spacing */
+    section {
+        padding: clamp(60px, 15vw, 100px) 0;
+    }
+
+    /* Improve mobile animations */
+    .hero-title, .section-title {
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    /* Better mobile grid layouts */
+    .services-grid,
+    .trainers-grid,
+    .media-grid,
+    .plans-grid {
+        grid-template-columns: 1fr;
+        gap: clamp(1rem, 4vw, 2rem);
+        padding: 0 clamp(8px, 2vw, 16px);
     }
 }
 
