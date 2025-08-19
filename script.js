@@ -1480,6 +1480,10 @@ function setResponsiveViewport() {
         // Also set viewport width for responsive calculations
         const vw = window.innerWidth * 0.01;
         document.documentElement.style.setProperty('--vw', `${vw}px`);
+
+        // Set safe area insets for newer mobile devices
+        document.documentElement.style.setProperty('--safe-area-inset-top', 'env(safe-area-inset-top, 0px)');
+        document.documentElement.style.setProperty('--safe-area-inset-bottom', 'env(safe-area-inset-bottom, 0px)');
     };
 
     setVH();
@@ -1489,11 +1493,16 @@ function setResponsiveViewport() {
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(setVH, 100);
-    });
+    }, { passive: true });
 
     window.addEventListener('orientationchange', () => {
         setTimeout(setVH, 500); // Delay for orientation change
-    });
+    }, { passive: true });
+
+    // Handle mobile keyboard appearance
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', setVH, { passive: true });
+    }
 }
 
 // Touch-friendly interaction improvements
@@ -2032,6 +2041,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // Add mobile-specific enhancements
         if (window.innerWidth <= 768) {
             enhanceMobileFormExperience();
+            optimizeMobileScrolling();
+            improveMobileTouchInteractions();
+            optimizeMobilePerformance();
+        }
+
+        // Add touch gesture support for all screen sizes
+        if ('ontouchstart' in window) {
+            document.body.classList.add('touch-device');
+            improveMobileTouchInteractions();
         }
 
     } catch (error) {
@@ -2102,5 +2120,139 @@ function addHoneypotSecurity() {
         honeypot2.tabIndex = -1;
         honeypot2.autocomplete = 'off';
         form.appendChild(honeypot2);
+    });
+}
+
+// Optimize mobile scrolling performance
+function optimizeMobileScrolling() {
+    // Smooth scroll for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                const navHeight = document.querySelector('.Navbar').offsetHeight;
+                const targetPosition = target.offsetTop - navHeight - 20;
+                
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // Optimize scroll events for mobile
+    let ticking = false;
+    function handleScroll() {
+        if (!ticking) {
+            requestAnimationFrame(() => {
+                // Handle scroll-based animations here
+                ticking = false;
+            });
+            ticking = true;
+        }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+}
+
+// Improve mobile touch interactions
+function improveMobileTouchInteractions() {
+    // Add haptic feedback for buttons (if supported)
+    const buttons = document.querySelectorAll('button, .btn, .nav-link');
+    buttons.forEach(button => {
+        button.addEventListener('touchstart', function() {
+            // Add visual feedback
+            this.style.transform = 'scale(0.98)';
+            this.style.transition = 'transform 0.1s ease';
+            
+            // Haptic feedback if supported
+            if (navigator.vibrate) {
+                navigator.vibrate(10);
+            }
+        }, { passive: true });
+
+        button.addEventListener('touchend', function() {
+            this.style.transform = 'scale(1)';
+        }, { passive: true });
+
+        button.addEventListener('touchcancel', function() {
+            this.style.transform = 'scale(1)';
+        }, { passive: true });
+    });
+
+    // Improve swipe gestures for cards
+    const cards = document.querySelectorAll('.service-card, .trainer-card, .plan-card');
+    cards.forEach(card => {
+        let startX = 0;
+        let startY = 0;
+
+        card.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        }, { passive: true });
+
+        card.addEventListener('touchmove', function(e) {
+            if (!startX || !startY) return;
+
+            const xDiff = startX - e.touches[0].clientX;
+            const yDiff = startY - e.touches[0].clientY;
+
+            // Add slight parallax effect
+            if (Math.abs(xDiff) > Math.abs(yDiff)) {
+                const translateX = -xDiff * 0.1;
+                this.style.transform = `translateX(${translateX}px)`;
+            }
+        }, { passive: true });
+
+        card.addEventListener('touchend', function() {
+            this.style.transform = '';
+            startX = 0;
+            startY = 0;
+        }, { passive: true });
+    });
+}
+
+// Mobile performance optimization
+function optimizeMobilePerformance() {
+    // Lazy load images when they're near viewport
+    const imageObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                if (img.dataset.src) {
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                }
+                imageObserver.unobserve(img);
+            }
+        });
+    }, {
+        rootMargin: '50px'
+    });
+
+    // Observe all images with data-src
+    document.querySelectorAll('img[data-src]').forEach(img => {
+        imageObserver.observe(img);
+    });
+
+    // Reduce motion for users who prefer it
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.style.setProperty('--transition', 'none');
+        document.querySelectorAll('*').forEach(el => {
+            el.style.animationDuration = '0.01ms';
+            el.style.animationIterationCount = '1';
+            el.style.transitionDuration = '0.01ms';
+        });
+    }
+
+    // Optimize video loading on mobile
+    const videos = document.querySelectorAll('video');
+    videos.forEach(video => {
+        if (window.innerWidth <= 768) {
+            video.preload = 'metadata';
+            video.setAttribute('playsinline', '');
+        }
     });
 }
