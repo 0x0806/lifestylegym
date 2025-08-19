@@ -1944,30 +1944,28 @@ function enhanceKeyboardNavigation() {
 
 // Auto-play videos function - optimized
 function initializeAutoplayVideos() {
-    // Play hero videos - seamless synchronization
-    const heroVideos = document.querySelectorAll('.hero-video');
-    heroVideos.forEach((video, index) => {
-        if (!video) return;
-
-        video.muted = true;
-        video.playsInline = true;
-        video.autoplay = true;
-        video.loop = true;
-        video.preload = 'auto';
+    // Play hero background video
+    const heroVideo = document.querySelector('.hero-background-video');
+    if (heroVideo) {
+        heroVideo.muted = true;
+        heroVideo.playsInline = true;
+        heroVideo.autoplay = true;
+        heroVideo.loop = true;
+        heroVideo.preload = 'auto';
 
         const playVideo = () => {
-            video.currentTime = 0;
-            video.play().catch(e => {
-                console.log(`Hero video ${index + 1} autoplay prevented by browser policy`);
+            heroVideo.currentTime = 0;
+            heroVideo.play().catch(e => {
+                console.log('Hero background video autoplay prevented by browser policy');
             });
         };
 
-        if (video.readyState >= 2) {
+        if (heroVideo.readyState >= 2) {
             playVideo();
         } else {
-            video.addEventListener('loadeddata', playVideo, { once: true });
+            heroVideo.addEventListener('loadeddata', playVideo, { once: true });
         }
-    });
+    }
 
     // Media section videos - disable autoplay, show controls
     const mediaVideos = document.querySelectorAll('#media .gym-video');
