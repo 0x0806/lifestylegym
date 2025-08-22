@@ -114,7 +114,7 @@ body {
     overflow-x: hidden;
 }
 
-/* Hero Background Video */
+/* Hero Background Video - Ultra aggressive autoplay setup */
 .hero-background-video {
     position: absolute;
     top: 50%;
@@ -128,18 +128,35 @@ body {
     z-index: 1;
     filter: brightness(0.8) contrast(1.1);
     /* Completely disable all interactions and controls */
-    pointer-events: none;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+    pointer-events: none !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    -khtml-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
     /* Aggressively remove controls */
-    controls: false;
-    -webkit-media-controls: none;
-    -moz-media-controls: none;
-    media-controls: none;
+    -webkit-media-controls: none !important;
+    -moz-media-controls: none !important;
+    -ms-media-controls: none !important;
+    media-controls: none !important;
+    /* Ensure autoplay works */
+    -webkit-playsinline: true !important;
+    -moz-playsinline: true !important;
+    -ms-playsinline: true !important;
+    playsinline: true !important;
+    /* Enhanced mobile autoplay support */
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    /* Prevent any possible control display */
+    outline: none !important;
+    border: none !important;
+    background: none !important;
+    /* Force video to behave as decoration only */
+    -webkit-user-modify: read-only !important;
+    -moz-user-modify: read-only !important;
+    user-modify: read-only !important;
 }
 
 /* Hide ALL video controls on all browsers - Most aggressive approach */
@@ -155,86 +172,126 @@ body {
 .hero-background-video::-webkit-media-controls-fullscreen-button,
 .hero-background-video::-webkit-media-controls-toggle-closed-captions-button,
 .hero-background-video::-webkit-media-controls-overlay-enclosure,
-.hero-background-video::-webkit-media-controls-enclosure {
+.hero-background-video::-webkit-media-controls-enclosure,
+.hero-background-video::-webkit-media-controls-overlay-play-button {
     display: none !important;
     -webkit-appearance: none !important;
+    appearance: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
     width: 0 !important;
     height: 0 !important;
     overflow: hidden !important;
     position: absolute !important;
-    top: -9999px !important;
-    left: -9999px !important;
+    top: -99999px !important;
+    left: -99999px !important;
+    z-index: -99999 !important;
+    pointer-events: none !important;
 }
 
 /* Firefox controls hiding */
 .hero-background-video::-moz-media-controls {
     display: none !important;
     visibility: hidden !important;
+    opacity: 0 !important;
 }
 
 /* Remove outline on focus */
 .hero-background-video:focus {
     outline: none !important;
     box-shadow: none !important;
+    border: none !important;
 }
 
-/* Ultra-aggressive mobile control removal */
-@media (max-width: 768px) {
+/* Ultra-aggressive mobile and all device control removal */
+@media screen {
     .hero-background-video {
-        /* Use optimal dimensions on mobile for better performance */
-        width: 100vw !important;
-        height: 100vh !important;
-        min-width: 100% !important;
-        min-height: 100% !important;
-        object-fit: cover !important;
-        transform: translate(-50%, -50%) !important;
-        /* Force remove all controls on mobile - most aggressive */
-        -webkit-appearance: none !important;
-        appearance: none !important;
-        /* Ensure video loads on mobile */
+        /* Force optimal video display */
         display: block !important;
         visibility: visible !important;
-        /* Mobile-specific control removal */
-        -webkit-media-controls-panel: none !important;
-        -webkit-media-controls: none !important;
-        /* Remove any possible control overlays */
-        z-index: 1 !important;
-        background: none !important;
-        /* Prevent any interaction whatsoever */
+        /* Ultimate control removal for all devices */
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        -ms-appearance: none !important;
+        appearance: none !important;
+        /* Prevent any possible interactions */
         pointer-events: none !important;
         touch-action: none !important;
         -webkit-touch-callout: none !important;
-        -webkit-user-select: none !important;
-        -khtml-user-select: none !important;
-        -moz-user-select: none !important;
-        -ms-user-select: none !important;
-        user-select: none !important;
+        /* Mobile-specific autoplay enforcement */
+        -webkit-playsinline: true !important;
+        -moz-playsinline: true !important;
+        playsinline: true !important;
     }
     
-    /* Hide any possible control elements that might appear on mobile */
-    .hero-background-video * {
+    /* Hide any possible control elements universally */
+    .hero-background-video *,
+    .hero-background-video::before,
+    .hero-background-video::after {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
+        position: absolute !important;
+        top: -99999px !important;
+        left: -99999px !important;
     }
     
-    /* Prevent context menu on mobile */
+    /* Ultimate prevention of any control display */
     .hero-background-video::-webkit-media-controls-panel,
-    .hero-background-video::-webkit-media-controls {
+    .hero-background-video::-webkit-media-controls,
+    .hero-background-video::-webkit-media-controls-overlay-play-button,
+    .hero-background-video::-webkit-media-controls-start-playback-button {
         -webkit-appearance: none !important;
         appearance: none !important;
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
         position: absolute !important;
-        top: -10000px !important;
-        left: -10000px !important;
+        top: -99999px !important;
+        left: -99999px !important;
         width: 0 !important;
         height: 0 !important;
         overflow: hidden !important;
-        z-index: -9999 !important;
+        z-index: -99999 !important;
+        pointer-events: none !important;
+        touch-action: none !important;
+    }
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px), (hover: none) {
+    .hero-background-video {
+        /* Enhanced mobile video properties */
+        width: 100vw !important;
+        height: 100vh !important;
+        min-width: 100vw !important;
+        min-height: 100vh !important;
+        max-width: 100vw !important;
+        max-height: 100vh !important;
+        object-fit: cover !important;
+        transform: translate(-50%, -50%) !important;
+        /* Force mobile autoplay settings */
+        -webkit-playsinline: true !important;
+        playsinline: true !important;
+        muted: true !important;
+        autoplay: true !important;
+        loop: true !important;
+        /* Ultimate mobile control prevention */
+        -webkit-media-controls: none !important;
+        -webkit-media-controls-panel: none !important;
+        -webkit-media-controls-overlay-play-button: none !important;
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        /* Prevent any mobile interactions */
+        pointer-events: none !important;
+        touch-action: none !important;
+        -webkit-touch-callout: none !important;
+        -webkit-user-select: none !important;
+        user-select: none !important;
+        /* Mobile performance optimizations */
+        will-change: auto !important;
+        transform: translate3d(-50%, -50%, 0) !important;
+        backface-visibility: hidden !important;
     }
 }
 
