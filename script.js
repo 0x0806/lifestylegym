@@ -1238,38 +1238,153 @@ function initializeVideoPlayers() {
 
 // Auto-play videos function
 function initializeAutoplayVideos() {
-    // Play hero background video
+    // Play hero background video with mobile optimizations
     const heroVideo = document.querySelector('.hero-background-video');
     if (heroVideo) {
+        const isMobile = window.innerWidth <= 768;
+        
+        // Ultra-aggressive control removal for mobile
         heroVideo.removeAttribute('controls');
         heroVideo.controls = false;
         heroVideo.muted = true;
         heroVideo.playsInline = true;
         heroVideo.autoplay = true;
         heroVideo.loop = true;
-        heroVideo.preload = 'auto';
+        heroVideo.preload = 'metadata';
+        
+        // Set all possible attributes to prevent controls
         heroVideo.setAttribute('playsinline', '');
         heroVideo.setAttribute('webkit-playsinline', '');
-        heroVideo.setAttribute('disableremoteplayback', '');
+        heroVideo.setAttribute('disableremoteplaybook', '');
         heroVideo.setAttribute('disablepictureinpicture', '');
+        heroVideo.setAttribute('x-webkit-airplay', 'deny');
+        heroVideo.setAttribute('controlsList', 'nodownload nofullscreen noremoteplaybook noplaybackrate');
+        heroVideo.setAttribute('muted', 'muted');
+        heroVideo.setAttribute('autoplay', 'autoplay');
+        heroVideo.setAttribute('loop', 'loop');
+        
+        // Aggressive style enforcement
         heroVideo.style.pointerEvents = 'none';
-
-        const playVideo = () => {
-            heroVideo.currentTime = 0;
-            heroVideo.play().catch(e => {
-                console.log('Hero background video autoplay prevented by browser policy');
-            });
-        };
-
-        if (heroVideo.readyState >= 2) {
-            playVideo();
-        } else {
-            heroVideo.addEventListener('loadeddata', playVideo, { once: true });
+        heroVideo.style.outline = 'none';
+        heroVideo.style.webkitTouchCallout = 'none';
+        heroVideo.style.webkitUserSelect = 'none';
+        heroVideo.style.userSelect = 'none';
+        heroVideo.style.webkitAppearance = 'none';
+        heroVideo.style.appearance = 'none';
+        
+        // Mobile-specific ultra-aggressive control removal
+        if (isMobile) {
+            // Remove any possible control-related properties
+            heroVideo.style.webkitMediaControls = 'none';
+            heroVideo.style.mozMediaControls = 'none';
+            heroVideo.style.mediaControls = 'none';
+            
+            // Force hide any control elements
+            const hideControls = () => {
+                heroVideo.style.setProperty('-webkit-media-controls', 'none', 'important');
+                heroVideo.style.setProperty('-webkit-media-controls-panel', 'none', 'important');
+                heroVideo.style.setProperty('display', 'block', 'important');
+                
+                // Remove controls attribute repeatedly
+                heroVideo.removeAttribute('controls');
+                heroVideo.controls = false;
+                
+                // Hide any shadow DOM controls
+                if (heroVideo.shadowRoot) {
+                    const style = document.createElement('style');
+                    style.textContent = '* { display: none !important; }';
+                    heroVideo.shadowRoot.appendChild(style);
+                }
+            };
+            
+            // Apply control hiding multiple times
+            hideControls();
+            setTimeout(hideControls, 100);
+            setTimeout(hideControls, 500);
+            setTimeout(hideControls, 1000);
         }
 
-        heroVideo.addEventListener('contextmenu', (e) => {
+        // Mobile-specific optimizations
+        if (isMobile) {
+            // Force video to load and play on mobile
+            heroVideo.load(); // Force reload
+            
+            const playVideo = async () => {
+                try {
+                    heroVideo.muted = true;
+                    heroVideo.currentTime = 0;
+                    await heroVideo.play();
+                    console.log('Mobile hero video playing successfully');
+                } catch (e) {
+                    console.log('Mobile video play failed, retrying...', e);
+                    // Retry after a short delay
+                    setTimeout(() => {
+                        heroVideo.play().catch(err => {
+                            console.log('Video retry failed:', err);
+                        });
+                    }, 1000);
+                }
+            };
+
+            // Try to play immediately
+            if (heroVideo.readyState >= 2) {
+                playVideo();
+            } else {
+                heroVideo.addEventListener('loadeddata', playVideo, { once: true });
+                heroVideo.addEventListener('canplay', playVideo, { once: true });
+            }
+            
+            // Also try on user interaction as fallback
+            let hasInteracted = false;
+            const playOnInteraction = () => {
+                if (!hasInteracted) {
+                    hasInteracted = true;
+                    playVideo();
+                }
+            };
+
+            document.addEventListener('touchstart', playOnInteraction, { once: true, passive: true });
+            document.addEventListener('click', playOnInteraction, { once: true, passive: true });
+            
+        } else {
+            // Desktop - try immediate autoplay
+            const forcePlay = async () => {
+                try {
+                    heroVideo.currentTime = 0;
+                    heroVideo.muted = true;
+                    await heroVideo.play();
+                    console.log('Hero background video playing successfully');
+                } catch (e) {
+                    console.log('Hero background video autoplay prevented:', e);
+                }
+            };
+
+            // Multiple attempts to ensure video plays on desktop
+            if (heroVideo.readyState >= 2) {
+                forcePlay();
+            } else {
+                heroVideo.addEventListener('loadeddata', forcePlay, { once: true });
+            }
+        }
+
+        // Prevent all user interactions
+        const preventInteraction = (e) => {
             e.preventDefault();
+            e.stopPropagation();
             return false;
+        };
+
+        heroVideo.addEventListener('contextmenu', preventInteraction);
+        heroVideo.addEventListener('selectstart', preventInteraction);
+        heroVideo.addEventListener('dragstart', preventInteraction);
+        heroVideo.addEventListener('mousedown', preventInteraction);
+        heroVideo.addEventListener('touchstart', preventInteraction);
+        
+        // Prevent video from pausing
+        heroVideo.addEventListener('pause', () => {
+            setTimeout(() => {
+                heroVideo.play().catch(e => console.log('Auto-resume failed:', e));
+            }, 100);
         });
     }
 
