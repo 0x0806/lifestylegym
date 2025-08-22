@@ -478,120 +478,1602 @@ function checkForSuccessMessage() {
     }
 }
 
-// Navigation functionality with proper mobile initialization
-function initializeNavigation() {
-    const Navbar = document.getElementById('Navbar');
-    const hamburger = document.getElementById('hamburger');
-    const navMenu = document.getElementById('nav-menu');
-    let scrollPosition = 0;
+// Complete Navigation System with Proper Section Mapping
+class NavigationController {
+    constructor() {
+        this.navbar = document.getElementById('Navbar');
+        this.hamburger = document.getElementById('hamburger');
+        this.navMenu = document.getElementById('nav-menu');
+        this.navLinks = document.querySelectorAll('.nav-link');
+        this.sections = document.querySelectorAll('section[id]');
+        this.scrollPosition = 0;
+        this.isScrolling = false;
+        this.activeSection = 'home';
+        
+        // Precise section mapping with proper offsets for accurate positioning
+        this.sectionOffsets = {
+            'home': 0,
+            'about': -80,
+            'services': -80,
+            'trainers': -80,
+            'media': -80,
+            'plans': -80,
+            'demo': -80,
+            'contact': -80
+        };
+        
+        // Enhanced section ID mapping for all navigation elements
+        this.sectionMapping = {
+            'home': 'home',
+            'about': 'about',
+            'services': 'services',
+            'trainers': 'trainers',
+            'media': 'media',
+            'plans': 'plans',
+            'demo': 'demo',
+            'contact': 'contact'
+        };
 
-    // Scroll effect for navbar
-    window.addEventListener('scroll', () => {
-        if (Navbar && window.scrollY > 100) {
-            Navbar.classList.add('scrolled');
-        } else if (Navbar) {
-            Navbar.classList.remove('scrolled');
-        }
-    }, { passive: true });
+        // Form-specific targets for precise navigation
+        this.formTargets = {
+            'book-demo': 'demo',
+            'contact-form': 'contact',
+            'book-session': 'contact',
+            'join-classes': 'demo',
+            'start-training': 'demo',
+            'book-home-session': 'contact'
+        };
+        
+        this.init();
+    }
 
-    // Mobile menu toggle with better mobile handling
-    if (hamburger && navMenu) {
-        // Enhanced click/touch handler for mobile
+    init() {
+        this.setupScrollEffects();
+        this.setupMobileMenu();
+        this.setupNavigationLinks();
+        this.setupGlobalNavigation();
+        this.setupActiveNavHighlight();
+        this.setupKeyboardNavigation();
+        this.mapAllNavigationButtons();
+    }
+
+    // Enhanced scroll effects for navbar
+    setupScrollEffects() {
+        let ticking = false;
+        
+        const handleScroll = () => {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    const scrollY = window.pageYOffset;
+                    
+                    // Add/remove scrolled class
+                    if (scrollY > 100) {
+                        this.navbar?.classList.add('scrolled');
+                    } else {
+                        this.navbar?.classList.remove('scrolled');
+                    }
+                    
+                    // Update active section
+                    this.updateActiveSection();
+                    
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+    }
+
+    // Enhanced mobile menu management
+    setupMobileMenu() {
+        if (!this.hamburger || !this.navMenu) return;
+
         const toggleMenu = (e) => {
             e.preventDefault();
             e.stopPropagation();
             
-            const isActive = hamburger.classList.contains('active');
+            const isActive = this.hamburger.classList.contains('active');
             
             if (!isActive) {
-                // Opening menu
-                scrollPosition = window.pageYOffset;
-                hamburger.classList.add('active');
-                navMenu.classList.add('active');
-                document.body.style.overflow = 'hidden';
-                document.body.style.position = 'fixed';
-                document.body.style.top = `-${scrollPosition}px`;
-                document.body.style.width = '100%';
+                this.openMobileMenu();
             } else {
-                // Closing menu
-                hamburger.classList.remove('active');
-                navMenu.classList.remove('active');
-                document.body.style.overflow = '';
-                document.body.style.position = '';
-                document.body.style.top = '';
-                document.body.style.width = '';
-                window.scrollTo(0, scrollPosition);
+                this.closeMobileMenu();
             }
         };
 
-        // Add both click and touchstart for better mobile support
-        hamburger.addEventListener('click', toggleMenu);
-        hamburger.addEventListener('touchstart', (e) => {
+        // Event listeners for hamburger menu
+        this.hamburger.addEventListener('click', toggleMenu);
+        this.hamburger.addEventListener('touchstart', (e) => {
             e.preventDefault();
             toggleMenu(e);
         }, { passive: false });
 
-        // Close menu when clicking outside
-        const closeMenu = () => {
-            if (hamburger.classList.contains('active')) {
-                hamburger.classList.remove('active');
-                navMenu.classList.remove('active');
-                document.body.style.overflow = '';
-                document.body.style.position = '';
-                document.body.style.top = '';
-                document.body.style.width = '';
-                window.scrollTo(0, scrollPosition);
-            }
-        };
-
-        // Handle clicks outside menu
+        // Close menu on outside clicks
         document.addEventListener('click', (e) => {
-            if (!navMenu.contains(e.target) && !hamburger.contains(e.target)) {
-                closeMenu();
+            if (!this.navMenu.contains(e.target) && !this.hamburger.contains(e.target)) {
+                this.closeMobileMenu();
             }
         });
 
-        // Handle touches outside menu for mobile
-        document.addEventListener('touchstart', (e) => {
-            if (!navMenu.contains(e.target) && !hamburger.contains(e.target)) {
-                closeMenu();
+        // Close menu on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.closeMobileMenu();
             }
-        }, { passive: true });
+        });
 
-        // Close mobile menu when clicking on nav links
-        document.querySelectorAll('.nav-link').forEach(link => {
-            const handleLinkClick = () => {
-                closeMenu();
-            };
-            
-            link.addEventListener('click', handleLinkClick);
-            link.addEventListener('touchstart', handleLinkClick, { passive: true });
+        // Close menu when any nav link is clicked
+        this.navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                this.closeMobileMenu();
+            });
         });
     }
-}
 
-// Smooth scrolling for navigation links
-function scrollToSection(sectionId) {
-    const section = document.getElementById(sectionId);
-    if (section) {
-        const navHeight = document.querySelector('.Navbar').offsetHeight;
-        const targetPosition = section.offsetTop - navHeight - 20;
+    openMobileMenu() {
+        this.scrollPosition = window.pageYOffset;
+        this.hamburger.classList.add('active');
+        this.navMenu.classList.add('active');
+        
+        // Update ARIA attributes
+        this.hamburger.setAttribute('aria-expanded', 'true');
+        this.navMenu.setAttribute('aria-hidden', 'false');
+        
+        // Prevent background scroll
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${this.scrollPosition}px`;
+        document.body.style.width = '100%';
+        
+        // Focus management for accessibility
+        setTimeout(() => {
+            this.navLinks[0]?.focus();
+        }, 100);
+        
+        console.log('Mobile menu opened');
+    }
 
+    closeMobileMenu() {
+        if (!this.hamburger.classList.contains('active')) return;
+        
+        this.hamburger.classList.remove('active');
+        this.navMenu.classList.remove('active');
+        
+        // Update ARIA attributes
+        this.hamburger.setAttribute('aria-expanded', 'false');
+        this.navMenu.setAttribute('aria-hidden', 'true');
+        
+        // Restore scroll position
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        window.scrollTo(0, this.scrollPosition);
+        
+        // Return focus to hamburger button
+        this.hamburger.focus();
+        
+        console.log('Mobile menu closed');
+    }
+
+    // Setup navigation links with proper section mapping
+    setupNavigationLinks() {
+        this.navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Get section ID from multiple attributes with priority
+                let sectionId = link.getAttribute('data-section') || 
+                               link.getAttribute('href')?.substring(1);
+                
+                // If no direct mapping found, check text content
+                if (!sectionId) {
+                    const textContent = link.textContent.toLowerCase().trim();
+                    if (textContent.includes('book') && textContent.includes('demo')) {
+                        sectionId = 'demo';
+                    } else if (textContent.includes('contact')) {
+                        sectionId = 'contact';
+                    } else {
+                        sectionId = textContent;
+                    }
+                }
+                
+                // Navigate to the appropriate section
+                if (this.sectionMapping[sectionId]) {
+                    this.scrollToSection(this.sectionMapping[sectionId]);
+                } else {
+                    console.warn(`No section mapping found for: ${sectionId}`);
+                }
+            });
+        });
+    }
+
+    // Map all navigation buttons throughout the site with enhanced precision
+    mapAllNavigationButtons() {
+        console.log('Mapping all navigation buttons with enhanced precision...');
+        
+        // Map primary navigation first
+        this.mapPrimaryNavigation();
+        
+        // Map hero section buttons
+        this.mapHeroButtons();
+        
+        // Map service section buttons with enhanced targeting
+        this.mapServiceButtons();
+        
+        // Map plan section buttons
+        this.mapPlanButtons();
+        
+        // Map trainer section interactions
+        this.mapTrainerButtons();
+        
+        // Map media section interactions
+        this.mapMediaButtons();
+        
+        // Map contact card interactions
+        this.mapContactCards();
+        
+        // Map about section interactions
+        this.mapAboutSection();
+        
+        // Map demo section interactions
+        this.mapDemoSection();
+        
+        // Map all other navigation buttons
+        this.mapMiscellaneousButtons();
+        
+        // Map footer and social links
+        this.mapFooterNavigation();
+        
+        // Map data-nav-target buttons globally
+        this.mapDataNavTargetButtons();
+        
+        // Map scroll indicator
+        this.mapScrollIndicator();
+        
+        // Map keyboard navigation
+        this.mapKeyboardNavigation();
+        
+        // Map touch navigation for mobile
+        this.mapTouchNavigation();
+        
+        // Map any remaining unmapped buttons
+        this.mapRemainingButtons();
+        
+        // Final verification of all navigation elements
+        this.verifyNavigationMapping();
+        console.log('All navigation buttons mapped successfully with enhanced precision');
+    }
+
+    // Verify all navigation elements are properly mapped
+    verifyNavigationMapping() {
+        const unmappedElements = document.querySelectorAll(`
+            button:not([data-nav-mapped]):not([type="submit"]),
+            .btn:not([data-nav-mapped]):not([type="submit"]),
+            [onclick]:not([data-nav-mapped]),
+            a[href^="#"]:not([data-nav-mapped]):not(.social-link):not([href="#"])
+        `);
+
+        if (unmappedElements.length > 0) {
+            console.warn(`Found ${unmappedElements.length} unmapped navigation elements:`, unmappedElements);
+            
+            // Try to map these elements
+            unmappedElements.forEach(element => {
+                const elementText = element.textContent.toLowerCase().trim();
+                const elementType = element.tagName.toLowerCase();
+                
+                console.log(`Attempting to map unmapped ${elementType}: "${elementText}"`);
+                
+                // Last resort mapping
+                if (elementText.includes('demo') || elementText.includes('book') || elementText.includes('free')) {
+                    this.mapElementToSection(element, 'demo');
+                } else if (elementText.includes('contact') || elementText.includes('message')) {
+                    this.mapElementToSection(element, 'contact');
+                } else if (elementText.includes('service')) {
+                    this.mapElementToSection(element, 'services');
+                } else if (elementText.includes('about')) {
+                    this.mapElementToSection(element, 'about');
+                } else if (elementText.includes('home')) {
+                    this.mapElementToSection(element, 'home');
+                }
+            });
+        } else {
+            console.log('All navigation elements successfully mapped!');
+        }
+    }
+
+    // Helper method to map individual elements
+    mapElementToSection(element, sectionId) {
+        if (!element || !this.sectionMapping[sectionId]) return;
+        
+        element.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (sectionId === 'demo' || sectionId === 'contact') {
+                this.scrollToFormSection(sectionId);
+            } else {
+                this.scrollToSection(sectionId);
+            }
+            
+            console.log(`Emergency mapped element navigated to: ${sectionId}`);
+        });
+        
+        element.setAttribute('data-nav-mapped', 'true');
+        element.style.cursor = 'pointer';
+        console.log(`Emergency mapped: ${element.textContent.trim()} -> ${sectionId}`);
+    }
+
+    // Enhanced primary navigation mapping
+    mapPrimaryNavigation() {
+        // Enhanced navbar navigation with better targeting
+        this.navLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            const dataSection = link.getAttribute('data-section');
+            const sectionId = dataSection || (href ? href.substring(1) : null);
+            
+            if (sectionId && this.sectionMapping[sectionId]) {
+                // Remove any existing listeners to prevent duplicates
+                const newLink = link.cloneNode(true);
+                link.parentNode.replaceChild(newLink, link);
+                
+                newLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Special handling for form sections
+                    if (sectionId === 'demo' || sectionId === 'contact') {
+                        this.scrollToFormSection(sectionId);
+                    } else {
+                        this.scrollToSection(sectionId);
+                    }
+                    
+                    // Close mobile menu after navigation
+                    this.closeMobileMenu();
+                    
+                    console.log(`Primary nav: Navigated to ${sectionId}`);
+                });
+                
+                console.log(`Mapped primary navigation: ${sectionId}`);
+            }
+        });
+        
+        // Update navLinks reference after cloning
+        this.navLinks = document.querySelectorAll('.nav-link');
+    }
+
+    // Enhanced contact cards mapping
+    mapContactCards() {
+        const contactCards = document.querySelectorAll('.contact-card');
+        contactCards.forEach((card, index) => {
+            card.style.cursor = 'pointer';
+            card.style.transition = 'transform 0.2s ease, box-shadow 0.2s ease';
+            
+            // Remove existing listeners
+            const newCard = card.cloneNode(true);
+            card.parentNode.replaceChild(newCard, card);
+            
+            newCard.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const icon = newCard.querySelector('i');
+                const cardText = newCard.textContent.toLowerCase();
+                
+                if (icon) {
+                    if (icon.classList.contains('fa-phone-alt') || cardText.includes('call')) {
+                        // Phone card - open phone dialer
+                        window.open('tel:+971581790093', '_self');
+                        console.log('Contact card: Opened phone dialer');
+                    } else if (icon.classList.contains('fa-envelope') || cardText.includes('email')) {
+                        // Email card - scroll to contact form
+                        this.scrollToFormSection('contact');
+                        console.log('Contact card: Navigated to contact form');
+                    } else if (icon.classList.contains('fa-map-marker-alt') || cardText.includes('visit')) {
+                        // Location card - open maps
+                        window.open('https://maps.google.com/?q=25.301111,55.374061', '_blank');
+                        console.log('Contact card: Opened maps');
+                    } else if (icon.classList.contains('fa-clock') || cardText.includes('hours')) {
+                        // Hours card - scroll to demo booking
+                        this.scrollToFormSection('demo');
+                        console.log('Contact card: Navigated to demo booking');
+                    } else {
+                        // Default action - scroll to contact form
+                        this.scrollToFormSection('contact');
+                        console.log('Contact card: Default navigation to contact form');
+                    }
+                }
+            });
+            
+            // Add hover effects
+            newCard.addEventListener('mouseenter', () => {
+                newCard.style.transform = 'translateY(-2px)';
+                newCard.style.boxShadow = '0 5px 20px rgba(0,0,0,0.1)';
+            });
+            
+            newCard.addEventListener('mouseleave', () => {
+                newCard.style.transform = 'translateY(0)';
+                newCard.style.boxShadow = '';
+            });
+            
+            console.log(`Mapped contact card ${index + 1}`);
+        });
+    }
+
+    // Enhanced about section mapping
+    mapAboutSection() {
+        // About cards navigation to services
+        const aboutCards = document.querySelectorAll('.about-card');
+        aboutCards.forEach((card, index) => {
+            card.style.cursor = 'pointer';
+            card.style.transition = 'transform 0.2s ease';
+            
+            // Remove existing listeners
+            const newCard = card.cloneNode(true);
+            card.parentNode.replaceChild(newCard, card);
+            
+            newCard.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.scrollToSection('services');
+                console.log(`About card ${index + 1}: Navigated to services`);
+            });
+            
+            newCard.addEventListener('mouseenter', () => {
+                newCard.style.transform = 'scale(1.02)';
+            });
+            
+            newCard.addEventListener('mouseleave', () => {
+                newCard.style.transform = 'scale(1)';
+            });
+            
+            console.log(`Mapped about card ${index + 1}`);
+        });
+
+        // Stats in hero section with enhanced targeting
+        const heroStats = document.querySelectorAll('.hero .stat');
+        heroStats.forEach((stat, index) => {
+            stat.style.cursor = 'pointer';
+            stat.style.transition = 'transform 0.2s ease';
+            
+            // Remove existing listeners
+            const newStat = stat.cloneNode(true);
+            stat.parentNode.replaceChild(newStat, stat);
+            
+            newStat.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (index === 0) { // 24/7 stat - contact for availability
+                    this.scrollToFormSection('contact');
+                    console.log('Hero stat: 24/7 - Navigated to contact');
+                } else if (index === 1) { // Customers stat - about us
+                    this.scrollToSection('about');
+                    console.log('Hero stat: Customers - Navigated to about');
+                } else { // Experience stat - trainers
+                    this.scrollToSection('trainers');
+                    console.log('Hero stat: Experience - Navigated to trainers');
+                }
+            });
+            
+            newStat.addEventListener('mouseenter', () => {
+                newStat.style.transform = 'scale(1.05)';
+            });
+            
+            newStat.addEventListener('mouseleave', () => {
+                newStat.style.transform = 'scale(1)';
+            });
+            
+            console.log(`Mapped hero stat ${index + 1}`);
+        });
+    }
+
+    // Enhanced demo section mapping
+    mapDemoSection() {
+        // Demo benefits navigation
+        const benefitElements = document.querySelectorAll('.benefit');
+        benefitElements.forEach((benefit, index) => {
+            benefit.style.cursor = 'pointer';
+            benefit.style.transition = 'transform 0.2s ease';
+            
+            // Remove existing listeners
+            const newBenefit = benefit.cloneNode(true);
+            benefit.parentNode.replaceChild(newBenefit, benefit);
+            
+            newBenefit.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Scroll to demo form and focus on first input
+                this.scrollToFormSection('demo');
+                setTimeout(() => {
+                    const firstInput = document.querySelector('#demoForm input[type="text"]');
+                    if (firstInput && window.innerWidth > 768) {
+                        firstInput.focus();
+                    }
+                }, 1200);
+                
+                console.log(`Demo benefit ${index + 1}: Navigated to demo form`);
+            });
+            
+            newBenefit.addEventListener('mouseenter', () => {
+                newBenefit.style.transform = 'translateX(5px)';
+            });
+            
+            newBenefit.addEventListener('mouseleave', () => {
+                newBenefit.style.transform = 'translateX(0)';
+            });
+            
+            console.log(`Mapped demo benefit ${index + 1}`);
+        });
+    }
+
+    // Map any remaining unmapped buttons with comprehensive coverage
+    mapRemainingButtons() {
+        // Find all clickable elements that might need navigation
+        const allClickableElements = document.querySelectorAll(`
+            button:not([data-nav-mapped]), 
+            .btn:not([data-nav-mapped]),
+            [onclick]:not([data-nav-mapped]),
+            [data-nav-target]:not([data-nav-mapped]),
+            a[href^="#"]:not([data-nav-mapped]):not(.nav-link)
+        `);
+        
+        allClickableElements.forEach((element, index) => {
+            const elementText = element.textContent.toLowerCase().trim();
+            const isFormButton = element.type === 'submit' || element.form;
+            const hasOnclick = element.hasAttribute('onclick');
+            const dataTarget = element.getAttribute('data-nav-target');
+            const href = element.getAttribute('href');
+            
+            // Skip form submission buttons and already mapped elements
+            if (isFormButton || element.hasAttribute('data-nav-mapped')) {
+                return;
+            }
+            
+            let targetSection = null;
+            
+            // Check data-nav-target first
+            if (dataTarget && this.sectionMapping[dataTarget]) {
+                targetSection = dataTarget;
+            }
+            // Check href for hash links
+            else if (href && href.startsWith('#')) {
+                const sectionId = href.substring(1);
+                if (this.sectionMapping[sectionId]) {
+                    targetSection = sectionId;
+                }
+            }
+            // Parse onclick for scrollToSection calls
+            else if (hasOnclick) {
+                const onclickValue = element.getAttribute('onclick');
+                const sectionMatch = onclickValue.match(/scrollToSection\(['"]([^'"]+)['"]\)/);
+                if (sectionMatch && this.sectionMapping[sectionMatch[1]]) {
+                    targetSection = sectionMatch[1];
+                }
+            }
+            // Determine target based on text content
+            else {
+                if (elementText.includes('book') && (elementText.includes('demo') || elementText.includes('free'))) {
+                    targetSection = 'demo';
+                } else if (elementText.includes('book') && elementText.includes('home')) {
+                    targetSection = 'contact';
+                } else if (elementText.includes('contact') || elementText.includes('message') || elementText.includes('email')) {
+                    targetSection = 'contact';
+                } else if (elementText.includes('service') || elementText.includes('explore')) {
+                    targetSection = 'services';
+                } else if (elementText.includes('plan') || elementText.includes('pricing') || elementText.includes('membership')) {
+                    targetSection = 'plans';
+                } else if (elementText.includes('trainer') || elementText.includes('team')) {
+                    targetSection = 'trainers';
+                } else if (elementText.includes('media') || elementText.includes('video') || elementText.includes('gallery')) {
+                    targetSection = 'media';
+                } else if (elementText.includes('about') || elementText.includes('story')) {
+                    targetSection = 'about';
+                } else if (elementText.includes('home') || elementText.includes('top')) {
+                    targetSection = 'home';
+                } else if (elementText.includes('demo') || elementText.includes('trial')) {
+                    targetSection = 'demo';
+                } else if (elementText.includes('join') || elementText.includes('classes')) {
+                    targetSection = 'demo';
+                } else if (elementText.includes('start') || elementText.includes('training')) {
+                    targetSection = 'demo';
+                } else if (elementText.includes('session')) {
+                    // Determine session type
+                    if (elementText.includes('home') || elementText.includes('wellness')) {
+                        targetSection = 'contact';
+                    } else {
+                        targetSection = 'demo';
+                    }
+                }
+            }
+            
+            if (targetSection && this.sectionMapping[targetSection]) {
+                // Remove existing listeners and onclick
+                const newElement = element.cloneNode(true);
+                element.parentNode.replaceChild(newElement, element);
+                newElement.removeAttribute('onclick');
+                
+                newElement.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    if (targetSection === 'demo' || targetSection === 'contact') {
+                        this.scrollToFormSection(targetSection);
+                        console.log(`Element: "${elementText}" - Navigated to ${targetSection} form`);
+                    } else {
+                        this.scrollToSection(targetSection);
+                        console.log(`Element: "${elementText}" - Navigated to ${targetSection} section`);
+                    }
+                });
+                
+                // Mark as mapped
+                newElement.setAttribute('data-nav-mapped', 'true');
+                console.log(`Mapped element: "${elementText}" -> ${targetSection}`);
+            }
+        });
+
+        // Also map any elements with specific classes that might be interactive
+        const interactiveElements = document.querySelectorAll(`
+            .contact-card:not([data-nav-mapped]),
+            .about-card:not([data-nav-mapped]),
+            .trainer-card:not([data-nav-mapped]),
+            .plan-card:not([data-nav-mapped]),
+            .service-card:not([data-nav-mapped]),
+            .benefit:not([data-nav-mapped]),
+            .stat:not([data-nav-mapped]),
+            .Logo-3D:not([data-nav-mapped])
+        `);
+
+        interactiveElements.forEach(element => {
+            if (element.hasAttribute('data-nav-mapped')) return;
+            
+            element.style.cursor = 'pointer';
+            let targetSection = null;
+            
+            if (element.classList.contains('contact-card')) {
+                const cardText = element.textContent.toLowerCase();
+                if (cardText.includes('phone') || cardText.includes('call')) {
+                    element.addEventListener('click', () => window.open('tel:+971581790093', '_self'));
+                    element.setAttribute('data-nav-mapped', 'true');
+                    return;
+                } else if (cardText.includes('map') || cardText.includes('visit')) {
+                    element.addEventListener('click', () => window.open('https://maps.google.com/?q=25.301111,55.374061', '_blank'));
+                    element.setAttribute('data-nav-mapped', 'true');
+                    return;
+                } else {
+                    targetSection = 'contact';
+                }
+            } else if (element.classList.contains('about-card')) {
+                targetSection = 'services';
+            } else if (element.classList.contains('trainer-card')) {
+                targetSection = 'demo';
+            } else if (element.classList.contains('plan-card')) {
+                targetSection = 'demo';
+            } else if (element.classList.contains('service-card')) {
+                const serviceTitle = element.querySelector('h3')?.textContent.toLowerCase() || '';
+                if (serviceTitle.includes('home') || serviceTitle.includes('wellness')) {
+                    targetSection = 'contact';
+                } else {
+                    targetSection = 'demo';
+                }
+            } else if (element.classList.contains('benefit')) {
+                targetSection = 'demo';
+            } else if (element.classList.contains('stat')) {
+                const statText = element.textContent.toLowerCase();
+                if (statText.includes('24') || statText.includes('hours')) {
+                    targetSection = 'contact';
+                } else if (statText.includes('customer') || statText.includes('trained')) {
+                    targetSection = 'about';
+                } else {
+                    targetSection = 'trainers';
+                }
+            } else if (element.classList.contains('Logo-3D')) {
+                targetSection = 'home';
+            }
+            
+            if (targetSection) {
+                element.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    if (targetSection === 'demo' || targetSection === 'contact') {
+                        this.scrollToFormSection(targetSection);
+                    } else {
+                        this.scrollToSection(targetSection);
+                    }
+                });
+                
+                element.setAttribute('data-nav-mapped', 'true');
+                console.log(`Mapped interactive element: ${element.className} -> ${targetSection}`);
+            }
+        });
+    }
+
+    mapHeroButtons() {
+        // Hero "Book Free Demo" button with enhanced targeting
+        const heroBookDemoBtn = document.querySelector('.hero-buttons .btn-primary');
+        if (heroBookDemoBtn) {
+            // Remove existing listeners
+            const newBtn = heroBookDemoBtn.cloneNode(true);
+            heroBookDemoBtn.parentNode.replaceChild(newBtn, heroBookDemoBtn);
+            
+            newBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.scrollToFormSection('demo');
+                console.log('Hero: Book Free Demo - Navigated to demo form');
+                
+                // Focus on first form field after navigation
+                setTimeout(() => {
+                    const firstInput = document.querySelector('#demoForm input[type="text"]');
+                    if (firstInput && window.innerWidth > 768) {
+                        firstInput.focus();
+                    }
+                }, 1200);
+            });
+            
+            console.log('Mapped hero Book Free Demo button');
+        }
+
+        // Hero "Explore Services" button with enhanced targeting
+        const heroExploreBtn = document.querySelector('.hero-buttons .btn-secondary');
+        if (heroExploreBtn) {
+            // Remove existing listeners
+            const newBtn = heroExploreBtn.cloneNode(true);
+            heroExploreBtn.parentNode.replaceChild(newBtn, heroExploreBtn);
+            
+            newBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.scrollToSection('services');
+                console.log('Hero: Explore Services - Navigated to services section');
+            });
+            
+            console.log('Mapped hero Explore Services button');
+        }
+
+        // Map any other buttons in hero section with data-nav-target
+        const allHeroButtons = document.querySelectorAll('.hero .btn, .hero-buttons .btn');
+        allHeroButtons.forEach((button, index) => {
+            const buttonText = button.textContent.toLowerCase().trim();
+            const dataTarget = button.getAttribute('data-nav-target');
+            
+            // Skip already processed buttons
+            if (button.classList.contains('btn-primary') || button.classList.contains('btn-secondary')) {
+                return;
+            }
+            
+            if (dataTarget && this.sectionMapping[dataTarget]) {
+                // Remove existing listeners
+                const newButton = button.cloneNode(true);
+                button.parentNode.replaceChild(newButton, button);
+                
+                newButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    if (dataTarget === 'demo' || dataTarget === 'contact') {
+                        this.scrollToFormSection(dataTarget);
+                        console.log(`Hero button: "${buttonText}" - Navigated to ${dataTarget} form`);
+                    } else {
+                        this.scrollToSection(dataTarget);
+                        console.log(`Hero button: "${buttonText}" - Navigated to ${dataTarget} section`);
+                    }
+                });
+                
+                console.log(`Mapped hero button ${index + 1}: "${buttonText}" -> ${dataTarget}`);
+            }
+        });
+    }
+
+    mapServiceButtons() {
+        // All service card buttons with enhanced mapping and precise targeting
+        const serviceButtons = document.querySelectorAll('.service-card .btn');
+        serviceButtons.forEach((button, index) => {
+            const buttonText = button.textContent.toLowerCase().trim();
+            
+            // Remove existing listeners to prevent duplicates
+            const newButton = button.cloneNode(true);
+            button.parentNode.replaceChild(newButton, button);
+            
+            newButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const serviceCard = newButton.closest('.service-card');
+                const serviceTitle = serviceCard?.querySelector('h3')?.textContent.toLowerCase() || '';
+                
+                // Enhanced button text matching with service context
+                if (buttonText.includes('book home') || buttonText.includes('home session') || serviceTitle.includes('home')) {
+                    this.scrollToFormSection('contact');
+                    console.log(`Service button: "${buttonText}" - Navigated to contact form for home service`);
+                } else if (buttonText.includes('demo') || buttonText.includes('book demo')) {
+                    this.scrollToFormSection('demo');
+                    console.log(`Service button: "${buttonText}" - Navigated to demo form`);
+                } else if (buttonText.includes('join classes') || serviceTitle.includes('group')) {
+                    this.scrollToFormSection('demo');
+                    console.log(`Service button: "${buttonText}" - Navigated to demo form for group classes`);
+                } else if (buttonText.includes('start training') || serviceTitle.includes('training')) {
+                    this.scrollToFormSection('demo');
+                    console.log(`Service button: "${buttonText}" - Navigated to demo form for training`);
+                } else if (buttonText.includes('book session') || buttonText.includes('session')) {
+                    // Determine form based on service type
+                    if (serviceTitle.includes('wellness') || serviceTitle.includes('home')) {
+                        this.scrollToFormSection('contact');
+                        console.log(`Service button: "${buttonText}" - Navigated to contact form for wellness/home service`);
+                    } else {
+                        this.scrollToFormSection('demo');
+                        console.log(`Service button: "${buttonText}" - Navigated to demo form for session booking`);
+                    }
+                } else {
+                    // Enhanced default behavior based on service type
+                    if (serviceTitle.includes('home') || serviceTitle.includes('wellness') || serviceTitle.includes('massage')) {
+                        this.scrollToFormSection('contact');
+                        console.log(`Service button: "${buttonText}" - Default navigation to contact form (service: ${serviceTitle})`);
+                    } else {
+                        this.scrollToFormSection('demo');
+                        console.log(`Service button: "${buttonText}" - Default navigation to demo form (service: ${serviceTitle})`);
+                    }
+                }
+                
+                // Pre-fill service information in forms
+                setTimeout(() => {
+                    if (serviceTitle) {
+                        const serviceSelect = document.getElementById('service');
+                        const messageField = document.getElementById('message') || document.getElementById('contactMessage');
+                        
+                        if (serviceSelect) {
+                            // Map service titles to select options
+                            if (serviceTitle.includes('home')) {
+                                serviceSelect.value = 'home-training';
+                            } else if (serviceTitle.includes('personal')) {
+                                serviceSelect.value = 'personal-training';
+                            } else if (serviceTitle.includes('group')) {
+                                serviceSelect.value = 'group-classes';
+                            } else if (serviceTitle.includes('weight')) {
+                                serviceSelect.value = 'personal-training';
+                            } else if (serviceTitle.includes('wellness')) {
+                                serviceSelect.value = 'general-fitness';
+                            }
+                        }
+                        
+                        if (messageField && !messageField.value) {
+                            messageField.value = `I'm interested in ${serviceTitle}.`;
+                        }
+                    }
+                }, 1000);
+            });
+            
+            // Add visual feedback
+            newButton.addEventListener('mouseenter', () => {
+                newButton.style.transform = 'translateY(-2px)';
+                newButton.style.boxShadow = '0 5px 15px rgba(0,0,0,0.2)';
+            });
+            
+            newButton.addEventListener('mouseleave', () => {
+                newButton.style.transform = 'translateY(0)';
+                newButton.style.boxShadow = '';
+            });
+            
+            console.log(`Mapped service button ${index + 1}: "${buttonText}"`);
+        });
+    }
+
+    mapPlanButtons() {
+        // All plan card buttons with enhanced targeting and form pre-filling
+        const planButtons = document.querySelectorAll('.plan-card .btn');
+        planButtons.forEach((button, index) => {
+            // Remove existing listeners to prevent duplicates
+            const newButton = button.cloneNode(true);
+            button.parentNode.replaceChild(newButton, button);
+            
+            newButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Get plan information for better form pre-filling
+                const planCard = newButton.closest('.plan-card');
+                const planName = planCard?.querySelector('h3')?.textContent || '';
+                const planPrice = planCard?.querySelector('.amount')?.textContent || '';
+                
+                // Always go to demo form for plan bookings
+                this.scrollToFormSection('demo');
+                console.log(`Plan button: "${planName}" - Navigated to demo form`);
+                
+                // Enhanced form pre-filling after navigation
+                setTimeout(() => {
+                    const planSelect = document.getElementById('planChoice');
+                    const messageField = document.getElementById('message');
+                    
+                    if (planSelect && planName) {
+                        const planLower = planName.toLowerCase();
+                        if (planLower.includes('basic')) {
+                            planSelect.value = 'basic';
+                        } else if (planLower.includes('premium')) {
+                            planSelect.value = 'premium';
+                        } else if (planLower.includes('vip')) {
+                            planSelect.value = 'vip-single';
+                        }
+                        
+                        // Trigger change event to update form
+                        planSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                    
+                    if (messageField && planName && !messageField.value) {
+                        let message = `I'm interested in the ${planName}`;
+                        if (planPrice) {
+                            message += ` (AED ${planPrice}/month)`;
+                        }
+                        message += '. Please provide more details about this membership.';
+                        messageField.value = message;
+                    }
+                }, 1200);
+            });
+            
+            // Add visual feedback
+            newButton.addEventListener('mouseenter', () => {
+                newButton.style.transform = 'translateY(-3px)';
+                newButton.style.boxShadow = '0 8px 25px rgba(255, 107, 53, 0.3)';
+            });
+            
+            newButton.addEventListener('mouseleave', () => {
+                newButton.style.transform = 'translateY(0)';
+                newButton.style.boxShadow = '';
+            });
+            
+            console.log(`Mapped plan button ${index + 1}: "${planName}"`);
+        });
+    }
+
+    mapTrainerButtons() {
+        // Trainer cards - clicking leads to demo booking form
+        const trainerCards = document.querySelectorAll('.trainer-card');
+        trainerCards.forEach(card => {
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', (e) => {
+                // Don't trigger if clicking on social links
+                if (!e.target.closest('.social-links')) {
+                    const trainerName = card.querySelector('h3')?.textContent || '';
+                    this.scrollToFormSection('demo');
+                    
+                    // Optional: Pre-fill trainer preference in demo form
+                    setTimeout(() => {
+                        const messageField = document.getElementById('message');
+                        if (messageField && trainerName && !messageField.value) {
+                            messageField.value = `I would like to book a demo session with ${trainerName}.`;
+                        }
+                    }, 1000);
+                }
+            });
+        });
+
+        // Trainer social links (keep their original functionality)
+        const trainerSocialLinks = document.querySelectorAll('.trainer-card .social-links a');
+        trainerSocialLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent card click
+            });
+        });
+    }
+
+    mapMediaButtons() {
+        // Video cards - clicking play button or video area
+        const videoCards = document.querySelectorAll('.video-card');
+        videoCards.forEach(card => {
+            const videoInfo = card.querySelector('.video-info');
+            if (videoInfo) {
+                videoInfo.style.cursor = 'pointer';
+                videoInfo.addEventListener('click', () => {
+                    // Trigger video play
+                    const playBtn = card.querySelector('.play-btn');
+                    if (playBtn) {
+                        playBtn.click();
+                    }
+                });
+            }
+        });
+    }
+
+    mapDataNavTargetButtons() {
+        // Map all buttons with data-nav-target attribute
+        const dataNavButtons = document.querySelectorAll('[data-nav-target]');
+        dataNavButtons.forEach(button => {
+            const targetSection = button.getAttribute('data-nav-target');
+            if (this.sectionMapping[targetSection]) {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.scrollToSection(targetSection);
+                });
+            }
+        });
+    }
+
+    mapScrollIndicator() {
+        // Scroll indicator in hero section
+        const scrollIndicator = document.querySelector('.scroll-indicator');
+        if (scrollIndicator) {
+            scrollIndicator.style.cursor = 'pointer';
+            scrollIndicator.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.scrollToSection('about');
+                console.log('Scroll indicator: Navigated to about section');
+            });
+            scrollIndicator.setAttribute('data-nav-mapped', 'true');
+        }
+        
+        // Also handle scroll arrow specifically
+        const scrollArrow = document.querySelector('.scroll-arrow');
+        if (scrollArrow) {
+            scrollArrow.style.cursor = 'pointer';
+            scrollArrow.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.scrollToSection('about');
+                console.log('Scroll arrow: Navigated to about section');
+            });
+            scrollArrow.setAttribute('data-nav-mapped', 'true');
+        }
+    }
+
+    mapMiscellaneousButtons() {
+        // Demo section benefits - clicking scrolls to demo form
+        const benefitElements = document.querySelectorAll('.benefit');
+        benefitElements.forEach(benefit => {
+            benefit.style.cursor = 'pointer';
+            benefit.addEventListener('click', () => {
+                this.scrollToFormSection('demo');
+            });
+        });
+
+        // About cards - clicking leads to services
+        const aboutCards = document.querySelectorAll('.about-card');
+        aboutCards.forEach(card => {
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', () => {
+                this.scrollToSection('services');
+            });
+        });
+
+        // Contact cards - make them interactive with better targeting
+        const contactCards = document.querySelectorAll('.contact-card');
+        contactCards.forEach((card, index) => {
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                const icon = card.querySelector('i');
+                const cardText = card.textContent.toLowerCase();
+                
+                if (icon) {
+                    if (icon.classList.contains('fa-phone-alt') || cardText.includes('call')) {
+                        // Phone card - open phone dialer
+                        window.open('tel:+971581790093', '_self');
+                    } else if (icon.classList.contains('fa-envelope') || cardText.includes('email')) {
+                        // Email card - scroll to contact form instead of email client
+                        this.scrollToFormSection('contact');
+                    } else if (icon.classList.contains('fa-map-marker-alt') || cardText.includes('visit')) {
+                        // Location card - open maps
+                        window.open('https://maps.google.com/?q=25.301111,55.374061', '_blank');
+                    } else if (icon.classList.contains('fa-clock') || cardText.includes('hours')) {
+                        // Hours card - scroll to demo booking
+                        this.scrollToFormSection('demo');
+                    } else {
+                        // Default action - scroll to contact form
+                        this.scrollToFormSection('contact');
+                    }
+                }
+            });
+        });
+
+        // WhatsApp chat button
+        const whatsappChat = document.getElementById('whatsappChat');
+        if (whatsappChat) {
+            whatsappChat.addEventListener('click', (e) => {
+                console.log('WhatsApp chat opened');
+            });
+        }
+
+        // Back to top button
+        const backToTop = document.getElementById('backtotop');
+        if (backToTop) {
+            backToTop.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.scrollToSection('home');
+            });
+        }
+
+        // Logo elements in navbar
+        const navLogo = document.querySelector('.nav-logo .Logo-3D');
+        if (navLogo) {
+            navLogo.style.cursor = 'pointer';
+            navLogo.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.scrollToSection('home');
+            });
+        }
+
+        // Stats in hero section - enhanced with form targeting
+        const heroStats = document.querySelectorAll('.hero .stat');
+        heroStats.forEach((stat, index) => {
+            stat.style.cursor = 'pointer';
+            stat.addEventListener('click', () => {
+                if (index === 0) { // 24/7 stat
+                    this.scrollToFormSection('contact');
+                } else if (index === 1) { // Customers stat
+                    this.scrollToSection('about');
+                } else { // Experience stat
+                    this.scrollToSection('trainers');
+                }
+            });
+        });
+
+        // Handle all buttons with data-nav-target attribute
+        const dataNavButtons = document.querySelectorAll('[data-nav-target]');
+        dataNavButtons.forEach(button => {
+            const targetSection = button.getAttribute('data-nav-target');
+            
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                if (targetSection === 'demo' || targetSection === 'contact') {
+                    this.scrollToFormSection(targetSection);
+                } else if (this.sectionMapping[targetSection]) {
+                    this.scrollToSection(targetSection);
+                }
+            });
+        });
+
+        // Remove old onclick handlers and replace with proper event listeners
+        const onclickButtons = document.querySelectorAll('[onclick*="scrollToSection"]');
+        onclickButtons.forEach(button => {
+            const onclickValue = button.getAttribute('onclick');
+            button.removeAttribute('onclick');
+            
+            if (onclickValue) {
+                const sectionMatch = onclickValue.match(/scrollToSection\(['"]([^'"]+)['"]\)/);
+                if (sectionMatch) {
+                    const sectionId = sectionMatch[1];
+                    button.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        
+                        if (sectionId === 'demo' || sectionId === 'contact') {
+                            this.scrollToFormSection(sectionId);
+                        } else {
+                            this.scrollToSection(sectionId);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    mapFooterNavigation() {
+        // Footer logo navigation
+        const footerLogo = document.querySelector('.footer-logo .Logo-3D');
+        if (footerLogo) {
+            footerLogo.style.cursor = 'pointer';
+            footerLogo.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.scrollToSection('home');
+            });
+        }
+
+        // Social media links (keep their original hrefs but add smooth scroll for internal links)
+        const socialLinks = document.querySelectorAll('.social-link');
+        socialLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && href.startsWith('#')) {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const sectionId = href.substring(1);
+                    if (this.sectionMapping[sectionId]) {
+                        this.scrollToSection(sectionId);
+                    }
+                });
+            }
+        });
+    }
+
+    // Setup global navigation for buttons throughout the site
+    setupGlobalNavigation() {
+        // Make scrollToSection globally accessible
+        window.scrollToSection = (sectionId) => this.scrollToSection(sectionId);
+        
+        // Handle logo clicks to go to home
+        const logoElements = document.querySelectorAll('.Logo-3D, .nav-logo');
+        logoElements.forEach(logo => {
+            logo.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.scrollToSection('home');
+            });
+            logo.style.cursor = 'pointer';
+        });
+
+        // Handle any hash links in the document
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('a[href^="#"]');
+            if (link && !link.classList.contains('nav-link')) {
+                e.preventDefault();
+                const sectionId = link.getAttribute('href').substring(1);
+                if (this.sectionMapping[sectionId]) {
+                    this.scrollToSection(sectionId);
+                }
+            }
+        });
+    }
+
+    // Enhanced section scrolling with proper offset handling
+    scrollToSection(sectionId) {
+        const section = document.getElementById(sectionId);
+        if (!section) {
+            console.warn(`Section with id '${sectionId}' not found`);
+            return;
+        }
+
+        // Close mobile menu if open
+        this.closeMobileMenu();
+
+        const navHeight = this.navbar?.offsetHeight || 80;
+        const offset = this.sectionOffsets[sectionId] || -80;
+        const targetPosition = section.offsetTop + offset;
+
+        // Smooth scroll to target position
         window.scrollTo({
-            top: targetPosition,
+            top: Math.max(0, targetPosition),
             behavior: 'smooth'
         });
+
+        // Update URL without triggering scroll event
+        if (history.pushState) {
+            history.pushState(null, null, `#${sectionId}`);
+        }
+
+        // Set scrolling flag to prevent conflicts with scroll detection
+        this.isScrolling = true;
+        setTimeout(() => {
+            this.isScrolling = false;
+        }, 1200);
+
+        // Update active navigation immediately
+        this.setActiveNavLink(sectionId);
+
+        // Log navigation for debugging
+        console.log(`Navigated to section: ${sectionId}`);
+    }
+
+    // New method for form-specific scrolling
+    scrollToFormSection(sectionId) {
+        this.scrollToSection(sectionId);
+        
+        // Additional focus on the form element after scrolling
+        setTimeout(() => {
+            let formElement = null;
+            
+            if (sectionId === 'demo') {
+                formElement = document.getElementById('demoForm');
+            } else if (sectionId === 'contact') {
+                formElement = document.getElementById('contactForm');
+            }
+            
+            if (formElement) {
+                // Smooth scroll to center the form in view
+                formElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+                
+                // Optional: Focus on first input field
+                setTimeout(() => {
+                    const firstInput = formElement.querySelector('input[type="text"], input[type="email"]');
+                    if (firstInput && window.innerWidth > 768) { // Only on desktop to avoid mobile keyboard issues
+                        firstInput.focus();
+                    }
+                }, 500);
+            }
+        }, 800); // Wait for section scroll to complete
+    }
+
+    // Active navigation highlighting
+    setupActiveNavHighlight() {
+        this.updateActiveSection();
+    }
+
+    updateActiveSection() {
+        if (this.isScrolling) return;
+
+        const scrollY = window.pageYOffset;
+        const windowHeight = window.innerHeight;
+        let currentSection = 'home';
+
+        // Offset for section detection
+        const offset = 120;
+        
+        // Find current section based on scroll position
+        for (const section of this.sections) {
+            const sectionTop = section.offsetTop - offset;
+            const sectionBottom = sectionTop + section.offsetHeight;
+            
+            if (scrollY >= sectionTop && scrollY < sectionBottom) {
+                currentSection = section.id;
+                break;
+            }
+        }
+
+        // Handle edge cases
+        if (scrollY + windowHeight >= document.documentElement.scrollHeight - 100) {
+            currentSection = 'contact';
+        }
+
+        if (scrollY < 50) {
+            currentSection = 'home';
+        }
+
+        // Update active section if changed
+        if (currentSection !== this.activeSection) {
+            this.activeSection = currentSection;
+            this.setActiveNavLink(currentSection);
+        }
+    }
+
+    setActiveNavLink(sectionId) {
+        // Remove active class from all nav links
+        this.navLinks.forEach(link => {
+            link.classList.remove('active');
+        });
+
+        // Add active class to current section link
+        const activeLink = document.querySelector(`[data-section="${sectionId}"], .nav-link[href="#${sectionId}"]`);
+        if (activeLink && activeLink.classList.contains('nav-link')) {
+            activeLink.classList.add('active');
+            
+            // Update URL hash if different
+            if (window.location.hash !== `#${sectionId}`) {
+                history.replaceState(null, null, `#${sectionId}`);
+            }
+        }
+    }
+
+    // Enhanced keyboard navigation
+    setupKeyboardNavigation() {
+        // Navigation links keyboard support
+        this.navLinks.forEach((link, index) => {
+            link.addEventListener('keydown', (e) => {
+                switch (e.key) {
+                    case 'ArrowDown':
+                    case 'ArrowRight':
+                        e.preventDefault();
+                        const nextIndex = (index + 1) % this.navLinks.length;
+                        this.navLinks[nextIndex].focus();
+                        break;
+                        
+                    case 'ArrowUp':
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        const prevIndex = index === 0 ? this.navLinks.length - 1 : index - 1;
+                        this.navLinks[prevIndex].focus();
+                        break;
+                        
+                    case 'Home':
+                        e.preventDefault();
+                        this.navLinks[0].focus();
+                        break;
+                        
+                    case 'End':
+                        e.preventDefault();
+                        this.navLinks[this.navLinks.length - 1].focus();
+                        break;
+                        
+                    case 'Enter':
+                    case ' ':
+                        e.preventDefault();
+                        link.click();
+                        break;
+                }
+            });
+        });
+
+        // Global keyboard shortcuts for navigation
+        document.addEventListener('keydown', (e) => {
+            // Only trigger if not typing in an input
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
+                return;
+            }
+
+            // Number keys for quick section navigation
+            const sectionKeys = {
+                '1': 'home',
+                '2': 'about', 
+                '3': 'services',
+                '4': 'trainers',
+                '5': 'media',
+                '6': 'plans',
+                '7': 'demo',
+                '8': 'contact'
+            };
+
+            if (sectionKeys[e.key]) {
+                e.preventDefault();
+                this.scrollToSection(sectionKeys[e.key]);
+            }
+
+            // Arrow keys for section navigation
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                    case 'ArrowUp':
+                        e.preventDefault();
+                        this.scrollToSection('home');
+                        break;
+                    case 'ArrowDown':
+                        e.preventDefault();
+                        this.scrollToSection('contact');
+                        break;
+                }
+            }
+        });
+    }
+
+    // Public method to programmatically navigate to a section
+    navigateToSection(sectionId) {
+        if (this.sectionMapping[sectionId]) {
+            this.scrollToSection(this.sectionMapping[sectionId]);
+        } else {
+            console.warn(`Invalid section ID: ${sectionId}`);
+        }
+    }
+
+    // Public method to get current active section
+    getCurrentSection() {
+        return this.activeSection;
+    }
+
+    // Public method to get all available sections
+    getAvailableSections() {
+        return Object.keys(this.sectionMapping);
+    }
+
+    // Enhanced keyboard navigation mapping
+    mapKeyboardNavigation() {
+        // Add keyboard shortcuts info
+        const keyboardShortcuts = {
+            '1': 'home',
+            '2': 'about',
+            '3': 'services', 
+            '4': 'trainers',
+            '5': 'media',
+            '6': 'plans',
+            '7': 'demo',
+            '8': 'contact',
+            'h': 'home',
+            'a': 'about',
+            's': 'services',
+            't': 'trainers',
+            'm': 'media',
+            'p': 'plans',
+            'd': 'demo',
+            'c': 'contact'
+        };
+
+        // Display keyboard shortcuts on Alt+K
+        document.addEventListener('keydown', (e) => {
+            if (e.altKey && e.key === 'k') {
+                e.preventDefault();
+                this.showKeyboardShortcuts(keyboardShortcuts);
+            }
+        });
+    }
+
+    // Touch navigation for mobile devices
+    mapTouchNavigation() {
+        let touchStartY = 0;
+        let touchEndY = 0;
+        
+        // Swipe navigation for mobile
+        document.addEventListener('touchstart', (e) => {
+            touchStartY = e.changedTouches[0].screenY;
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            touchEndY = e.changedTouches[0].screenY;
+            this.handleSwipeNavigation(touchStartY, touchEndY);
+        }, { passive: true });
+    }
+
+    // Handle swipe navigation
+    handleSwipeNavigation(startY, endY) {
+        const minSwipeDistance = 100;
+        const swipeDistance = Math.abs(startY - endY);
+        
+        if (swipeDistance < minSwipeDistance) return;
+        
+        const sections = Object.keys(this.sectionMapping);
+        const currentIndex = sections.indexOf(this.activeSection);
+        
+        if (startY > endY && currentIndex < sections.length - 1) {
+            // Swipe up - next section
+            this.scrollToSection(sections[currentIndex + 1]);
+        } else if (startY < endY && currentIndex > 0) {
+            // Swipe down - previous section
+            this.scrollToSection(sections[currentIndex - 1]);
+        }
+    }
+
+    // Show keyboard shortcuts modal
+    showKeyboardShortcuts(shortcuts) {
+        const modal = document.createElement('div');
+        modal.className = 'keyboard-shortcuts-modal';
+        modal.innerHTML = `
+            <div class="shortcuts-content">
+                <h3>Keyboard Shortcuts</h3>
+                <div class="shortcuts-grid">
+                    ${Object.entries(shortcuts).map(([key, section]) => 
+                        `<div class="shortcut-item">
+                            <kbd>${key}</kbd>
+                            <span>${section.charAt(0).toUpperCase() + section.slice(1)}</span>
+                        </div>`
+                    ).join('')}
+                </div>
+                <p>Press <kbd>Esc</kbd> to close this dialog</p>
+            </div>
+        `;
+        
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Close on Escape or click outside
+        const closeModal = () => {
+            document.body.removeChild(modal);
+        };
+        
+        document.addEventListener('keydown', function escHandler(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+                document.removeEventListener('keydown', escHandler);
+            }
+        });
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
     }
 }
 
-// Add click listeners to nav links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const targetId = this.getAttribute('href').substring(1);
-        scrollToSection(targetId);
-    });
-});
+// Global navigation controller instance
+let navigationController;
+
+// Initialize navigation system
+function initializeNavigation() {
+    navigationController = new NavigationController();
+    
+    // Ensure all buttons are properly mapped after initialization
+    setTimeout(() => {
+        navigationController.mapAllNavigationButtons();
+        console.log('Navigation system fully initialized and mapped');
+    }, 100);
+}
+
+// Legacy function for backward compatibility
+function scrollToSection(sectionId) {
+    if (navigationController) {
+        navigationController.scrollToSection(sectionId);
+    } else {
+        console.warn('Navigation controller not initialized');
+    }
+}
 
 // Intersection Observer for animations
 const observerOptions = {
