@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,65 +37,25 @@
     <nav class="Navbar" id="Navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <div class="Logo-3D" data-nav-target="home" role="button" tabindex="0" aria-label="Navigate to Home section">
+                <div class="Logo-3D">
                     <img src="Screenshot 2025-07-30 091817.png" alt="New Lifestyle Gym Logo" class="logo-image">
                     <span>New Lifestyle</span>
                 </div>
             </div>
-            <ul class="nav-menu" id="nav-menu" role="menubar">
-                <li class="nav-item" role="none">
-                    <a href="#home" class="nav-link" data-section="home" role="menuitem" tabindex="0" aria-label="Navigate to Home section">
-                        <i class="fas fa-home" aria-hidden="true"></i>
-                        <span>Home</span>
-                    </a>
-                </li>
-                <li class="nav-item" role="none">
-                    <a href="#about" class="nav-link" data-section="about" role="menuitem" tabindex="0" aria-label="Navigate to About section">
-                        <i class="fas fa-info-circle" aria-hidden="true"></i>
-                        <span>About</span>
-                    </a>
-                </li>
-                <li class="nav-item" role="none">
-                    <a href="#services" class="nav-link" data-section="services" role="menuitem" tabindex="0" aria-label="Navigate to Services section">
-                        <i class="fas fa-dumbbell" aria-hidden="true"></i>
-                        <span>Services</span>
-                    </a>
-                </li>
-                <li class="nav-item" role="none">
-                    <a href="#trainers" class="nav-link" data-section="trainers" role="menuitem" tabindex="0" aria-label="Navigate to Trainers section">
-                        <i class="fas fa-users" aria-hidden="true"></i>
-                        <span>Trainers</span>
-                    </a>
-                </li>
-                <li class="nav-item" role="none">
-                    <a href="#media" class="nav-link" data-section="media" role="menuitem" tabindex="0" aria-label="Navigate to Media section">
-                        <i class="fas fa-play-circle" aria-hidden="true"></i>
-                        <span>Media</span>
-                    </a>
-                </li>
-                <li class="nav-item" role="none">
-                    <a href="#plans" class="nav-link" data-section="plans" role="menuitem" tabindex="0" aria-label="Navigate to Plans section">
-                        <i class="fas fa-credit-card" aria-hidden="true"></i>
-                        <span>Plans</span>
-                    </a>
-                </li>
-                <li class="nav-item" role="none">
-                    <a href="#contact" class="nav-link" data-section="contact" role="menuitem" tabindex="0" aria-label="Navigate to Contact section">
-                        <i class="fas fa-envelope" aria-hidden="true"></i>
-                        <span>Contact</span>
-                    </a>
-                </li>
-                <li class="nav-item nav-cta" role="none">
-                    <a href="#demo" class="nav-link cta-btn" data-section="demo" role="menuitem" tabindex="0" aria-label="Navigate to Demo booking section">
-                        <i class="fas fa-calendar-alt" aria-hidden="true"></i>
-                        <span>Book Demo</span>
-                    </a>
-                </li>
+            <ul class="nav-menu" id="nav-menu">
+                <li class="nav-item"><a href="home" class="nav-link">Home</a></li>
+                <li class="nav-item"><a href="about" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="services" class="nav-link">Services</a></li>
+                <li class="nav-item"><a href="trainers" class="nav-link">Trainers</a></li>
+                <li class="nav-item"><a href="media" class="nav-link">Media</a></li>
+                <li class="nav-item"><a href="plans" class="nav-link">Plans</a></li>
+                <li class="nav-item"><a href="contact" class="nav-link">Contact</a></li>
+                <li class="nav-item"><a href="demo" class="nav-link cta-btn">Book Demo</a></li>
             </ul>
-            <div class="hamburger" id="hamburger" role="button" tabindex="0" aria-label="Toggle navigation menu" aria-expanded="false">
-                <span class="bar" aria-hidden="true"></span>
-                <span class="bar" aria-hidden="true"></span>
-                <span class="bar" aria-hidden="true"></span>
+            <div class="hamburger" id="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
             </div>
         </div>
     </nav>
@@ -102,39 +63,7 @@
     <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-background">
-            <video class="hero-background-video" 
-                   muted="true"
-                   defaultmuted="true"
-                   autoplay="true"
-                   loop="true"
-                   playsinline="true"
-                   webkit-playsinline="true"
-                   preload="auto"
-                   disableremoteplaybook="true"
-                   disablepictureinpicture="true"
-                   x-webkit-airplay="deny"
-                   x5-playsinline="true"
-                   x5-video-player-type="h5"
-                   x5-video-player-fullscreen="false"
-                   x5-video-orientation="portrait"
-                   t7-video-player-type="inline"
-                   controlsList="nodownload nofullscreen noremoteplaybook noplaybackrate"
-                   data-setup="{}"
-                   poster=""
-                   src="g1.mp4"
-                   style="pointer-events: none !important; -webkit-touch-callout: none !important; -webkit-user-select: none !important; user-select: none !important; -webkit-media-controls: none !important; outline: none !important; border: none !important;"
-                   oncontextmenu="return false;"
-                   onselectstart="return false;"
-                   ondragstart="return false;"
-                   onmousedown="return false;"
-                   ontouchstart="return false;"
-                   onclick="return false;"
-                   ondblclick="return false;"
-                   onplay="this.muted=true;"
-                   onloadstart="this.muted=true;this.volume=0;"
-                   oncanplay="this.muted=true;this.volume=0;"
-                   onloadeddata="this.play().catch(()=>{});"
-                   onloadedmetadata="this.play().catch(()=>{});">
+            <video class="hero-background-video" muted autoplay loop playsinline preload="auto" disableremoteplayback disablepictureinpicture webkit-playsinline>
                 <source src="g1.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
@@ -164,17 +93,17 @@
                     </div>
                 </div>
                 <div class="hero-buttons">
-                    <button class="btn btn-primary" data-nav-target="demo" data-nav-mapped="false" aria-label="Book a free demo session">
+                    <button class="btn btn-primary" onclick="scrollToSection('demo')">
                         <i class="fas fa-calendar-alt"></i>
                         Book Free Demo
                     </button>
-                    <button class="btn btn-secondary" data-nav-target="services" data-nav-mapped="false" aria-label="Explore our services">
+                    <button class="btn btn-secondary" onclick="scrollToSection('services')">
                         <i class="fas fa-play"></i>
                         Explore Services
                     </button>
                 </div>
             </div>
-
+            
         </div>
         <div class="scroll-indicator">
             <div class="scroll-arrow"></div>
@@ -253,7 +182,7 @@
                         <li><i class="fas fa-check"></i> Trainers bring equipment</li>
                         <li><i class="fas fa-check"></i> Tailored to your goals</li>
                     </ul>
-                    <button class="btn btn-primary" data-nav-target="contact" data-nav-mapped="false" aria-label="Book home training session">Book Home Session</button>
+                    <button class="btn btn-primary" onclick="scrollToSection('contact')">Book Home Session</button>
                 </div>
                 <div class="service-card">
                     <div class="service-icon">
@@ -267,7 +196,7 @@
                         <li><i class="fas fa-check"></i> Tailored guidance</li>
                         <li><i class="fas fa-check"></i> Progress tracking</li>
                     </ul>
-                    <button class="btn btn-outline" data-nav-target="demo" data-nav-mapped="false" aria-label="Book personal training demo">Book Demo</button>
+                    <button class="btn btn-outline" onclick="scrollToSection('contact')">Learn More</button>
                 </div>
                 <div class="service-card">
                     <div class="service-icon">
@@ -281,7 +210,7 @@
                         <li><i class="fas fa-check"></i> Strength Training - muscle building</li>
                         <li><i class="fas fa-check"></i> Bootcamp - high-intensity</li>
                     </ul>
-                    <button class="btn btn-outline" data-nav-target="demo" data-nav-mapped="false" aria-label="Join group fitness classes">Join Classes</button>
+                    <button class="btn btn-outline" onclick="scrollToSection('contact')">Join Classes</button>
                 </div>
                 <div class="service-card">
                     <div class="service-icon">
@@ -295,7 +224,7 @@
                         <li><i class="fas fa-check"></i> Increased muscle mass</li>
                         <li><i class="fas fa-check"></i> Better joint function</li>
                     </ul>
-                    <button class="btn btn-outline" data-nav-target="demo" data-nav-mapped="false" aria-label="Start weight training program">Start Training</button>
+                    <button class="btn btn-outline" onclick="scrollToSection('contact')">Start Training</button>
                 </div>
                 <div class="service-card">
                     <div class="service-icon">
@@ -309,7 +238,7 @@
                         <li><i class="fas fa-check"></i> Nutrition consultation</li>
                         <li><i class="fas fa-check"></i> Meditation sessions</li>
                     </ul>
-                    <button class="btn btn-outline" data-nav-target="contact" data-nav-mapped="false" aria-label="Book wellness session">Book Session</button>
+                    <button class="btn btn-outline" onclick="scrollToSection('contact')">Book Session</button>
                 </div>
             </div>
         </div>
@@ -526,9 +455,9 @@
 
                 <div class="video-card">
                     <div class="video-container">
-                        <video class="gym-video" muted loop playsinline preload="metadata">
+                        <video class="gym-video" poster="#">
                             <source src="v2.mp4" type="video/mp4">
-                            <source src="g1.mp4" type="video/mp4">
+                            <source src="https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
                         <div class="video-overlay">
@@ -536,15 +465,6 @@
                                 <i class="fas fa-play"></i>
                             </button>
                         </div>
-
-
-                        <!-- Math CAPTCHA -->
-                        <div id="demoCaptcha" class="advanced-captcha-container">
-                            <div id="demoCaptchaChallenge" class="captcha-challenge">
-                                <!-- CAPTCHA content will be inserted here -->
-                            </div>
-                        </div>
-
                     </div>
                     <div class="video-info">
                         <h3>Ladies Section Tour</h3>
@@ -558,9 +478,9 @@
 
                 <div class="video-card">
                     <div class="video-container">
-                        <video class="gym-video" muted loop playsinline preload="metadata">
+                        <video class="gym-video" poster="#">
                             <source src="v3.mp4" type="video/mp4">
-                            <source src="g2.mp4" type="video/mp4">
+                            <source src="https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
                         <div class="video-overlay">
@@ -573,7 +493,7 @@
                         <h3>Equipment Showcase</h3>
                         <p>State-of-the-art equipment and facilities walkthrough</p>
                         <div class="video-meta">
-                            <span class="duration">Auto Play</span>
+                            <span class="duration">7:10</span>
                             <span class="category">Equipment</span>
                         </div>
                     </div>
@@ -581,9 +501,9 @@
 
                 <div class="video-card">
                     <div class="video-container">
-                        <video class="gym-video" muted loop playsinline preload="metadata">
+                        <video class="gym-video" poster="#">
                             <source src="v4.mp4" type="video/mp4">
-                            <source src="g3.mp4" type="video/mp4">
+                            <source src="https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
                         <div class="video-overlay">
@@ -603,15 +523,6 @@
                 </div>
             </div>
         </div>
-
-
-                        <!-- Math CAPTCHA -->
-                        <div id="contactCaptcha" class="advanced-captcha-container">
-                            <div id="contactCaptchaChallenge" class="captcha-challenge">
-                                <!-- CAPTCHA content will be inserted here -->
-                            </div>
-                        </div>
-
     </section>
 
     <!-- Membership Plans -->
@@ -638,7 +549,7 @@
                         <li><i class="fas fa-times"></i> Personal training</li>
                         <li><i class="fas fa-times"></i> Group classes</li>
                     </ul>
-                    <button class="btn btn-outline" data-nav-target="demo" data-nav-mapped="false" aria-label="Book demo for Basic plan">Book Your Demo</button>
+                    <button class="btn btn-outline" onclick="scrollToSection('demo')">Book Your Demo</button>
                 </div>
                 <div class="plan-card featured">
                     <div class="plan-badge">Most Popular</div>
@@ -658,7 +569,7 @@
                         <li><i class="fas fa-check"></i> Unlimited group classes</li>
                         <li><i class="fas fa-check"></i> Nutrition consultation</li>
                     </ul>
-                    <button class="btn btn-primary" data-nav-target="demo" data-nav-mapped="false" aria-label="Book demo for Premium package">Book Your Demo</button>
+                    <button class="btn btn-primary" onclick="scrollToSection('demo')">Book Your Demo</button>
                 </div>
                 <div class="plan-card">
                     <div class="plan-header">
@@ -683,7 +594,7 @@
                         <li><i class="fas fa-check"></i> Diet plan</li>
                         <li><i class="fas fa-check"></i> Nutrition consultation</li>
                     </ul>
-                    <button class="btn btn-outline" data-nav-target="demo" data-nav-mapped="false" aria-label="Book demo for VIP package">Book Your Demo</button>
+                    <button class="btn btn-outline" onclick="scrollToSection('demo')">Book Your Demo</button>
                 </div>
             </div>
         </div>
@@ -714,7 +625,7 @@
                 <div class="demo-form">
                     <form id="demoForm" class="booking-form" action="https://formsubmit.co/newlifeconnection1@gmail.com" method="POST">
                         <h3>Book Your Free Demo</h3>
-
+                        
                         <!-- Enhanced FormSubmit Configuration - NO REDIRECTS -->
                         <input type="hidden" name="_subject" value="🏋️ New Demo Booking Request - New Lifestyle Gym">
                         <input type="hidden" name="_captcha" value="false">
@@ -723,7 +634,7 @@
                         <input type="hidden" name="_blacklist" value="spammer@example.com,bot@test.com">
                         <input type="hidden" name="_format" value="html">
                         <input type="hidden" name="_replyto" value="email">
-
+                        
                         <!-- Form Fields -->
                         <div class="form-row">
                             <div class="form-group">
@@ -735,17 +646,17 @@
                                 <label for="lastName">Last Name</label>
                             </div>
                         </div>
-
+                        
                         <div class="form-group">
                             <input type="email" id="email" name="email" placeholder="Email Address" required maxlength="100" autocomplete="email" inputmode="email">
                             <label for="email">Email Address</label>
                         </div>
-
+                        
                         <div class="form-group">
                             <input type="tel" id="phone" name="phone" placeholder="Phone Number (UAE: +971...)" required pattern="[\+]?[0-9]{7,15}" maxlength="15" autocomplete="tel" inputmode="tel">
                             <label for="phone">Phone Number</label>
                         </div>
-
+                        
                         <div class="form-row">
                             <div class="form-group">
                                 <select id="service" name="service" required>
@@ -769,26 +680,34 @@
                                 <label for="planChoice">Membership Plan</label>
                             </div>
                         </div>
-
+                        
                         <div class="form-group">
                             <input type="date" id="preferredDate" name="preferredDate" required>
                             <label for="preferredDate">Preferred Date</label>
                         </div>
-
+                        
                         <div class="form-group">
                             <textarea id="message" name="message" placeholder="Tell us about your fitness goals..." maxlength="500"></textarea>
                             <label for="message">Message (Optional)</label>
                         </div>
 
+                        <!-- Advanced CAPTCHA Container -->
+                        <div class="advanced-captcha-container" id="demoCaptcha">
+                            <label class="captcha-label">
+                                <i class="fas fa-shield-alt"></i> Security Verification
+                            </label>
+                            <div class="captcha-challenge" id="demoCaptchaChallenge">
+                                <!-- CAPTCHA will be dynamically generated here -->
+                            </div>
+                        </div>
                         
-
                         <!-- Hidden fields for security -->
                         <input type="hidden" name="_form_id" value="demo_booking">
                         <input type="hidden" name="_timestamp" id="demoTimestamp">
                         <input type="hidden" name="_user_agent" id="demoUserAgent">
                         <input type="hidden" name="_referrer" id="demoReferrer">
-
-                        <button type="submit" class="btn btn-primary btn-full" id="demoSubmitBtn">
+                        
+                        <button type="submit" class="btn btn-primary btn-full" id="demoSubmitBtn" disabled>
                             <i class="fas fa-calendar-check"></i>
                             Book Free Demo
                         </button>
@@ -839,7 +758,7 @@
                 <div class="contact-form-container">
                     <form id="contactForm" class="contact-form" action="https://formsubmit.co/newlifeconnection1@gmail.com" method="POST">
                         <h3>Send us a Message</h3>
-
+                        
                         <!-- Enhanced FormSubmit Configuration - NO REDIRECTS -->
                         <input type="hidden" name="_subject" value="💬 New Contact Message - New Lifestyle Gym">
                         <input type="hidden" name="_captcha" value="false">
@@ -848,7 +767,7 @@
                         <input type="hidden" name="_blacklist" value="spammer@example.com,bot@test.com">
                         <input type="hidden" name="_format" value="html">
                         <input type="hidden" name="_replyto" value="email">
-
+                        
                         <!-- Form Fields -->
                         <div class="form-row">
                             <div class="form-group">
@@ -860,7 +779,7 @@
                                 <label for="contactEmail">Your Email</label>
                             </div>
                         </div>
-
+                        
                         <div class="form-group">
                             <select id="inquiryType" name="inquiry_type" required>
                                 <option value="">Select Inquiry Type</option>
@@ -874,12 +793,12 @@
                             </select>
                             <label for="inquiryType">Inquiry Type</label>
                         </div>
-
+                        
                         <div class="form-group">
                             <input type="text" id="subject" name="subject" placeholder="Subject" required maxlength="150">
                             <label for="subject">Subject</label>
                         </div>
-
+                        
                         <div class="form-group">
                             <textarea id="contactMessage" name="message" placeholder="Your message..." required maxlength="1000" rows="5"></textarea>
                             <label for="contactMessage">Your Message</label>
@@ -888,15 +807,23 @@
                             </div>
                         </div>
 
+                        <!-- Advanced CAPTCHA Container -->
+                        <div class="advanced-captcha-container contact-captcha" id="contactCaptcha">
+                            <label class="captcha-label">
+                                <i class="fas fa-shield-alt"></i> Security Verification
+                            </label>
+                            <div class="captcha-challenge" id="contactCaptchaChallenge">
+                                <!-- CAPTCHA will be dynamically generated here -->
+                            </div>
+                        </div>
                         
-
                         <!-- Hidden fields for security -->
                         <input type="hidden" name="_form_id" value="contact_message">
                         <input type="hidden" name="_timestamp" id="contactTimestamp">
                         <input type="hidden" name="_user_agent" id="contactUserAgent">
                         <input type="hidden" name="_referrer" id="contactReferrer">
-
-                        <button type="submit" class="btn btn-primary btn-full" id="contactSubmitBtn">
+                        
+                        <button type="submit" class="btn btn-primary btn-full" id="contactSubmitBtn" disabled>
                             <i class="fas fa-paper-plane"></i>
                             Send Message
                         </button>
