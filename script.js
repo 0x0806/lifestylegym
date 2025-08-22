@@ -47,7 +47,7 @@ class SimpleCaptcha {
                 }, 500);
                 return;
             }
-            
+
             this.generateChallenge();
             this.setupEventListeners();
         } catch (error) {
@@ -58,7 +58,7 @@ class SimpleCaptcha {
 
     handleInitializationError() {
         console.warn('CAPTCHA system failed to initialize, enabling form submission');
-        
+
         // Show user-friendly message
         if (this.challengeContainer) {
             this.challengeContainer.innerHTML = `
@@ -68,11 +68,11 @@ class SimpleCaptcha {
                 </div>
             `;
         }
-        
+
         // Enable form submission
         this.isVerified = true;
         this.updateSubmitButton(true);
-        
+
         // Mark container as initialized
         if (this.container) {
             this.container.classList.add('captcha-success');
@@ -666,7 +666,7 @@ class NavigationController {
             touchStartTime = Date.now();
             hasBeenTouched = true;
             this.hamburger.style.transform = 'scale(0.95)';
-            
+
             // Visual feedback
             this.hamburger.style.background = 'rgba(220, 20, 60, 0.3)';
         }, { passive: true });
@@ -674,16 +674,16 @@ class NavigationController {
         this.hamburger.addEventListener('touchend', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            
+
             const touchDuration = Date.now() - touchStartTime;
             this.hamburger.style.transform = 'scale(1)';
             this.hamburger.style.background = 'rgba(220, 20, 60, 0.2)';
-            
+
             // Only toggle if it was a quick tap (not a scroll)
             if (touchDuration < 500 && hasBeenTouched) {
                 setTimeout(() => toggleMenu(e), 50);
             }
-            
+
             hasBeenTouched = false;
         }, { passive: false });
 
@@ -741,7 +741,7 @@ class NavigationController {
             this.hamburger.style.pointerEvents = 'auto';
             this.hamburger.style.position = 'relative';
             this.hamburger.style.zIndex = '1001';
-            
+
             // Ensure bars are visible
             const bars = this.hamburger.querySelectorAll('.bar');
             bars.forEach(bar => {
@@ -749,7 +749,7 @@ class NavigationController {
                 bar.style.visibility = 'visible';
                 bar.style.opacity = '1';
             });
-            
+
             console.log('Hamburger visibility enforced');
         }
     }
@@ -863,8 +863,8 @@ class NavigationController {
         // Map demo section interactions
         this.mapDemoSection();
 
-        // Map all other navigation buttons
-        this.mapMiscellaneousButtons();
+        // Map any remaining unmapped buttons
+        this.mapRemainingButtons();
 
         // Map footer and social links
         this.mapFooterNavigation();
@@ -2406,13 +2406,6 @@ async function submitFormWithFormSubmit(form, formType) {
             // Reset form
             form.reset();
 
-            // Reset CAPTCHA
-            if (formType === 'demo' && demoCaptcha) {
-                demoCaptcha.reset();
-            } else if (formType === 'contact' && contactCaptcha) {
-                contactCaptcha.reset();
-            }
-
             // Record submission for rate limiting
             formSecurity.recordSubmission();
 
@@ -2436,13 +2429,6 @@ async function submitFormWithFormSubmit(form, formType) {
             // Reset form
             form.reset();
 
-            // Reset CAPTCHA
-            if (formType === 'demo' && demoCaptcha) {
-                demoCaptcha.reset();
-            } else if (formType === 'contact' && contactCaptcha) {
-                contactCaptcha.reset();
-            }
-
             // Record submission for rate limiting
             formSecurity.recordSubmission();
         }
@@ -2461,12 +2447,6 @@ async function submitFormWithFormSubmit(form, formType) {
         // Reset form even on error
         form.reset();
 
-        // Reset CAPTCHA
-        if (formType === 'demo' && demoCaptcha) {
-            demoCaptcha.reset();
-        } else if (formType === 'contact' && contactCaptcha) {
-            contactCaptcha.reset();
-        }
     } finally {
         // Reset button
         submitBtn.innerHTML = originalBtnText;
@@ -2953,34 +2933,34 @@ function initializeVideoPlayers() {
 // Enhanced video loading error handler with retry functionality
 function handleVideoError(video, card) {
     console.warn('Video loading error, attempting recovery...');
-    
+
     const overlay = card.querySelector('.video-overlay');
     const playBtn = card.querySelector('.play-btn');
     const videoInfo = card.querySelector('.video-info h3');
-    
+
     // Try to reload video source
     const sources = video.querySelectorAll('source');
     let retryCount = 0;
     const maxRetries = 2;
-    
+
     const attemptReload = () => {
         if (retryCount < maxRetries && sources.length > 0) {
             retryCount++;
             console.log(`Video retry attempt ${retryCount}/${maxRetries}`);
-            
+
             // Try next source or reload current
             const currentSource = retryCount <= sources.length ? 
                 sources[retryCount - 1].src : sources[0].src;
-            
+
             video.src = currentSource;
             video.load();
-            
+
             // Show loading state
             if (playBtn) {
                 playBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 playBtn.title = 'Loading video...';
             }
-            
+
             // Set timeout for retry
             setTimeout(() => {
                 if (video.readyState < 2) {
@@ -2993,25 +2973,25 @@ function handleVideoError(video, card) {
                     }
                 }
             }, 2000);
-            
+
         } else {
             // All retries failed, show error state
             console.error('Video failed to load after all retries');
             showVideoErrorState();
         }
     };
-    
+
     const showVideoErrorState = () => {
         if (overlay && playBtn) {
             playBtn.innerHTML = '<i class="fas fa-image"></i>';
             playBtn.style.background = 'rgba(108, 117, 125, 0.8)';
             playBtn.title = 'Video not available - showing placeholder';
-            
+
             // Create fallback functionality
             playBtn.onclick = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 // Show notification that video is unavailable
                 const notification = document.createElement('div');
                 notification.style.cssText = `
@@ -3031,7 +3011,7 @@ function handleVideoError(video, card) {
                     <h4 style="margin: 0.5rem 0;">Video Unavailable</h4>
                     <p style="margin: 0; opacity: 0.8;">This video is temporarily unavailable. Please try again later.</p>
                 `;
-                
+
                 document.body.appendChild(notification);
                 setTimeout(() => {
                     if (notification.parentNode) {
@@ -3053,7 +3033,7 @@ function handleVideoError(video, card) {
                 container.style.alignItems = 'center';
                 container.style.justifyContent = 'center';
                 container.style.position = 'relative';
-                
+
                 // Add placeholder text
                 const placeholder = document.createElement('div');
                 placeholder.style.cssText = `
@@ -3070,12 +3050,12 @@ function handleVideoError(video, card) {
                 placeholder.textContent = 'Video Preview';
                 container.appendChild(placeholder);
             }
-            
+
             // Hide the actual video element
             video.style.opacity = '0';
         }
     };
-    
+
     // Start retry process
     attemptReload();
 }
@@ -3085,25 +3065,6 @@ function initializeAutoplayVideos() {
     // Play hero background video with ultra-aggressive mobile autoplay
     const heroVideo = document.querySelector('.hero-background-video');
     if (heroVideo) {
-        // Add error handling for video source
-        heroVideo.addEventListener('error', (e) => {
-            console.log('Hero video error, trying fallback:', e);
-            // Hide video and show background color instead
-            heroVideo.style.display = 'none';
-            const heroSection = document.querySelector('.hero');
-            if (heroSection) {
-                heroSection.style.background = 'linear-gradient(135deg, #000000 0%, #1a0000 100%)';
-            }
-        });
-
-        heroVideo.addEventListener('loadstart', () => {
-            console.log('Hero video loading started');
-        });
-
-        heroVideo.addEventListener('canplay', () => {
-            console.log('Hero video can play');
-        });
-
         // Add error handling for video source
         heroVideo.addEventListener('error', (e) => {
             console.log('Hero video error, trying fallback:', e);
@@ -3430,11 +3391,11 @@ function initializeAutoplayVideos() {
             // Enhanced error handling with retry logic
             video.addEventListener('error', (e) => {
                 console.warn(`Media video ${index + 1} error (attempt ${loadAttempts + 1}):`, e);
-                
+
                 if (loadAttempts < maxLoadAttempts) {
                     loadAttempts++;
                     console.log(`Retrying video load for video ${index + 1}...`);
-                    
+
                     setTimeout(() => {
                         try {
                             video.load();
@@ -3454,13 +3415,13 @@ function initializeAutoplayVideos() {
             video.addEventListener('loadeddata', () => {
                 console.log(`Media video ${index + 1} loaded successfully`);
                 loadAttempts = 0; // Reset counter on success
-                
+
                 // Ensure overlay is properly configured
                 const overlay = video.closest('.video-container')?.querySelector('.video-overlay');
                 if (overlay) {
                     overlay.style.display = 'flex';
                     overlay.classList.remove('playing');
-                    
+
                     const playBtn = overlay.querySelector('.play-btn');
                     if (playBtn) {
                         playBtn.innerHTML = '<i class="fas fa-play"></i>';
@@ -3511,7 +3472,7 @@ function initializeAutoplayVideos() {
                 try {
                     // Show loading state
                     playBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                    
+
                     // Pause all other videos first
                     document.querySelectorAll('#media .gym-video').forEach(v => {
                         if (v !== video && !v.paused) {
@@ -3542,12 +3503,12 @@ function initializeAutoplayVideos() {
                     console.error('Error playing video:', error);
                     // Reset play button
                     playBtn.innerHTML = '<i class="fas fa-play"></i>';
-                    
+
                     // Show error state
                     playBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
                     playBtn.style.background = 'rgba(220, 53, 69, 0.8)';
                     playBtn.title = 'Video playback failed';
-                    
+
                     // Try fallback after delay
                     setTimeout(async () => {
                         try {
