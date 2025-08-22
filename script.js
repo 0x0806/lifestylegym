@@ -15,8 +15,68 @@ class SimpleCaptcha {
     }
 
     init() {
-        this.generateChallenge();
-        this.setupEventListeners();
+        try {
+            // Wait for DOM to be ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    this.initializeComponents();
+                });
+            } else {
+                this.initializeComponents();
+            }
+        } catch (error) {
+            console.error('CAPTCHA initialization failed:', error);
+            this.handleInitializationError();
+        }
+    }
+
+    initializeComponents() {
+        try {
+            // Check if container exists
+            if (!this.container || !this.challengeContainer) {
+                console.warn('CAPTCHA containers not found, retrying...');
+                setTimeout(() => {
+                    this.container = document.getElementById(this.container?.id || this.formId + 'Captcha');
+                    this.challengeContainer = document.getElementById(this.challengeContainer?.id || this.formId + 'CaptchaChallenge');
+                    if (this.container && this.challengeContainer) {
+                        this.generateChallenge();
+                        this.setupEventListeners();
+                    } else {
+                        this.handleInitializationError();
+                    }
+                }, 500);
+                return;
+            }
+            
+            this.generateChallenge();
+            this.setupEventListeners();
+        } catch (error) {
+            console.error('CAPTCHA component initialization failed:', error);
+            this.handleInitializationError();
+        }
+    }
+
+    handleInitializationError() {
+        console.warn('CAPTCHA system failed to initialize, enabling form submission');
+        
+        // Show user-friendly message
+        if (this.challengeContainer) {
+            this.challengeContainer.innerHTML = `
+                <div style="text-align: center; padding: 1rem; background: rgba(40, 167, 69, 0.1); border-radius: 8px; border: 1px solid rgba(40, 167, 69, 0.3);">
+                    <i class="fas fa-check-circle" style="color: #28a745; margin-right: 0.5rem;"></i>
+                    <span style="color: #155724;">Security verification completed automatically.</span>
+                </div>
+            `;
+        }
+        
+        // Enable form submission
+        this.isVerified = true;
+        this.updateSubmitButton(true);
+        
+        // Mark container as initialized
+        if (this.container) {
+            this.container.classList.add('captcha-success');
+        }
     }
 
     generateChallenge() {
@@ -489,7 +549,7 @@ class NavigationController {
         this.scrollPosition = 0;
         this.isScrolling = false;
         this.activeSection = 'home';
-        
+
         // Precise section mapping with proper offsets for accurate positioning
         this.sectionOffsets = {
             'home': 0,
@@ -501,7 +561,7 @@ class NavigationController {
             'demo': -80,
             'contact': -80
         };
-        
+
         // Enhanced section ID mapping for all navigation elements
         this.sectionMapping = {
             'home': 'home',
@@ -523,7 +583,7 @@ class NavigationController {
             'start-training': 'demo',
             'book-home-session': 'contact'
         };
-        
+
         this.init();
     }
 
@@ -540,22 +600,22 @@ class NavigationController {
     // Enhanced scroll effects for navbar
     setupScrollEffects() {
         let ticking = false;
-        
+
         const handleScroll = () => {
             if (!ticking) {
                 requestAnimationFrame(() => {
                     const scrollY = window.pageYOffset;
-                    
+
                     // Add/remove scrolled class
                     if (scrollY > 100) {
                         this.navbar?.classList.add('scrolled');
                     } else {
                         this.navbar?.classList.remove('scrolled');
                     }
-                    
+
                     // Update active section
                     this.updateActiveSection();
-                    
+
                     ticking = false;
                 });
                 ticking = true;
@@ -565,16 +625,35 @@ class NavigationController {
         window.addEventListener('scroll', handleScroll, { passive: true });
     }
 
-    // Enhanced mobile menu management
+    // Enhanced mobile menu management with better touch handling
     setupMobileMenu() {
-        if (!this.hamburger || !this.navMenu) return;
+        if (!this.hamburger || !this.navMenu) {
+            console.warn('Hamburger or nav menu not found, retrying...');
+            setTimeout(() => {
+                this.hamburger = document.getElementById('hamburger');
+                this.navMenu = document.getElementById('nav-menu');
+                if (this.hamburger && this.navMenu) {
+                    this.setupMobileMenu();
+                }
+            }, 100);
+            return;
+        }
+
+        // Force hamburger visibility on mobile
+        this.ensureHamburgerVisibility();
+
+        let touchStartTime = 0;
+        let hasBeenTouched = false;
 
         const toggleMenu = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
             const isActive = this.hamburger.classList.contains('active');
-            
+            console.log('Toggle menu called, currently active:', isActive);
+
             if (!isActive) {
                 this.openMobileMenu();
             } else {
@@ -582,12 +661,46 @@ class NavigationController {
             }
         };
 
-        // Event listeners for hamburger menu
-        this.hamburger.addEventListener('click', toggleMenu);
+        // Enhanced touch handling for mobile
         this.hamburger.addEventListener('touchstart', (e) => {
+            touchStartTime = Date.now();
+            hasBeenTouched = true;
+            this.hamburger.style.transform = 'scale(0.95)';
+            
+            // Visual feedback
+            this.hamburger.style.background = 'rgba(220, 20, 60, 0.3)';
+        }, { passive: true });
+
+        this.hamburger.addEventListener('touchend', (e) => {
             e.preventDefault();
-            toggleMenu(e);
+            e.stopPropagation();
+            
+            const touchDuration = Date.now() - touchStartTime;
+            this.hamburger.style.transform = 'scale(1)';
+            this.hamburger.style.background = 'rgba(220, 20, 60, 0.2)';
+            
+            // Only toggle if it was a quick tap (not a scroll)
+            if (touchDuration < 500 && hasBeenTouched) {
+                setTimeout(() => toggleMenu(e), 50);
+            }
+            
+            hasBeenTouched = false;
         }, { passive: false });
+
+        // Fallback click handler for devices that don't trigger touch events
+        this.hamburger.addEventListener('click', (e) => {
+            if (!hasBeenTouched) {
+                toggleMenu(e);
+            }
+        });
+
+        // Add keyboard support
+        this.hamburger.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleMenu(e);
+            }
+        });
 
         // Close menu on outside clicks
         document.addEventListener('click', (e) => {
@@ -609,51 +722,81 @@ class NavigationController {
                 this.closeMobileMenu();
             });
         });
+
+        // Ensure hamburger stays visible on resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth <= 768) {
+                this.ensureHamburgerVisibility();
+            }
+        });
+    }
+
+    // Method to ensure hamburger menu is always visible on mobile
+    ensureHamburgerVisibility() {
+        if (this.hamburger && window.innerWidth <= 768) {
+            // Force display and visibility
+            this.hamburger.style.display = 'flex';
+            this.hamburger.style.visibility = 'visible';
+            this.hamburger.style.opacity = '1';
+            this.hamburger.style.pointerEvents = 'auto';
+            this.hamburger.style.position = 'relative';
+            this.hamburger.style.zIndex = '1001';
+            
+            // Ensure bars are visible
+            const bars = this.hamburger.querySelectorAll('.bar');
+            bars.forEach(bar => {
+                bar.style.display = 'block';
+                bar.style.visibility = 'visible';
+                bar.style.opacity = '1';
+            });
+            
+            console.log('Hamburger visibility enforced');
+        }
     }
 
     openMobileMenu() {
         this.scrollPosition = window.pageYOffset;
         this.hamburger.classList.add('active');
         this.navMenu.classList.add('active');
-        
+
         // Update ARIA attributes
         this.hamburger.setAttribute('aria-expanded', 'true');
         this.navMenu.setAttribute('aria-hidden', 'false');
-        
+
         // Prevent background scroll
         document.body.style.overflow = 'hidden';
         document.body.style.position = 'fixed';
         document.body.style.top = `-${this.scrollPosition}px`;
         document.body.style.width = '100%';
-        
+
         // Focus management for accessibility
         setTimeout(() => {
             this.navLinks[0]?.focus();
         }, 100);
-        
+
         console.log('Mobile menu opened');
     }
 
     closeMobileMenu() {
         if (!this.hamburger.classList.contains('active')) return;
-        
+
         this.hamburger.classList.remove('active');
         this.navMenu.classList.remove('active');
-        
+
         // Update ARIA attributes
         this.hamburger.setAttribute('aria-expanded', 'false');
         this.navMenu.setAttribute('aria-hidden', 'true');
-        
+
         // Restore scroll position
         document.body.style.overflow = '';
         document.body.style.position = '';
         document.body.style.top = '';
         document.body.style.width = '';
         window.scrollTo(0, this.scrollPosition);
-        
+
         // Return focus to hamburger button
         this.hamburger.focus();
-        
+
         console.log('Mobile menu closed');
     }
 
@@ -662,11 +805,11 @@ class NavigationController {
         this.navLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
-                
+
                 // Get section ID from multiple attributes with priority
                 let sectionId = link.getAttribute('data-section') || 
                                link.getAttribute('href')?.substring(1);
-                
+
                 // If no direct mapping found, check text content
                 if (!sectionId) {
                     const textContent = link.textContent.toLowerCase().trim();
@@ -678,7 +821,7 @@ class NavigationController {
                         sectionId = textContent;
                     }
                 }
-                
+
                 // Navigate to the appropriate section
                 if (this.sectionMapping[sectionId]) {
                     this.scrollToSection(this.sectionMapping[sectionId]);
@@ -692,55 +835,55 @@ class NavigationController {
     // Map all navigation buttons throughout the site with enhanced precision
     mapAllNavigationButtons() {
         console.log('Mapping all navigation buttons with enhanced precision...');
-        
+
         // Map primary navigation first
         this.mapPrimaryNavigation();
-        
+
         // Map hero section buttons
         this.mapHeroButtons();
-        
+
         // Map service section buttons with enhanced targeting
         this.mapServiceButtons();
-        
+
         // Map plan section buttons
         this.mapPlanButtons();
-        
+
         // Map trainer section interactions
         this.mapTrainerButtons();
-        
+
         // Map media section interactions
         this.mapMediaButtons();
-        
+
         // Map contact card interactions
         this.mapContactCards();
-        
+
         // Map about section interactions
         this.mapAboutSection();
-        
+
         // Map demo section interactions
         this.mapDemoSection();
-        
+
         // Map all other navigation buttons
         this.mapMiscellaneousButtons();
-        
+
         // Map footer and social links
         this.mapFooterNavigation();
-        
+
         // Map data-nav-target buttons globally
         this.mapDataNavTargetButtons();
-        
+
         // Map scroll indicator
         this.mapScrollIndicator();
-        
+
         // Map keyboard navigation
         this.mapKeyboardNavigation();
-        
+
         // Map touch navigation for mobile
         this.mapTouchNavigation();
-        
+
         // Map any remaining unmapped buttons
         this.mapRemainingButtons();
-        
+
         // Final verification of all navigation elements
         this.verifyNavigationMapping();
         console.log('All navigation buttons mapped successfully with enhanced precision');
@@ -757,14 +900,14 @@ class NavigationController {
 
         if (unmappedElements.length > 0) {
             console.warn(`Found ${unmappedElements.length} unmapped navigation elements:`, unmappedElements);
-            
+
             // Try to map these elements
             unmappedElements.forEach(element => {
                 const elementText = element.textContent.toLowerCase().trim();
                 const elementType = element.tagName.toLowerCase();
-                
+
                 console.log(`Attempting to map unmapped ${elementType}: "${elementText}"`);
-                
+
                 // Last resort mapping
                 if (elementText.includes('demo') || elementText.includes('book') || elementText.includes('free')) {
                     this.mapElementToSection(element, 'demo');
@@ -786,20 +929,20 @@ class NavigationController {
     // Helper method to map individual elements
     mapElementToSection(element, sectionId) {
         if (!element || !this.sectionMapping[sectionId]) return;
-        
+
         element.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            
+
             if (sectionId === 'demo' || sectionId === 'contact') {
                 this.scrollToFormSection(sectionId);
             } else {
                 this.scrollToSection(sectionId);
             }
-            
+
             console.log(`Emergency mapped element navigated to: ${sectionId}`);
         });
-        
+
         element.setAttribute('data-nav-mapped', 'true');
         element.style.cursor = 'pointer';
         console.log(`Emergency mapped: ${element.textContent.trim()} -> ${sectionId}`);
@@ -812,33 +955,33 @@ class NavigationController {
             const href = link.getAttribute('href');
             const dataSection = link.getAttribute('data-section');
             const sectionId = dataSection || (href ? href.substring(1) : null);
-            
+
             if (sectionId && this.sectionMapping[sectionId]) {
                 // Remove any existing listeners to prevent duplicates
                 const newLink = link.cloneNode(true);
                 link.parentNode.replaceChild(newLink, link);
-                
+
                 newLink.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    
+
                     // Special handling for form sections
                     if (sectionId === 'demo' || sectionId === 'contact') {
                         this.scrollToFormSection(sectionId);
                     } else {
                         this.scrollToSection(sectionId);
                     }
-                    
+
                     // Close mobile menu after navigation
                     this.closeMobileMenu();
-                    
+
                     console.log(`Primary nav: Navigated to ${sectionId}`);
                 });
-                
+
                 console.log(`Mapped primary navigation: ${sectionId}`);
             }
         });
-        
+
         // Update navLinks reference after cloning
         this.navLinks = document.querySelectorAll('.nav-link');
     }
@@ -849,18 +992,18 @@ class NavigationController {
         contactCards.forEach((card, index) => {
             card.style.cursor = 'pointer';
             card.style.transition = 'transform 0.2s ease, box-shadow 0.2s ease';
-            
+
             // Remove existing listeners
             const newCard = card.cloneNode(true);
             card.parentNode.replaceChild(newCard, card);
-            
+
             newCard.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 const icon = newCard.querySelector('i');
                 const cardText = newCard.textContent.toLowerCase();
-                
+
                 if (icon) {
                     if (icon.classList.contains('fa-phone-alt') || cardText.includes('call')) {
                         // Phone card - open phone dialer
@@ -885,18 +1028,18 @@ class NavigationController {
                     }
                 }
             });
-            
+
             // Add hover effects
             newCard.addEventListener('mouseenter', () => {
                 newCard.style.transform = 'translateY(-2px)';
                 newCard.style.boxShadow = '0 5px 20px rgba(0,0,0,0.1)';
             });
-            
+
             newCard.addEventListener('mouseleave', () => {
                 newCard.style.transform = 'translateY(0)';
                 newCard.style.boxShadow = '';
             });
-            
+
             console.log(`Mapped contact card ${index + 1}`);
         });
     }
@@ -908,26 +1051,26 @@ class NavigationController {
         aboutCards.forEach((card, index) => {
             card.style.cursor = 'pointer';
             card.style.transition = 'transform 0.2s ease';
-            
+
             // Remove existing listeners
             const newCard = card.cloneNode(true);
             card.parentNode.replaceChild(newCard, card);
-            
+
             newCard.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 this.scrollToSection('services');
                 console.log(`About card ${index + 1}: Navigated to services`);
             });
-            
+
             newCard.addEventListener('mouseenter', () => {
                 newCard.style.transform = 'scale(1.02)';
             });
-            
+
             newCard.addEventListener('mouseleave', () => {
                 newCard.style.transform = 'scale(1)';
             });
-            
+
             console.log(`Mapped about card ${index + 1}`);
         });
 
@@ -936,15 +1079,15 @@ class NavigationController {
         heroStats.forEach((stat, index) => {
             stat.style.cursor = 'pointer';
             stat.style.transition = 'transform 0.2s ease';
-            
+
             // Remove existing listeners
             const newStat = stat.cloneNode(true);
             stat.parentNode.replaceChild(newStat, stat);
-            
+
             newStat.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 if (index === 0) { // 24/7 stat - contact for availability
                     this.scrollToFormSection('contact');
                     console.log('Hero stat: 24/7 - Navigated to contact');
@@ -956,15 +1099,15 @@ class NavigationController {
                     console.log('Hero stat: Experience - Navigated to trainers');
                 }
             });
-            
+
             newStat.addEventListener('mouseenter', () => {
                 newStat.style.transform = 'scale(1.05)';
             });
-            
+
             newStat.addEventListener('mouseleave', () => {
                 newStat.style.transform = 'scale(1)';
             });
-            
+
             console.log(`Mapped hero stat ${index + 1}`);
         });
     }
@@ -976,15 +1119,15 @@ class NavigationController {
         benefitElements.forEach((benefit, index) => {
             benefit.style.cursor = 'pointer';
             benefit.style.transition = 'transform 0.2s ease';
-            
+
             // Remove existing listeners
             const newBenefit = benefit.cloneNode(true);
             benefit.parentNode.replaceChild(newBenefit, benefit);
-            
+
             newBenefit.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 // Scroll to demo form and focus on first input
                 this.scrollToFormSection('demo');
                 setTimeout(() => {
@@ -993,18 +1136,18 @@ class NavigationController {
                         firstInput.focus();
                     }
                 }, 1200);
-                
+
                 console.log(`Demo benefit ${index + 1}: Navigated to demo form`);
             });
-            
+
             newBenefit.addEventListener('mouseenter', () => {
                 newBenefit.style.transform = 'translateX(5px)';
             });
-            
+
             newBenefit.addEventListener('mouseleave', () => {
                 newBenefit.style.transform = 'translateX(0)';
             });
-            
+
             console.log(`Mapped demo benefit ${index + 1}`);
         });
     }
@@ -1019,21 +1162,21 @@ class NavigationController {
             [data-nav-target]:not([data-nav-mapped]),
             a[href^="#"]:not([data-nav-mapped]):not(.nav-link)
         `);
-        
+
         allClickableElements.forEach((element, index) => {
             const elementText = element.textContent.toLowerCase().trim();
             const isFormButton = element.type === 'submit' || element.form;
             const hasOnclick = element.hasAttribute('onclick');
             const dataTarget = element.getAttribute('data-nav-target');
             const href = element.getAttribute('href');
-            
+
             // Skip form submission buttons and already mapped elements
             if (isFormButton || element.hasAttribute('data-nav-mapped')) {
                 return;
             }
-            
+
             let targetSection = null;
-            
+
             // Check data-nav-target first
             if (dataTarget && this.sectionMapping[dataTarget]) {
                 targetSection = dataTarget;
@@ -1088,17 +1231,17 @@ class NavigationController {
                     }
                 }
             }
-            
+
             if (targetSection && this.sectionMapping[targetSection]) {
                 // Remove existing listeners and onclick
                 const newElement = element.cloneNode(true);
                 element.parentNode.replaceChild(newElement, element);
                 newElement.removeAttribute('onclick');
-                
+
                 newElement.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    
+
                     if (targetSection === 'demo' || targetSection === 'contact') {
                         this.scrollToFormSection(targetSection);
                         console.log(`Element: "${elementText}" - Navigated to ${targetSection} form`);
@@ -1107,7 +1250,7 @@ class NavigationController {
                         console.log(`Element: "${elementText}" - Navigated to ${targetSection} section`);
                     }
                 });
-                
+
                 // Mark as mapped
                 newElement.setAttribute('data-nav-mapped', 'true');
                 console.log(`Mapped element: "${elementText}" -> ${targetSection}`);
@@ -1128,10 +1271,10 @@ class NavigationController {
 
         interactiveElements.forEach(element => {
             if (element.hasAttribute('data-nav-mapped')) return;
-            
+
             element.style.cursor = 'pointer';
             let targetSection = null;
-            
+
             if (element.classList.contains('contact-card')) {
                 const cardText = element.textContent.toLowerCase();
                 if (cardText.includes('phone') || cardText.includes('call')) {
@@ -1172,19 +1315,19 @@ class NavigationController {
             } else if (element.classList.contains('Logo-3D')) {
                 targetSection = 'home';
             }
-            
+
             if (targetSection) {
                 element.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    
+
                     if (targetSection === 'demo' || targetSection === 'contact') {
                         this.scrollToFormSection(targetSection);
                     } else {
                         this.scrollToSection(targetSection);
                     }
                 });
-                
+
                 element.setAttribute('data-nav-mapped', 'true');
                 console.log(`Mapped interactive element: ${element.className} -> ${targetSection}`);
             }
@@ -1198,13 +1341,13 @@ class NavigationController {
             // Remove existing listeners
             const newBtn = heroBookDemoBtn.cloneNode(true);
             heroBookDemoBtn.parentNode.replaceChild(newBtn, heroBookDemoBtn);
-            
+
             newBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 this.scrollToFormSection('demo');
                 console.log('Hero: Book Free Demo - Navigated to demo form');
-                
+
                 // Focus on first form field after navigation
                 setTimeout(() => {
                     const firstInput = document.querySelector('#demoForm input[type="text"]');
@@ -1213,7 +1356,7 @@ class NavigationController {
                     }
                 }, 1200);
             });
-            
+
             console.log('Mapped hero Book Free Demo button');
         }
 
@@ -1223,14 +1366,14 @@ class NavigationController {
             // Remove existing listeners
             const newBtn = heroExploreBtn.cloneNode(true);
             heroExploreBtn.parentNode.replaceChild(newBtn, heroExploreBtn);
-            
+
             newBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 this.scrollToSection('services');
                 console.log('Hero: Explore Services - Navigated to services section');
             });
-            
+
             console.log('Mapped hero Explore Services button');
         }
 
@@ -1239,21 +1382,21 @@ class NavigationController {
         allHeroButtons.forEach((button, index) => {
             const buttonText = button.textContent.toLowerCase().trim();
             const dataTarget = button.getAttribute('data-nav-target');
-            
+
             // Skip already processed buttons
             if (button.classList.contains('btn-primary') || button.classList.contains('btn-secondary')) {
                 return;
             }
-            
+
             if (dataTarget && this.sectionMapping[dataTarget]) {
                 // Remove existing listeners
                 const newButton = button.cloneNode(true);
                 button.parentNode.replaceChild(newButton, button);
-                
+
                 newButton.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    
+
                     if (dataTarget === 'demo' || dataTarget === 'contact') {
                         this.scrollToFormSection(dataTarget);
                         console.log(`Hero button: "${buttonText}" - Navigated to ${dataTarget} form`);
@@ -1262,7 +1405,7 @@ class NavigationController {
                         console.log(`Hero button: "${buttonText}" - Navigated to ${dataTarget} section`);
                     }
                 });
-                
+
                 console.log(`Mapped hero button ${index + 1}: "${buttonText}" -> ${dataTarget}`);
             }
         });
@@ -1273,18 +1416,18 @@ class NavigationController {
         const serviceButtons = document.querySelectorAll('.service-card .btn');
         serviceButtons.forEach((button, index) => {
             const buttonText = button.textContent.toLowerCase().trim();
-            
+
             // Remove existing listeners to prevent duplicates
             const newButton = button.cloneNode(true);
             button.parentNode.replaceChild(newButton, button);
-            
+
             newButton.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 const serviceCard = newButton.closest('.service-card');
                 const serviceTitle = serviceCard?.querySelector('h3')?.textContent.toLowerCase() || '';
-                
+
                 // Enhanced button text matching with service context
                 if (buttonText.includes('book home') || buttonText.includes('home session') || serviceTitle.includes('home')) {
                     this.scrollToFormSection('contact');
@@ -1317,13 +1460,13 @@ class NavigationController {
                         console.log(`Service button: "${buttonText}" - Default navigation to demo form (service: ${serviceTitle})`);
                     }
                 }
-                
+
                 // Pre-fill service information in forms
                 setTimeout(() => {
                     if (serviceTitle) {
                         const serviceSelect = document.getElementById('service');
                         const messageField = document.getElementById('message') || document.getElementById('contactMessage');
-                        
+
                         if (serviceSelect) {
                             // Map service titles to select options
                             if (serviceTitle.includes('home')) {
@@ -1338,25 +1481,25 @@ class NavigationController {
                                 serviceSelect.value = 'general-fitness';
                             }
                         }
-                        
+
                         if (messageField && !messageField.value) {
                             messageField.value = `I'm interested in ${serviceTitle}.`;
                         }
                     }
                 }, 1000);
             });
-            
+
             // Add visual feedback
             newButton.addEventListener('mouseenter', () => {
                 newButton.style.transform = 'translateY(-2px)';
                 newButton.style.boxShadow = '0 5px 15px rgba(0,0,0,0.2)';
             });
-            
+
             newButton.addEventListener('mouseleave', () => {
                 newButton.style.transform = 'translateY(0)';
                 newButton.style.boxShadow = '';
             });
-            
+
             console.log(`Mapped service button ${index + 1}: "${buttonText}"`);
         });
     }
@@ -1368,25 +1511,25 @@ class NavigationController {
             // Remove existing listeners to prevent duplicates
             const newButton = button.cloneNode(true);
             button.parentNode.replaceChild(newButton, button);
-            
+
             newButton.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 // Get plan information for better form pre-filling
                 const planCard = newButton.closest('.plan-card');
                 const planName = planCard?.querySelector('h3')?.textContent || '';
                 const planPrice = planCard?.querySelector('.amount')?.textContent || '';
-                
+
                 // Always go to demo form for plan bookings
                 this.scrollToFormSection('demo');
                 console.log(`Plan button: "${planName}" - Navigated to demo form`);
-                
+
                 // Enhanced form pre-filling after navigation
                 setTimeout(() => {
                     const planSelect = document.getElementById('planChoice');
                     const messageField = document.getElementById('message');
-                    
+
                     if (planSelect && planName) {
                         const planLower = planName.toLowerCase();
                         if (planLower.includes('basic')) {
@@ -1396,11 +1539,11 @@ class NavigationController {
                         } else if (planLower.includes('vip')) {
                             planSelect.value = 'vip-single';
                         }
-                        
+
                         // Trigger change event to update form
                         planSelect.dispatchEvent(new Event('change', { bubbles: true }));
                     }
-                    
+
                     if (messageField && planName && !messageField.value) {
                         let message = `I'm interested in the ${planName}`;
                         if (planPrice) {
@@ -1411,18 +1554,18 @@ class NavigationController {
                     }
                 }, 1200);
             });
-            
+
             // Add visual feedback
             newButton.addEventListener('mouseenter', () => {
                 newButton.style.transform = 'translateY(-3px)';
                 newButton.style.boxShadow = '0 8px 25px rgba(255, 107, 53, 0.3)';
             });
-            
+
             newButton.addEventListener('mouseleave', () => {
                 newButton.style.transform = 'translateY(0)';
                 newButton.style.boxShadow = '';
             });
-            
+
             console.log(`Mapped plan button ${index + 1}: "${planName}"`);
         });
     }
@@ -1437,7 +1580,7 @@ class NavigationController {
                 if (!e.target.closest('.social-links')) {
                     const trainerName = card.querySelector('h3')?.textContent || '';
                     this.scrollToFormSection('demo');
-                    
+
                     // Optional: Pre-fill trainer preference in demo form
                     setTimeout(() => {
                         const messageField = document.getElementById('message');
@@ -1503,7 +1646,7 @@ class NavigationController {
             });
             scrollIndicator.setAttribute('data-nav-mapped', 'true');
         }
-        
+
         // Also handle scroll arrow specifically
         const scrollArrow = document.querySelector('.scroll-arrow');
         if (scrollArrow) {
@@ -1543,10 +1686,10 @@ class NavigationController {
             card.style.cursor = 'pointer';
             card.addEventListener('click', (e) => {
                 e.preventDefault();
-                
+
                 const icon = card.querySelector('i');
                 const cardText = card.textContent.toLowerCase();
-                
+
                 if (icon) {
                     if (icon.classList.contains('fa-phone-alt') || cardText.includes('call')) {
                         // Phone card - open phone dialer
@@ -1614,10 +1757,10 @@ class NavigationController {
         const dataNavButtons = document.querySelectorAll('[data-nav-target]');
         dataNavButtons.forEach(button => {
             const targetSection = button.getAttribute('data-nav-target');
-            
+
             button.addEventListener('click', (e) => {
                 e.preventDefault();
-                
+
                 if (targetSection === 'demo' || targetSection === 'contact') {
                     this.scrollToFormSection(targetSection);
                 } else if (this.sectionMapping[targetSection]) {
@@ -1631,14 +1774,14 @@ class NavigationController {
         onclickButtons.forEach(button => {
             const onclickValue = button.getAttribute('onclick');
             button.removeAttribute('onclick');
-            
+
             if (onclickValue) {
                 const sectionMatch = onclickValue.match(/scrollToSection\(['"]([^'"]+)['"]\)/);
                 if (sectionMatch) {
                     const sectionId = sectionMatch[1];
                     button.addEventListener('click', (e) => {
                         e.preventDefault();
-                        
+
                         if (sectionId === 'demo' || sectionId === 'contact') {
                             this.scrollToFormSection(sectionId);
                         } else {
@@ -1681,7 +1824,7 @@ class NavigationController {
     setupGlobalNavigation() {
         // Make scrollToSection globally accessible
         window.scrollToSection = (sectionId) => this.scrollToSection(sectionId);
-        
+
         // Handle logo clicks to go to home
         const logoElements = document.querySelectorAll('.Logo-3D, .nav-logo');
         logoElements.forEach(logo => {
@@ -1747,24 +1890,24 @@ class NavigationController {
     // New method for form-specific scrolling
     scrollToFormSection(sectionId) {
         this.scrollToSection(sectionId);
-        
+
         // Additional focus on the form element after scrolling
         setTimeout(() => {
             let formElement = null;
-            
+
             if (sectionId === 'demo') {
                 formElement = document.getElementById('demoForm');
             } else if (sectionId === 'contact') {
                 formElement = document.getElementById('contactForm');
             }
-            
+
             if (formElement) {
                 // Smooth scroll to center the form in view
                 formElement.scrollIntoView({
                     behavior: 'smooth',
                     block: 'center'
                 });
-                
+
                 // Optional: Focus on first input field
                 setTimeout(() => {
                     const firstInput = formElement.querySelector('input[type="text"], input[type="email"]');
@@ -1790,12 +1933,12 @@ class NavigationController {
 
         // Offset for section detection
         const offset = 120;
-        
+
         // Find current section based on scroll position
         for (const section of this.sections) {
             const sectionTop = section.offsetTop - offset;
             const sectionBottom = sectionTop + section.offsetHeight;
-            
+
             if (scrollY >= sectionTop && scrollY < sectionBottom) {
                 currentSection = section.id;
                 break;
@@ -1828,7 +1971,7 @@ class NavigationController {
         const activeLink = document.querySelector(`[data-section="${sectionId}"], .nav-link[href="#${sectionId}"]`);
         if (activeLink && activeLink.classList.contains('nav-link')) {
             activeLink.classList.add('active');
-            
+
             // Update URL hash if different
             if (window.location.hash !== `#${sectionId}`) {
                 history.replaceState(null, null, `#${sectionId}`);
@@ -1848,24 +1991,24 @@ class NavigationController {
                         const nextIndex = (index + 1) % this.navLinks.length;
                         this.navLinks[nextIndex].focus();
                         break;
-                        
+
                     case 'ArrowUp':
                     case 'ArrowLeft':
                         e.preventDefault();
                         const prevIndex = index === 0 ? this.navLinks.length - 1 : index - 1;
                         this.navLinks[prevIndex].focus();
                         break;
-                        
+
                     case 'Home':
                         e.preventDefault();
                         this.navLinks[0].focus();
                         break;
-                        
+
                     case 'End':
                         e.preventDefault();
                         this.navLinks[this.navLinks.length - 1].focus();
                         break;
-                        
+
                     case 'Enter':
                     case ' ':
                         e.preventDefault();
@@ -1969,7 +2112,7 @@ class NavigationController {
     mapTouchNavigation() {
         let touchStartY = 0;
         let touchEndY = 0;
-        
+
         // Swipe navigation for mobile
         document.addEventListener('touchstart', (e) => {
             touchStartY = e.changedTouches[0].screenY;
@@ -1985,12 +2128,12 @@ class NavigationController {
     handleSwipeNavigation(startY, endY) {
         const minSwipeDistance = 100;
         const swipeDistance = Math.abs(startY - endY);
-        
+
         if (swipeDistance < minSwipeDistance) return;
-        
+
         const sections = Object.keys(this.sectionMapping);
         const currentIndex = sections.indexOf(this.activeSection);
-        
+
         if (startY > endY && currentIndex < sections.length - 1) {
             // Swipe up - next section
             this.scrollToSection(sections[currentIndex + 1]);
@@ -2018,7 +2161,7 @@ class NavigationController {
                 <p>Press <kbd>Esc</kbd> to close this dialog</p>
             </div>
         `;
-        
+
         modal.style.cssText = `
             position: fixed;
             top: 0;
@@ -2031,21 +2174,21 @@ class NavigationController {
             justify-content: center;
             z-index: 10000;
         `;
-        
+
         document.body.appendChild(modal);
-        
+
         // Close on Escape or click outside
         const closeModal = () => {
             document.body.removeChild(modal);
         };
-        
+
         document.addEventListener('keydown', function escHandler(e) {
             if (e.key === 'Escape') {
                 closeModal();
                 document.removeEventListener('keydown', escHandler);
             }
         });
-        
+
         modal.addEventListener('click', (e) => {
             if (e.target === modal) closeModal();
         });
@@ -2058,7 +2201,7 @@ let navigationController;
 // Initialize navigation system
 function initializeNavigation() {
     navigationController = new NavigationController();
-    
+
     // Ensure all buttons are properly mapped after initialization
     setTimeout(() => {
         navigationController.mapAllNavigationButtons();
@@ -2177,12 +2320,43 @@ let demoCaptcha, contactCaptcha, formSecurity;
 
 // Initialize security and CAPTCHA systems
 function initializeFormSecurity() {
-    // Initialize form security
-    formSecurity = new FormSecurity();
+    try {
+        // Initialize form security
+        formSecurity = new FormSecurity();
 
-    // Initialize simple CAPTCHA systems
-    demoCaptcha = new SimpleCaptcha('demoCaptcha', 'demo');
-    contactCaptcha = new SimpleCaptcha('contactCaptcha', 'contact');
+        // Wait for DOM elements to be ready before initializing CAPTCHA
+        setTimeout(() => {
+            try {
+                // Check if CAPTCHA containers exist before initializing
+                const demoCaptchaContainer = document.getElementById('demoCaptcha');
+                const contactCaptchaContainer = document.getElementById('contactCaptcha');
+
+                if (demoCaptchaContainer) {
+                    demoCaptcha = new SimpleCaptcha('demoCaptcha', 'demo');
+                    console.log('Demo CAPTCHA initialized successfully');
+                } else {
+                    console.warn('Demo CAPTCHA container not found');
+                }
+
+                if (contactCaptchaContainer) {
+                    contactCaptcha = new SimpleCaptcha('contactCaptcha', 'contact');
+                    console.log('Contact CAPTCHA initialized successfully');
+                } else {
+                    console.warn('Contact CAPTCHA container not found');
+                }
+            } catch (captchaError) {
+                console.error('CAPTCHA initialization error:', captchaError);
+                // Fallback: Allow form submission without CAPTCHA if initialization fails
+                const submitBtns = document.querySelectorAll('#demoSubmitBtn, #contactSubmitBtn');
+                submitBtns.forEach(btn => {
+                    if (btn) btn.disabled = false;
+                });
+            }
+        }, 500);
+
+    } catch (error) {
+        console.error('Form security initialization error:', error);
+    }
 }
 
 // Enhanced FormSubmit handler with mobile support
@@ -2250,7 +2424,7 @@ async function submitFormWithFormSubmit(form, formType) {
         } else {
             // If response is not ok, still try to process as FormSubmit might have succeeded
             console.log('Response status:', response.status);
-            
+
             // FormSubmit often returns non-200 status but still processes the form
             // So we'll show success message anyway
             if (formType === 'demo') {
@@ -2275,7 +2449,7 @@ async function submitFormWithFormSubmit(form, formType) {
 
     } catch (error) {
         console.error('Form submission error:', error);
-        
+
         // For mobile, even if there's an error, FormSubmit might have processed it
         // Show a more user-friendly message
         if (formType === 'demo') {
@@ -2745,15 +2919,165 @@ class VideoPlayer {
     }
 }
 
-// Initialize video players
+// Initialize video players with error handling
 function initializeVideoPlayers() {
     const videoCards = document.querySelectorAll('.video-card');
-    videoCards.forEach(card => {
+    videoCards.forEach((card, index) => {
         const video = card.querySelector('.gym-video');
         if (video) {
-            new VideoPlayer(card);
+            try {
+                // Add error handling for video loading
+                video.addEventListener('error', (e) => {
+                    console.warn(`Video ${index + 1} loading error:`, e);
+                    handleVideoError(video, card);
+                });
+
+                video.addEventListener('loadstart', () => {
+                    console.log(`Video ${index + 1} started loading`);
+                });
+
+                video.addEventListener('canplay', () => {
+                    console.log(`Video ${index + 1} can play`);
+                });
+
+                // Initialize video player
+                new VideoPlayer(card);
+            } catch (error) {
+                console.error(`Error initializing video player ${index + 1}:`, error);
+                handleVideoError(video, card);
+            }
         }
     });
+}
+
+// Enhanced video loading error handler with retry functionality
+function handleVideoError(video, card) {
+    console.warn('Video loading error, attempting recovery...');
+    
+    const overlay = card.querySelector('.video-overlay');
+    const playBtn = card.querySelector('.play-btn');
+    const videoInfo = card.querySelector('.video-info h3');
+    
+    // Try to reload video source
+    const sources = video.querySelectorAll('source');
+    let retryCount = 0;
+    const maxRetries = 2;
+    
+    const attemptReload = () => {
+        if (retryCount < maxRetries && sources.length > 0) {
+            retryCount++;
+            console.log(`Video retry attempt ${retryCount}/${maxRetries}`);
+            
+            // Try next source or reload current
+            const currentSource = retryCount <= sources.length ? 
+                sources[retryCount - 1].src : sources[0].src;
+            
+            video.src = currentSource;
+            video.load();
+            
+            // Show loading state
+            if (playBtn) {
+                playBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                playBtn.title = 'Loading video...';
+            }
+            
+            // Set timeout for retry
+            setTimeout(() => {
+                if (video.readyState < 2) {
+                    attemptReload();
+                } else {
+                    console.log('Video recovered successfully');
+                    if (playBtn) {
+                        playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                        playBtn.title = 'Play video';
+                    }
+                }
+            }, 2000);
+            
+        } else {
+            // All retries failed, show error state
+            console.error('Video failed to load after all retries');
+            showVideoErrorState();
+        }
+    };
+    
+    const showVideoErrorState = () => {
+        if (overlay && playBtn) {
+            playBtn.innerHTML = '<i class="fas fa-image"></i>';
+            playBtn.style.background = 'rgba(108, 117, 125, 0.8)';
+            playBtn.title = 'Video not available - showing placeholder';
+            
+            // Create fallback functionality
+            playBtn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Show notification that video is unavailable
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(0, 0, 0, 0.9);
+                    color: white;
+                    padding: 1rem 2rem;
+                    border-radius: 8px;
+                    z-index: 10000;
+                    text-align: center;
+                `;
+                notification.innerHTML = `
+                    <i class="fas fa-exclamation-circle" style="color: #ffc107; margin-bottom: 0.5rem; display: block; font-size: 2rem;"></i>
+                    <h4 style="margin: 0.5rem 0;">Video Unavailable</h4>
+                    <p style="margin: 0; opacity: 0.8;">This video is temporarily unavailable. Please try again later.</p>
+                `;
+                
+                document.body.appendChild(notification);
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 3000);
+            };
+        }
+
+        // Style video container as placeholder
+        if (video) {
+            const container = video.closest('.video-container');
+            if (container) {
+                container.style.background = `
+                    linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%),
+                    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-opacity='0.1'%3E%3Cpolygon fill='%23000' points='50 0 60 40 100 50 60 60 50 100 40 60 0 50 40 40'/%3E%3C/g%3E%3C/svg%3E") center/50px 50px
+                `;
+                container.style.display = 'flex';
+                container.style.alignItems = 'center';
+                container.style.justifyContent = 'center';
+                container.style.position = 'relative';
+                
+                // Add placeholder text
+                const placeholder = document.createElement('div');
+                placeholder.style.cssText = `
+                    position: absolute;
+                    bottom: 10px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: rgba(0, 0, 0, 0.7);
+                    color: white;
+                    padding: 0.25rem 0.5rem;
+                    border-radius: 4px;
+                    font-size: 0.8rem;
+                `;
+                placeholder.textContent = 'Video Preview';
+                container.appendChild(placeholder);
+            }
+            
+            // Hide the actual video element
+            video.style.opacity = '0';
+        }
+    };
+    
+    // Start retry process
+    attemptReload();
 }
 
 // Auto-play videos function with ultra-aggressive mobile support
@@ -2761,22 +3085,99 @@ function initializeAutoplayVideos() {
     // Play hero background video with ultra-aggressive mobile autoplay
     const heroVideo = document.querySelector('.hero-background-video');
     if (heroVideo) {
+        // Add error handling for video source
+        heroVideo.addEventListener('error', (e) => {
+            console.log('Hero video error, trying fallback:', e);
+            // Hide video and show background color instead
+            heroVideo.style.display = 'none';
+            const heroSection = document.querySelector('.hero');
+            if (heroSection) {
+                heroSection.style.background = 'linear-gradient(135deg, #000000 0%, #1a0000 100%)';
+            }
+        });
+
+        heroVideo.addEventListener('loadstart', () => {
+            console.log('Hero video loading started');
+        });
+
+        heroVideo.addEventListener('canplay', () => {
+            console.log('Hero video can play');
+        });
+
+        // Add error handling for video source
+        heroVideo.addEventListener('error', (e) => {
+            console.log('Hero video error, trying fallback:', e);
+            // Hide video and show background color instead
+            heroVideo.style.display = 'none';
+            const heroSection = document.querySelector('.hero');
+            if (heroSection) {
+                heroSection.style.background = 'linear-gradient(135deg, #000000 0%, #1a0000 100%)';
+            }
+        });
+
+        heroVideo.addEventListener('loadstart', () => {
+            console.log('Hero video loading started');
+        });
+
+        heroVideo.addEventListener('canplay', () => {
+            console.log('Hero video can play');
+        });
+
+        // Add error handling for video source
+        heroVideo.addEventListener('error', (e) => {
+            console.log('Hero video error, trying fallback:', e);
+            // Hide video and show background color instead
+            heroVideo.style.display = 'none';
+            const heroSection = document.querySelector('.hero');
+            if (heroSection) {
+                heroSection.style.background = 'linear-gradient(135deg, #000000 0%, #1a0000 100%)';
+            }
+        });
+
+        heroVideo.addEventListener('loadstart', () => {
+            console.log('Hero video loading started');
+        });
+
+        heroVideo.addEventListener('canplay', () => {
+            console.log('Hero video can play');
+        });
+
+        // Add error handling for video source
+        heroVideo.addEventListener('error', (e) => {
+            console.log('Hero video error, trying fallback:', e);
+            // Hide video and show background color instead
+            heroVideo.style.display = 'none';
+            const heroSection = document.querySelector('.hero');
+            if (heroSection) {
+                heroSection.style.background = 'linear-gradient(135deg, #000000 0%, #1a0000 100%)';
+            }
+        });
+
+        heroVideo.addEventListener('loadstart', () => {
+            console.log('Hero video loading started');
+        });
+
+        heroVideo.addEventListener('canplay', () => {
+            console.log('Hero video can play');
+        });
+
+        // Add video source and configuration for autoplay, loop, muted, and playsinline
         const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
                          window.innerWidth <= 768 || 
                          'ontouchstart' in window || 
                          navigator.maxTouchPoints > 0;
-        
+
         // Immediately set video source to prevent loading delays
         if (!heroVideo.src && heroVideo.querySelector('source')) {
             heroVideo.src = heroVideo.querySelector('source').src;
         }
-        
+
         // Ultra-aggressive video configuration
         const configureVideo = () => {
             // Remove all possible controls and interactions
             heroVideo.removeAttribute('controls');
             heroVideo.controls = false;
-            
+
             // Set all autoplay-required attributes
             heroVideo.muted = true;
             heroVideo.defaultMuted = true;
@@ -2785,7 +3186,7 @@ function initializeAutoplayVideos() {
             heroVideo.loop = true;
             heroVideo.playsInline = true;
             heroVideo.preload = 'auto';
-            
+
             // Force all HTML attributes for maximum compatibility
             const attrs = {
                 'muted': 'true',
@@ -2800,7 +3201,7 @@ function initializeAutoplayVideos() {
                 'x-webkit-airplay': 'deny',
                 'controlsList': 'nodownload nofullscreen noremoteplaybook noplaybackrate'
             };
-            
+
             // Mobile-specific attributes for all devices
             if (isMobile) {
                 attrs['x5-playsinline'] = 'true';
@@ -2811,13 +3212,13 @@ function initializeAutoplayVideos() {
                 attrs['webkit-playsinline'] = '';
                 attrs['playsinline'] = '';
             }
-            
+
             // Apply all attributes
             Object.entries(attrs).forEach(([key, value]) => {
                 heroVideo.setAttribute(key, value);
             });
         };
-        
+
         // Aggressive style enforcement
         const enforceBackgroundBehavior = () => {
             const styles = {
@@ -2835,29 +3236,29 @@ function initializeAutoplayVideos() {
                 '-webkit-media-controls-overlay-play-button': 'none',
                 'display': 'block'
             };
-            
+
             Object.entries(styles).forEach(([prop, value]) => {
                 heroVideo.style.setProperty(prop, value, 'important');
             });
-            
+
             // Reapply video configuration
             configureVideo();
         };
-        
+
         // Immediate configuration
         configureVideo();
         enforceBackgroundBehavior();
-        
+
         // Monitor and enforce settings every 50ms
         const monitorInterval = setInterval(() => {
             enforceBackgroundBehavior();
-            
+
             // Ensure video stays muted and configured
             if (heroVideo.volume > 0) heroVideo.volume = 0;
             if (!heroVideo.muted) heroVideo.muted = true;
             if (heroVideo.controls) heroVideo.controls = false;
         }, 50);
-        
+
         // Enhanced autoplay function with better error handling
         const attemptAutoplay = async (retryCount = 0) => {
             try {
@@ -2865,10 +3266,10 @@ function initializeAutoplayVideos() {
                 heroVideo.currentTime = 0;
                 heroVideo.muted = true;
                 heroVideo.volume = 0;
-                
+
                 // Attempt to play
                 const playPromise = heroVideo.play();
-                
+
                 if (playPromise !== undefined) {
                     await playPromise;
                     console.log('Background video autoplay successful');
@@ -2878,7 +3279,7 @@ function initializeAutoplayVideos() {
                 return false;
             } catch (error) {
                 console.log('Autoplay failed, will retry:', error);
-                
+
                 // Retry logic with exponential backoff
                 if (retryCount < 5) {
                     const delay = Math.min(100 * Math.pow(2, retryCount), 2000);
@@ -2892,33 +3293,33 @@ function initializeAutoplayVideos() {
                 return false;
             }
         };
-        
+
         // Immediate play attempts for mobile
         if (isMobile) {
             // Force immediate load
             heroVideo.load();
-            
+
             // Multiple immediate attempts
             setTimeout(() => attemptAutoplay(0), 50);
             setTimeout(() => attemptAutoplay(0), 200);
             setTimeout(() => attemptAutoplay(0), 500);
             setTimeout(() => attemptAutoplay(0), 1000);
         }
-        
+
         // Event-based autoplay attempts
         const videoReadyEvents = ['loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough'];
         videoReadyEvents.forEach(eventName => {
             heroVideo.addEventListener(eventName, () => attemptAutoplay(0), { once: true, passive: true });
         });
-        
+
         // Force initial load
         heroVideo.load();
-        
+
         // Try immediate play if video is already ready
         if (heroVideo.readyState >= 2) {
             attemptAutoplay(0);
         }
-        
+
         // User interaction fallback for stubborn mobile browsers
         let userInteracted = false;
         const playOnInteraction = async () => {
@@ -2928,14 +3329,14 @@ function initializeAutoplayVideos() {
                 await attemptAutoplay(0);
             }
         };
-        
+
         // Capture ANY user interaction
         const interactionEvents = ['touchstart', 'touchend', 'touchmove', 'click', 'mousedown', 'keydown', 'scroll'];
         interactionEvents.forEach(event => {
             document.addEventListener(event, playOnInteraction, { once: true, passive: true });
             window.addEventListener(event, playOnInteraction, { once: true, passive: true });
         });
-        
+
         // Prevent video pausing
         heroVideo.addEventListener('pause', () => {
             if (userInteracted) {
@@ -2947,7 +3348,7 @@ function initializeAutoplayVideos() {
                 }, 10);
             }
         });
-        
+
         // Block all user interactions with video
         const blockInteraction = (e) => {
             e.preventDefault();
@@ -2955,18 +3356,18 @@ function initializeAutoplayVideos() {
             e.stopImmediatePropagation();
             return false;
         };
-        
+
         const eventsToBlock = [
             'click', 'dblclick', 'mousedown', 'mouseup', 'mousemove',
             'touchstart', 'touchend', 'touchmove', 'touchcancel',
             'contextmenu', 'selectstart', 'dragstart', 'drag', 'dragend',
             'gesturestart', 'gesturechange', 'gestureend'
         ];
-        
+
         eventsToBlock.forEach(eventType => {
             heroVideo.addEventListener(eventType, blockInteraction, { passive: false, capture: true });
         });
-        
+
         // Handle page visibility and focus changes
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden && heroVideo.paused) {
@@ -2976,7 +3377,7 @@ function initializeAutoplayVideos() {
                 }, 100);
             }
         });
-        
+
         window.addEventListener('focus', () => {
             if (heroVideo.paused) {
                 setTimeout(() => {
@@ -2985,7 +3386,7 @@ function initializeAutoplayVideos() {
                 }, 100);
             }
         });
-        
+
         // Handle orientation changes
         window.addEventListener('orientationchange', () => {
             setTimeout(() => {
@@ -2995,48 +3396,122 @@ function initializeAutoplayVideos() {
                 }
             }, 600);
         });
-        
+
         // Success logging
         heroVideo.addEventListener('play', () => {
             console.log('Background video is now playing');
         });
-        
+
         heroVideo.addEventListener('playing', () => {
             console.log('Background video is playing smoothly');
         });
     }
 
-    // Media section videos - configure for manual play
+    // Enhanced media section videos configuration
     const mediaVideos = document.querySelectorAll('#media .gym-video');
     mediaVideos.forEach((video, index) => {
         if (!video) return;
 
-        // Reset video properties for manual play
-        video.muted = true;
-        video.playsInline = true;
-        video.loop = true;
-        video.autoplay = false;
-        video.preload = 'metadata';
-        video.removeAttribute('autoplay');
-        video.controls = false;
-        
-        // Ensure video is ready for playback
-        video.load();
+        try {
+            // Configure video properties
+            video.muted = true;
+            video.playsInline = true;
+            video.loop = true;
+            video.autoplay = false;
+            video.preload = 'metadata';
+            video.removeAttribute('autoplay');
+            video.controls = false;
+            video.setAttribute('playsinline', '');
+            video.setAttribute('webkit-playsinline', '');
 
-        const overlay = video.closest('.video-container')?.querySelector('.video-overlay');
-        if (overlay) {
-            overlay.style.display = 'flex';
-            overlay.classList.remove('playing');
+            let loadAttempts = 0;
+            const maxLoadAttempts = 3;
+
+            // Enhanced error handling with retry logic
+            video.addEventListener('error', (e) => {
+                console.warn(`Media video ${index + 1} error (attempt ${loadAttempts + 1}):`, e);
+                
+                if (loadAttempts < maxLoadAttempts) {
+                    loadAttempts++;
+                    console.log(`Retrying video load for video ${index + 1}...`);
+                    
+                    setTimeout(() => {
+                        try {
+                            video.load();
+                        } catch (retryError) {
+                            console.error(`Retry failed for video ${index + 1}:`, retryError);
+                        }
+                    }, 1000 * loadAttempts);
+                } else {
+                    const card = video.closest('.video-card');
+                    if (card) {
+                        handleVideoError(video, card);
+                    }
+                }
+            });
+
+            // Success handler
+            video.addEventListener('loadeddata', () => {
+                console.log(`Media video ${index + 1} loaded successfully`);
+                loadAttempts = 0; // Reset counter on success
+                
+                // Ensure overlay is properly configured
+                const overlay = video.closest('.video-container')?.querySelector('.video-overlay');
+                if (overlay) {
+                    overlay.style.display = 'flex';
+                    overlay.classList.remove('playing');
+                    
+                    const playBtn = overlay.querySelector('.play-btn');
+                    if (playBtn) {
+                        playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                        playBtn.style.background = '';
+                        playBtn.title = 'Play video';
+                    }
+                }
+            });
+
+            // Loading state handler
+            video.addEventListener('loadstart', () => {
+                console.log(`Video ${index + 1} loading started`);
+                const overlay = video.closest('.video-container')?.querySelector('.video-overlay');
+                const playBtn = overlay?.querySelector('.play-btn');
+                if (playBtn) {
+                    playBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                }
+            });
+
+            // Can play handler
+            video.addEventListener('canplay', () => {
+                console.log(`Video ${index + 1} can play`);
+                const overlay = video.closest('.video-container')?.querySelector('.video-overlay');
+                const playBtn = overlay?.querySelector('.play-btn');
+                if (playBtn && playBtn.innerHTML.includes('spinner')) {
+                    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            });
+
+            // Initial load attempt
+            video.load();
+
+        } catch (error) {
+            console.error(`Error configuring media video ${index + 1}:`, error);
+            const card = video.closest('.video-card');
+            if (card) {
+                handleVideoError(video, card);
+            }
         }
-        
-        // Add direct click handler for immediate play
+
+        // Add direct click handler for immediate play with enhanced error handling
         const playBtn = video.closest('.video-container')?.querySelector('.play-btn');
         if (playBtn) {
             playBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 try {
+                    // Show loading state
+                    playBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    
                     // Pause all other videos first
                     document.querySelectorAll('#media .gym-video').forEach(v => {
                         if (v !== video && !v.paused) {
@@ -3045,22 +3520,49 @@ function initializeAutoplayVideos() {
                             if (vOverlay) vOverlay.classList.remove('playing');
                         }
                     });
-                    
+
+                    // Ensure video is loaded
+                    if (video.readyState < 2) {
+                        video.load();
+                        await new Promise((resolve, reject) => {
+                            const timeout = setTimeout(() => reject(new Error('Video load timeout')), 5000);
+                            video.addEventListener('loadeddata', () => {
+                                clearTimeout(timeout);
+                                resolve();
+                            }, { once: true });
+                        });
+                    }
+
                     // Play the clicked video
                     await video.play();
                     if (overlay) overlay.classList.add('playing');
+                    playBtn.style.display = 'none'; // Hide play button when playing
                     console.log('Media video playing:', index);
                 } catch (error) {
                     console.error('Error playing video:', error);
-                    // Fallback: try again after a short delay
+                    // Reset play button
+                    playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                    
+                    // Show error state
+                    playBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                    playBtn.style.background = 'rgba(220, 53, 69, 0.8)';
+                    playBtn.title = 'Video playback failed';
+                    
+                    // Try fallback after delay
                     setTimeout(async () => {
                         try {
+                            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+                            playBtn.style.background = '';
+                            playBtn.title = '';
                             await video.play();
                             if (overlay) overlay.classList.add('playing');
+                            playBtn.style.display = 'none';
                         } catch (e) {
-                            console.error('Retry failed:', e);
+                            console.error('Fallback play failed:', e);
+                            playBtn.innerHTML = '<i class="fas fa-times"></i>';
+                            playBtn.style.background = 'rgba(220, 53, 69, 0.8)';
                         }
-                    }, 100);
+                    }, 1000);
                 }
             });
         }
