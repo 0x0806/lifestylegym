@@ -63,17 +63,29 @@
     <section id="home" class="hero">
         <div class="hero-background">
             <video class="hero-background-video" 
-                   muted 
+                   muted
                    autoplay
                    loop 
-                   playsinline 
+                   playsinline
                    webkit-playsinline
-                   preload="metadata"
-                   disableremoteplaybook 
+                   preload="auto"
+                   disableremoteplaybook
                    disablepictureinpicture
                    x-webkit-airplay="deny"
+                   x5-playsinline
+                   x5-video-player-type="h5"
+                   x5-video-player-fullscreen="false"
+                   x5-video-orientation="portraint"
+                   t7-video-player-type="inline"
                    controlsList="nodownload nofullscreen noremoteplaybook noplaybackrate"
-                   style="pointer-events: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none;">
+                   style="pointer-events: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-media-controls: none !important;"
+                   oncontextmenu="return false;"
+                   onselectstart="return false;"
+                   ondragstart="return false;"
+                   onmousedown="return false;"
+                   ontouchstart="return false;"
+                   onclick="return false;"
+                   ondblclick="return false;"
                 <source src="g1.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
