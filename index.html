@@ -36,25 +36,65 @@
     <nav class="Navbar" id="Navbar">
         <div class="nav-container">
             <div class="nav-logo">
-                <div class="Logo-3D">
+                <div class="Logo-3D" data-nav-target="home" role="button" tabindex="0" aria-label="Navigate to Home section">
                     <img src="Screenshot 2025-07-30 091817.png" alt="New Lifestyle Gym Logo" class="logo-image">
                     <span>New Lifestyle</span>
                 </div>
             </div>
-            <ul class="nav-menu" id="nav-menu">
-                <li class="nav-item"><a href="#home" class="nav-link">Home</a></li>
-                <li class="nav-item"><a href="#about" class="nav-link">About</a></li>
-                <li class="nav-item"><a href="#services" class="nav-link">Services</a></li>
-                <li class="nav-item"><a href="#trainers" class="nav-link">Trainers</a></li>
-                <li class="nav-item"><a href="#media" class="nav-link">Media</a></li>
-                <li class="nav-item"><a href="#plans" class="nav-link">Plans</a></li>
-                <li class="nav-item"><a href="#contact" class="nav-link">Contact</a></li>
-                <li class="nav-item"><a href="#demo" class="nav-link cta-btn">Book Demo</a></li>
+            <ul class="nav-menu" id="nav-menu" role="menubar">
+                <li class="nav-item" role="none">
+                    <a href="#home" class="nav-link" data-section="home" role="menuitem" tabindex="0" aria-label="Navigate to Home section">
+                        <i class="fas fa-home" aria-hidden="true"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li class="nav-item" role="none">
+                    <a href="#about" class="nav-link" data-section="about" role="menuitem" tabindex="0" aria-label="Navigate to About section">
+                        <i class="fas fa-info-circle" aria-hidden="true"></i>
+                        <span>About</span>
+                    </a>
+                </li>
+                <li class="nav-item" role="none">
+                    <a href="#services" class="nav-link" data-section="services" role="menuitem" tabindex="0" aria-label="Navigate to Services section">
+                        <i class="fas fa-dumbbell" aria-hidden="true"></i>
+                        <span>Services</span>
+                    </a>
+                </li>
+                <li class="nav-item" role="none">
+                    <a href="#trainers" class="nav-link" data-section="trainers" role="menuitem" tabindex="0" aria-label="Navigate to Trainers section">
+                        <i class="fas fa-users" aria-hidden="true"></i>
+                        <span>Trainers</span>
+                    </a>
+                </li>
+                <li class="nav-item" role="none">
+                    <a href="#media" class="nav-link" data-section="media" role="menuitem" tabindex="0" aria-label="Navigate to Media section">
+                        <i class="fas fa-play-circle" aria-hidden="true"></i>
+                        <span>Media</span>
+                    </a>
+                </li>
+                <li class="nav-item" role="none">
+                    <a href="#plans" class="nav-link" data-section="plans" role="menuitem" tabindex="0" aria-label="Navigate to Plans section">
+                        <i class="fas fa-credit-card" aria-hidden="true"></i>
+                        <span>Plans</span>
+                    </a>
+                </li>
+                <li class="nav-item" role="none">
+                    <a href="#contact" class="nav-link" data-section="contact" role="menuitem" tabindex="0" aria-label="Navigate to Contact section">
+                        <i class="fas fa-envelope" aria-hidden="true"></i>
+                        <span>Contact</span>
+                    </a>
+                </li>
+                <li class="nav-item nav-cta" role="none">
+                    <a href="#demo" class="nav-link cta-btn" data-section="demo" role="menuitem" tabindex="0" aria-label="Navigate to Demo booking section">
+                        <i class="fas fa-calendar-alt" aria-hidden="true"></i>
+                        <span>Book Demo</span>
+                    </a>
+                </li>
             </ul>
-            <div class="hamburger" id="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
+            <div class="hamburger" id="hamburger" role="button" tabindex="0" aria-label="Toggle navigation menu" aria-expanded="false">
+                <span class="bar" aria-hidden="true"></span>
+                <span class="bar" aria-hidden="true"></span>
+                <span class="bar" aria-hidden="true"></span>
             </div>
         </div>
     </nav>
@@ -124,11 +164,11 @@
                     </div>
                 </div>
                 <div class="hero-buttons">
-                    <button class="btn btn-primary" onclick="scrollToSection('demo')">
+                    <button class="btn btn-primary" data-nav-target="demo" data-nav-mapped="false" aria-label="Book a free demo session">
                         <i class="fas fa-calendar-alt"></i>
                         Book Free Demo
                     </button>
-                    <button class="btn btn-secondary" onclick="scrollToSection('services')">
+                    <button class="btn btn-secondary" data-nav-target="services" data-nav-mapped="false" aria-label="Explore our services">
                         <i class="fas fa-play"></i>
                         Explore Services
                     </button>
@@ -213,7 +253,7 @@
                         <li><i class="fas fa-check"></i> Trainers bring equipment</li>
                         <li><i class="fas fa-check"></i> Tailored to your goals</li>
                     </ul>
-                    <button class="btn btn-primary" onclick="scrollToSection('contact')">Book Home Session</button>
+                    <button class="btn btn-primary" data-nav-target="contact" data-nav-mapped="false" aria-label="Book home training session">Book Home Session</button>
                 </div>
                 <div class="service-card">
                     <div class="service-icon">
@@ -227,7 +267,7 @@
                         <li><i class="fas fa-check"></i> Tailored guidance</li>
                         <li><i class="fas fa-check"></i> Progress tracking</li>
                     </ul>
-                    <button class="btn btn-outline" onclick="scrollToSection('contact')">Learn More</button>
+                    <button class="btn btn-outline" data-nav-target="demo" data-nav-mapped="false" aria-label="Book personal training demo">Book Demo</button>
                 </div>
                 <div class="service-card">
                     <div class="service-icon">
@@ -241,7 +281,7 @@
                         <li><i class="fas fa-check"></i> Strength Training - muscle building</li>
                         <li><i class="fas fa-check"></i> Bootcamp - high-intensity</li>
                     </ul>
-                    <button class="btn btn-outline" onclick="scrollToSection('contact')">Join Classes</button>
+                    <button class="btn btn-outline" data-nav-target="demo" data-nav-mapped="false" aria-label="Join group fitness classes">Join Classes</button>
                 </div>
                 <div class="service-card">
                     <div class="service-icon">
@@ -255,7 +295,7 @@
                         <li><i class="fas fa-check"></i> Increased muscle mass</li>
                         <li><i class="fas fa-check"></i> Better joint function</li>
                     </ul>
-                    <button class="btn btn-outline" onclick="scrollToSection('contact')">Start Training</button>
+                    <button class="btn btn-outline" data-nav-target="demo" data-nav-mapped="false" aria-label="Start weight training program">Start Training</button>
                 </div>
                 <div class="service-card">
                     <div class="service-icon">
@@ -269,7 +309,7 @@
                         <li><i class="fas fa-check"></i> Nutrition consultation</li>
                         <li><i class="fas fa-check"></i> Meditation sessions</li>
                     </ul>
-                    <button class="btn btn-outline" onclick="scrollToSection('contact')">Book Session</button>
+                    <button class="btn btn-outline" data-nav-target="contact" data-nav-mapped="false" aria-label="Book wellness session">Book Session</button>
                 </div>
             </div>
         </div>
@@ -580,7 +620,7 @@
                         <li><i class="fas fa-times"></i> Personal training</li>
                         <li><i class="fas fa-times"></i> Group classes</li>
                     </ul>
-                    <button class="btn btn-outline" onclick="scrollToSection('demo')">Book Your Demo</button>
+                    <button class="btn btn-outline" data-nav-target="demo" data-nav-mapped="false" aria-label="Book demo for Basic plan">Book Your Demo</button>
                 </div>
                 <div class="plan-card featured">
                     <div class="plan-badge">Most Popular</div>
@@ -600,7 +640,7 @@
                         <li><i class="fas fa-check"></i> Unlimited group classes</li>
                         <li><i class="fas fa-check"></i> Nutrition consultation</li>
                     </ul>
-                    <button class="btn btn-primary" onclick="scrollToSection('demo')">Book Your Demo</button>
+                    <button class="btn btn-primary" data-nav-target="demo" data-nav-mapped="false" aria-label="Book demo for Premium package">Book Your Demo</button>
                 </div>
                 <div class="plan-card">
                     <div class="plan-header">
@@ -625,7 +665,7 @@
                         <li><i class="fas fa-check"></i> Diet plan</li>
                         <li><i class="fas fa-check"></i> Nutrition consultation</li>
                     </ul>
-                    <button class="btn btn-outline" onclick="scrollToSection('demo')">Book Your Demo</button>
+                    <button class="btn btn-outline" data-nav-target="demo" data-nav-mapped="false" aria-label="Book demo for VIP package">Book Your Demo</button>
                 </div>
             </div>
         </div>
