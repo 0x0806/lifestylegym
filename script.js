@@ -1236,155 +1236,286 @@ function initializeVideoPlayers() {
     });
 }
 
-// Auto-play videos function
+// Auto-play videos function with ultra-aggressive mobile support
 function initializeAutoplayVideos() {
-    // Play hero background video with mobile optimizations
+    // Play hero background video with ultra-aggressive mobile autoplay
     const heroVideo = document.querySelector('.hero-background-video');
     if (heroVideo) {
-        const isMobile = window.innerWidth <= 768;
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
         
-        // Ultra-aggressive control removal for mobile
-        heroVideo.removeAttribute('controls');
-        heroVideo.controls = false;
-        heroVideo.muted = true;
-        heroVideo.playsInline = true;
-        heroVideo.autoplay = true;
-        heroVideo.loop = true;
-        heroVideo.preload = 'metadata';
-        
-        // Set all possible attributes to prevent controls
-        heroVideo.setAttribute('playsinline', '');
-        heroVideo.setAttribute('webkit-playsinline', '');
-        heroVideo.setAttribute('disableremoteplaybook', '');
-        heroVideo.setAttribute('disablepictureinpicture', '');
-        heroVideo.setAttribute('x-webkit-airplay', 'deny');
-        heroVideo.setAttribute('controlsList', 'nodownload nofullscreen noremoteplaybook noplaybackrate');
-        heroVideo.setAttribute('muted', 'muted');
-        heroVideo.setAttribute('autoplay', 'autoplay');
-        heroVideo.setAttribute('loop', 'loop');
-        
-        // Aggressive style enforcement
-        heroVideo.style.pointerEvents = 'none';
-        heroVideo.style.outline = 'none';
-        heroVideo.style.webkitTouchCallout = 'none';
-        heroVideo.style.webkitUserSelect = 'none';
-        heroVideo.style.userSelect = 'none';
-        heroVideo.style.webkitAppearance = 'none';
-        heroVideo.style.appearance = 'none';
-        
-        // Mobile-specific ultra-aggressive control removal
-        if (isMobile) {
-            // Remove any possible control-related properties
-            heroVideo.style.webkitMediaControls = 'none';
-            heroVideo.style.mozMediaControls = 'none';
-            heroVideo.style.mediaControls = 'none';
-            
-            // Force hide any control elements
-            const hideControls = () => {
-                heroVideo.style.setProperty('-webkit-media-controls', 'none', 'important');
-                heroVideo.style.setProperty('-webkit-media-controls-panel', 'none', 'important');
-                heroVideo.style.setProperty('display', 'block', 'important');
-                
-                // Remove controls attribute repeatedly
-                heroVideo.removeAttribute('controls');
-                heroVideo.controls = false;
-                
-                // Hide any shadow DOM controls
-                if (heroVideo.shadowRoot) {
-                    const style = document.createElement('style');
-                    style.textContent = '* { display: none !important; }';
-                    heroVideo.shadowRoot.appendChild(style);
-                }
-            };
-            
-            // Apply control hiding multiple times
-            hideControls();
-            setTimeout(hideControls, 100);
-            setTimeout(hideControls, 500);
-            setTimeout(hideControls, 1000);
+        // Set video source to ensure it's properly loaded
+        if (!heroVideo.src && heroVideo.querySelector('source')) {
+            heroVideo.src = heroVideo.querySelector('source').src;
         }
-
-        // Mobile-specific optimizations
-        if (isMobile) {
-            // Force video to load and play on mobile
-            heroVideo.load(); // Force reload
+        
+        // Ultra-aggressive setup for all devices - force all attributes
+        const configureVideo = () => {
+            heroVideo.removeAttribute('controls');
+            heroVideo.controls = false;
+            heroVideo.muted = true;
+            heroVideo.playsInline = true;
+            heroVideo.autoplay = true;
+            heroVideo.loop = true;
+            heroVideo.defaultMuted = true;
+            heroVideo.volume = 0;
+            heroVideo.preload = 'auto';
             
-            const playVideo = async () => {
-                try {
-                    heroVideo.muted = true;
-                    heroVideo.currentTime = 0;
-                    await heroVideo.play();
-                    console.log('Mobile hero video playing successfully');
-                } catch (e) {
-                    console.log('Mobile video play failed, retrying...', e);
-                    // Retry after a short delay
+            // Set all possible mobile attributes
+            heroVideo.setAttribute('playsinline', 'true');
+            heroVideo.setAttribute('webkit-playsinline', 'true');
+            heroVideo.setAttribute('disableremoteplaybook', 'true');
+            heroVideo.setAttribute('disablepictureinpicture', 'true');
+            heroVideo.setAttribute('x-webkit-airplay', 'deny');
+            heroVideo.setAttribute('controlsList', 'nodownload nofullscreen noremoteplaybook noplaybackrate');
+            heroVideo.setAttribute('muted', 'true');
+            heroVideo.setAttribute('autoplay', 'true');
+            heroVideo.setAttribute('loop', 'true');
+            heroVideo.setAttribute('defaultMuted', 'true');
+            heroVideo.setAttribute('preload', 'auto');
+            
+            // Mobile-specific attributes
+            if (isMobile) {
+                heroVideo.setAttribute('playsinline', '');
+                heroVideo.setAttribute('webkit-playsinline', '');
+                heroVideo.setAttribute('x5-playsinline', '');
+                heroVideo.setAttribute('t7-video-player-type', 'inline');
+                heroVideo.setAttribute('x5-video-player-type', 'h5');
+                heroVideo.setAttribute('x5-video-player-fullscreen', 'false');
+                heroVideo.setAttribute('x5-video-orientation', 'portraint');
+            }
+        };
+        
+        configureVideo();
+        
+        // Aggressive style enforcement - remove all controls
+        const hideControls = () => {
+            heroVideo.style.setProperty('-webkit-media-controls', 'none', 'important');
+            heroVideo.style.setProperty('-webkit-media-controls-panel', 'none', 'important');
+            heroVideo.style.setProperty('-webkit-media-controls-play-button', 'none', 'important');
+            heroVideo.style.setProperty('-webkit-media-controls-start-playback-button', 'none', 'important');
+            heroVideo.style.setProperty('-webkit-media-controls-overlay-play-button', 'none', 'important');
+            heroVideo.style.setProperty('display', 'block', 'important');
+            heroVideo.style.pointerEvents = 'none';
+            heroVideo.style.outline = 'none';
+            heroVideo.style.webkitTouchCallout = 'none';
+            heroVideo.style.webkitUserSelect = 'none';
+            heroVideo.style.userSelect = 'none';
+            heroVideo.style.webkitAppearance = 'none';
+            heroVideo.style.appearance = 'none';
+            
+            // Force configuration
+            configureVideo();
+        };
+        
+        // Apply control hiding immediately and repeatedly
+        hideControls();
+        const hideControlsInterval = setInterval(hideControls, 50); // More frequent checking
+        
+        // Ultra-aggressive autoplay function
+        const forceAutoplay = async () => {
+            try {
+                // Reset video state completely
+                heroVideo.muted = true;
+                heroVideo.defaultMuted = true;
+                heroVideo.volume = 0;
+                heroVideo.currentTime = 0;
+                
+                // Remove any interfering event listeners
+                heroVideo.onplay = null;
+                heroVideo.onpause = null;
+                heroVideo.onended = null;
+                heroVideo.oncanplay = null;
+                heroVideo.onloadstart = null;
+                
+                // Force play with promise handling
+                const playPromise = heroVideo.play();
+                if (playPromise !== undefined) {
+                    await playPromise;
+                    console.log('Background video autoplay successful');
+                    return true;
+                }
+                return false;
+            } catch (error) {
+                console.log('Autoplay attempt failed:', error.name || error);
+                return false;
+            }
+        };
+        
+        // Mobile-specific immediate play attempt
+        const mobileImmediatePlay = () => {
+            if (isMobile) {
+                // Try to play immediately without waiting
+                heroVideo.load();
+                setTimeout(() => {
+                    forceAutoplay();
+                }, 100);
+                setTimeout(() => {
+                    forceAutoplay();
+                }, 300);
+                setTimeout(() => {
+                    forceAutoplay();
+                }, 500);
+            }
+        };
+        
+        // Enhanced autoplay attempts with multiple strategies
+        const attemptAutoplay = async () => {
+            let playSuccess = false;
+            
+            // Strategy 1: Immediate play
+            playSuccess = await forceAutoplay();
+            if (playSuccess) return;
+            
+            // Strategy 2: After small delay
+            setTimeout(async () => {
+                if (!playSuccess) {
+                    playSuccess = await forceAutoplay();
+                }
+            }, 100);
+            
+            // Strategy 3: After longer delay
+            setTimeout(async () => {
+                if (!playSuccess) {
+                    playSuccess = await forceAutoplay();
+                }
+            }, 500);
+            
+            // Strategy 4: Multiple retries
+            for (let i = 0; i < 5; i++) {
+                setTimeout(async () => {
+                    if (!playSuccess && heroVideo.paused) {
+                        playSuccess = await forceAutoplay();
+                    }
+                }, 1000 + (i * 500));
+            }
+        };
+        
+        // Mobile immediate play
+        mobileImmediatePlay();
+        
+        // Start autoplay based on video readiness with multiple event listeners
+        const videoEvents = ['loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough'];
+        videoEvents.forEach(eventName => {
+            heroVideo.addEventListener(eventName, attemptAutoplay, { once: true, passive: true });
+        });
+        
+        // Force load the video
+        heroVideo.load();
+        
+        // Immediate attempt if already loaded
+        if (heroVideo.readyState >= 2) {
+            attemptAutoplay();
+        }
+        
+        // Ultra-aggressive user interaction handlers for mobile
+        let hasUserInteracted = false;
+        let interactionAttempts = 0;
+        
+        const playOnFirstInteraction = async (event) => {
+            if (!hasUserInteracted && interactionAttempts < 3) {
+                hasUserInteracted = true;
+                interactionAttempts++;
+                
+                // Force video configuration again
+                configureVideo();
+                
+                const success = await forceAutoplay();
+                if (success) {
+                    console.log('Video started after user interaction');
+                } else {
+                    // Try again after a short delay
                     setTimeout(() => {
-                        heroVideo.play().catch(err => {
-                            console.log('Video retry failed:', err);
-                        });
-                    }, 1000);
+                        forceAutoplay();
+                    }, 100);
                 }
-            };
-
-            // Try to play immediately
-            if (heroVideo.readyState >= 2) {
-                playVideo();
-            } else {
-                heroVideo.addEventListener('loadeddata', playVideo, { once: true });
-                heroVideo.addEventListener('canplay', playVideo, { once: true });
             }
-            
-            // Also try on user interaction as fallback
-            let hasInteracted = false;
-            const playOnInteraction = () => {
-                if (!hasInteracted) {
-                    hasInteracted = true;
-                    playVideo();
-                }
-            };
-
-            document.addEventListener('touchstart', playOnInteraction, { once: true, passive: true });
-            document.addEventListener('click', playOnInteraction, { once: true, passive: true });
-            
-        } else {
-            // Desktop - try immediate autoplay
-            const forcePlay = async () => {
-                try {
-                    heroVideo.currentTime = 0;
-                    heroVideo.muted = true;
-                    await heroVideo.play();
-                    console.log('Hero background video playing successfully');
-                } catch (e) {
-                    console.log('Hero background video autoplay prevented:', e);
-                }
-            };
-
-            // Multiple attempts to ensure video plays on desktop
-            if (heroVideo.readyState >= 2) {
-                forcePlay();
-            } else {
-                heroVideo.addEventListener('loadeddata', forcePlay, { once: true });
+        };
+        
+        // Add multiple interaction listeners with immediate triggers
+        const interactionEvents = ['touchstart', 'touchend', 'click', 'tap', 'mousedown', 'pointerdown'];
+        interactionEvents.forEach(event => {
+            document.addEventListener(event, playOnFirstInteraction, { once: true, passive: true });
+            // Also add to window for broader capture
+            window.addEventListener(event, playOnFirstInteraction, { once: true, passive: true });
+        });
+        
+        // Prevent video from pausing - ultra-aggressive resume
+        heroVideo.addEventListener('pause', (e) => {
+            if (hasUserInteracted) {
+                setTimeout(() => {
+                    if (heroVideo.paused) {
+                        configureVideo();
+                        forceAutoplay();
+                    }
+                }, 10);
             }
-        }
-
-        // Prevent all user interactions
+        });
+        
+        // Prevent ALL user interactions with the video element
         const preventInteraction = (e) => {
             e.preventDefault();
             e.stopPropagation();
+            e.stopImmediatePropagation();
             return false;
         };
-
-        heroVideo.addEventListener('contextmenu', preventInteraction);
-        heroVideo.addEventListener('selectstart', preventInteraction);
-        heroVideo.addEventListener('dragstart', preventInteraction);
-        heroVideo.addEventListener('mousedown', preventInteraction);
-        heroVideo.addEventListener('touchstart', preventInteraction);
         
-        // Prevent video from pausing
-        heroVideo.addEventListener('pause', () => {
+        const interactionEventsToBlock = [
+            'contextmenu', 'selectstart', 'dragstart', 'mousedown', 
+            'touchstart', 'touchend', 'touchmove', 'click', 'dblclick',
+            'gesturestart', 'gesturechange', 'gestureend'
+        ];
+        
+        interactionEventsToBlock.forEach(eventType => {
+            heroVideo.addEventListener(eventType, preventInteraction, { passive: false, capture: true });
+        });
+        
+        // Ultra-aggressive monitoring - check video state constantly
+        const monitorVideo = () => {
+            if (heroVideo.paused && hasUserInteracted) {
+                configureVideo();
+                forceAutoplay();
+            }
+            // Ensure controls stay hidden
+            hideControls();
+        };
+        
+        setInterval(monitorVideo, 500); // Check every 500ms
+        
+        // Handle visibility changes with immediate play
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                setTimeout(() => {
+                    if (heroVideo.paused) {
+                        configureVideo();
+                        forceAutoplay();
+                    }
+                }, 50);
+            }
+        });
+        
+        // Handle page focus with immediate play
+        window.addEventListener('focus', () => {
             setTimeout(() => {
-                heroVideo.play().catch(e => console.log('Auto-resume failed:', e));
-            }, 100);
+                if (heroVideo.paused) {
+                    configureVideo();
+                    forceAutoplay();
+                }
+            }, 50);
+        });
+        
+        // Mobile orientation change handler
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                configureVideo();
+                if (heroVideo.paused) {
+                    forceAutoplay();
+                }
+            }, 600);
+        });
+        
+        // Clean up intervals when video plays successfully
+        heroVideo.addEventListener('play', () => {
+            console.log('Background video is now playing');
         });
     }
 
