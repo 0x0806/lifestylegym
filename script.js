@@ -2584,8 +2584,16 @@ class VideoPlayer {
 
     attachEventListeners() {
         // Play button click
-        this.playBtn.addEventListener('click', () => this.togglePlay());
-        this.playPauseBtn.addEventListener('click', () => this.togglePlay());
+        if (this.playBtn) {
+            this.playBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.togglePlay();
+            });
+        }
+        if (this.playPauseBtn) {
+            this.playPauseBtn.addEventListener('click', () => this.togglePlay());
+        }
 
         // Video events
         this.video.addEventListener('loadedmetadata', () => this.updateTimeDisplay());
@@ -2620,20 +2628,47 @@ class VideoPlayer {
         }
     }
 
-    playVideo() {
-        // Pause all other videos first
-        document.querySelectorAll('.gym-video').forEach(v => {
-            if (v !== this.video && !v.paused) {
-                v.pause();
-                v.closest('.video-card').querySelector('.video-overlay').classList.remove('playing');
-                v.closest('.video-card').querySelector('.play-pause-btn i').className = 'fas fa-play';
-            }
-        });
+    async playVideo() {
+        try {
+            // Pause all other videos first
+            document.querySelectorAll('.gym-video').forEach(v => {
+                if (v !== this.video && !v.paused) {
+                    v.pause();
+                    const vCard = v.closest('.video-card');
+                    const vOverlay = vCard?.querySelector('.video-overlay');
+                    const vPlayBtn = vCard?.querySelector('.play-pause-btn i');
+                    if (vOverlay) vOverlay.classList.remove('playing');
+                    if (vPlayBtn) vPlayBtn.className = 'fas fa-play';
+                }
+            });
 
-        this.video.play();
-        this.overlay.classList.add('playing');
-        this.playPauseBtn.querySelector('i').className = 'fas fa-pause';
-        this.isPlaying = true;
+            // Ensure video is ready
+            if (this.video.readyState < 2) {
+                this.video.load();
+                await new Promise(resolve => {
+                    this.video.addEventListener('loadeddata', resolve, { once: true });
+                });
+            }
+
+            await this.video.play();
+            if (this.overlay) this.overlay.classList.add('playing');
+            if (this.playPauseBtn) this.playPauseBtn.querySelector('i').className = 'fas fa-pause';
+            this.isPlaying = true;
+            console.log('Video playing successfully');
+        } catch (error) {
+            console.error('Error playing video:', error);
+            // Fallback attempt
+            setTimeout(async () => {
+                try {
+                    await this.video.play();
+                    if (this.overlay) this.overlay.classList.add('playing');
+                    if (this.playPauseBtn) this.playPauseBtn.querySelector('i').className = 'fas fa-pause';
+                    this.isPlaying = true;
+                } catch (e) {
+                    console.error('Video playback failed:', e);
+                }
+            }, 200);
+        }
     }
 
     pauseVideo() {
@@ -2714,7 +2749,10 @@ class VideoPlayer {
 function initializeVideoPlayers() {
     const videoCards = document.querySelectorAll('.video-card');
     videoCards.forEach(card => {
-        new VideoPlayer(card);
+        const video = card.querySelector('.gym-video');
+        if (video) {
+            new VideoPlayer(card);
+        }
     });
 }
 
@@ -2968,22 +3006,63 @@ function initializeAutoplayVideos() {
         });
     }
 
-    // Media section videos - disable autoplay, show controls
+    // Media section videos - configure for manual play
     const mediaVideos = document.querySelectorAll('#media .gym-video');
     mediaVideos.forEach((video, index) => {
         if (!video) return;
 
+        // Reset video properties for manual play
         video.muted = true;
         video.playsInline = true;
         video.loop = true;
         video.autoplay = false;
         video.preload = 'metadata';
         video.removeAttribute('autoplay');
+        video.controls = false;
+        
+        // Ensure video is ready for playback
+        video.load();
 
         const overlay = video.closest('.video-container')?.querySelector('.video-overlay');
         if (overlay) {
             overlay.style.display = 'flex';
             overlay.classList.remove('playing');
+        }
+        
+        // Add direct click handler for immediate play
+        const playBtn = video.closest('.video-container')?.querySelector('.play-btn');
+        if (playBtn) {
+            playBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                try {
+                    // Pause all other videos first
+                    document.querySelectorAll('#media .gym-video').forEach(v => {
+                        if (v !== video && !v.paused) {
+                            v.pause();
+                            const vOverlay = v.closest('.video-container')?.querySelector('.video-overlay');
+                            if (vOverlay) vOverlay.classList.remove('playing');
+                        }
+                    });
+                    
+                    // Play the clicked video
+                    await video.play();
+                    if (overlay) overlay.classList.add('playing');
+                    console.log('Media video playing:', index);
+                } catch (error) {
+                    console.error('Error playing video:', error);
+                    // Fallback: try again after a short delay
+                    setTimeout(async () => {
+                        try {
+                            await video.play();
+                            if (overlay) overlay.classList.add('playing');
+                        } catch (e) {
+                            console.error('Retry failed:', e);
+                        }
+                    }, 100);
+                }
+            });
         }
     });
 }
