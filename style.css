@@ -546,7 +546,73 @@ p {
     font-size: 1rem;
     letter-spacing: 0.3px;
     white-space: nowrap;
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-link i {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover i,
+.nav-link.active i {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.nav-cta .nav-link {
+    background: var(--gradient-primary);
+    color: var(--light-color);
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(220, 20, 60, 0.3);
+    border: 2px solid transparent;
+}
+
+.nav-cta .nav-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(220, 20, 60, 0.5);
+    background: linear-gradient(135deg, #dc143c 0%, #b91c1c 50%, #991b1b 100%);
+}
+
+/* Keyboard shortcuts modal */
+.keyboard-shortcuts-modal .shortcuts-content {
+    background: var(--dark-color);
+    padding: 2rem;
+    border-radius: 15px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    color: var(--light-color);
+}
+
+.shortcuts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.shortcut-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+.shortcut-item kbd {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    min-width: 24px;
+    text-align: center;
 }
 
 .nav-link::before {
@@ -568,8 +634,14 @@ p {
     transform: translateY(-1px);
 }
 
-.nav-link:hover::before {
+.nav-link:hover::before,
+.nav-link.active::before {
     width: 30px;
+}
+
+.nav-link.active {
+    color: var(--primary-color);
+    background: rgba(220, 20, 60, 0.1);
 }
 
 .nav-link.cta-btn {
@@ -781,6 +853,13 @@ p {
         color: var(--light-color) !important;
         transform: translateY(-3px) !important;
         box-shadow: 0 6px 25px rgba(220, 20, 60, 0.6) !important;
+    }
+
+    .nav-link.active {
+        background: rgba(220, 20, 60, 0.25) !important;
+        color: var(--primary-color) !important;
+        border-color: rgba(220, 20, 60, 0.5) !important;
+        font-weight: 600 !important;
     }
 }
 
