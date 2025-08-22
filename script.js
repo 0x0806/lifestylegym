@@ -572,10 +572,26 @@ function initializeNavigation() {
 
 // Smooth scrolling for navigation links
 function scrollToSection(sectionId) {
-    const section = document.getElementById(sectionId);
+    // Remove # if it exists at the beginning
+    const cleanSectionId = sectionId.startsWith('#') ? sectionId.substring(1) : sectionId;
+    const section = document.getElementById(cleanSectionId);
+    
     if (section) {
-        const navHeight = document.querySelector('.Navbar').offsetHeight;
+        const navbar = document.querySelector('.Navbar');
+        const navHeight = navbar ? navbar.offsetHeight : 80;
         const targetPosition = section.offsetTop - navHeight - 20;
+
+        // Close mobile menu if open
+        const hamburger = document.getElementById('hamburger');
+        const navMenu = document.getElementById('nav-menu');
+        if (hamburger && navMenu && hamburger.classList.contains('active')) {
+            hamburger.classList.remove('active');
+            navMenu.classList.remove('active');
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
+        }
 
         window.scrollTo({
             top: targetPosition,
@@ -588,9 +604,23 @@ function scrollToSection(sectionId) {
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
-        const targetId = this.getAttribute('href').substring(1);
+        const targetId = this.getAttribute('href');
         scrollToSection(targetId);
     });
+});
+
+// Add click listeners to buttons that scroll to sections
+document.addEventListener('click', function(e) {
+    // Handle buttons with onclick="scrollToSection(...)"
+    if (e.target.closest('button[onclick*="scrollToSection"]')) {
+        const button = e.target.closest('button');
+        const onclickValue = button.getAttribute('onclick');
+        const match = onclickValue.match(/scrollToSection\(['"]([^'"]+)['"]\)/);
+        if (match) {
+            e.preventDefault();
+            scrollToSection(match[1]);
+        }
+    }
 });
 
 // Intersection Observer for animations
