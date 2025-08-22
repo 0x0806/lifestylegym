@@ -116,59 +116,126 @@ body {
 
 /* Hero Background Video */
 .hero-background-video {
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
     object-fit: cover;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-3d);
+    z-index: 1;
     filter: brightness(0.8) contrast(1.1);
-    transition: var(--transition);
-    /* Hide all video controls for background video */
+    /* Completely disable all interactions and controls */
     pointer-events: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    /* Aggressively remove controls */
+    controls: false;
+    -webkit-media-controls: none;
+    -moz-media-controls: none;
+    media-controls: none;
 }
 
-.hero-background-video::-webkit-media-controls {
+/* Hide ALL video controls on all browsers - Most aggressive approach */
+.hero-background-video::-webkit-media-controls,
+.hero-background-video::-webkit-media-controls-panel,
+.hero-background-video::-webkit-media-controls-play-button,
+.hero-background-video::-webkit-media-controls-start-playback-button,
+.hero-background-video::-webkit-media-controls-timeline,
+.hero-background-video::-webkit-media-controls-current-time-display,
+.hero-background-video::-webkit-media-controls-time-remaining-display,
+.hero-background-video::-webkit-media-controls-mute-button,
+.hero-background-video::-webkit-media-controls-volume-slider,
+.hero-background-video::-webkit-media-controls-fullscreen-button,
+.hero-background-video::-webkit-media-controls-toggle-closed-captions-button,
+.hero-background-video::-webkit-media-controls-overlay-enclosure,
+.hero-background-video::-webkit-media-controls-enclosure {
     display: none !important;
+    -webkit-appearance: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
 }
 
-.hero-background-video::-webkit-media-controls-panel {
+/* Firefox controls hiding */
+.hero-background-video::-moz-media-controls {
     display: none !important;
+    visibility: hidden !important;
 }
 
-.hero-background-video::-webkit-media-controls-play-button {
-    display: none !important;
+/* Remove outline on focus */
+.hero-background-video:focus {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
-.hero-background-video::-webkit-media-controls-start-playback-button {
-    display: none !important;
-}
-
-.hero-background-video::-webkit-media-controls-timeline {
-    display: none !important;
-}
-
-.hero-background-video::-webkit-media-controls-current-time-display {
-    display: none !important;
-}
-
-.hero-background-video::-webkit-media-controls-time-remaining-display {
-    display: none !important;
-}
-
-.hero-background-video::-webkit-media-controls-mute-button {
-    display: none !important;
-}
-
-.hero-background-video::-webkit-media-controls-volume-slider {
-    display: none !important;
-}
-
-.hero-background-video::-webkit-media-controls-fullscreen-button {
-    display: none !important;
-}
-
-.hero-background-video::-webkit-media-controls-toggle-closed-captions-button {
-    display: none !important;
+/* Ultra-aggressive mobile control removal */
+@media (max-width: 768px) {
+    .hero-background-video {
+        /* Use optimal dimensions on mobile for better performance */
+        width: 100vw !important;
+        height: 100vh !important;
+        min-width: 100% !important;
+        min-height: 100% !important;
+        object-fit: cover !important;
+        transform: translate(-50%, -50%) !important;
+        /* Force remove all controls on mobile - most aggressive */
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        /* Ensure video loads on mobile */
+        display: block !important;
+        visibility: visible !important;
+        /* Mobile-specific control removal */
+        -webkit-media-controls-panel: none !important;
+        -webkit-media-controls: none !important;
+        /* Remove any possible control overlays */
+        z-index: 1 !important;
+        background: none !important;
+        /* Prevent any interaction whatsoever */
+        pointer-events: none !important;
+        touch-action: none !important;
+        -webkit-touch-callout: none !important;
+        -webkit-user-select: none !important;
+        -khtml-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        user-select: none !important;
+    }
+    
+    /* Hide any possible control elements that might appear on mobile */
+    .hero-background-video * {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+    }
+    
+    /* Prevent context menu on mobile */
+    .hero-background-video::-webkit-media-controls-panel,
+    .hero-background-video::-webkit-media-controls {
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        position: absolute !important;
+        top: -10000px !important;
+        left: -10000px !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        z-index: -9999 !important;
+    }
 }
 
 /* Animations */
@@ -686,18 +753,7 @@ p {
     z-index: 1;
 }
 
-.hero-background-video {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    transform: translate(-50%, -50%);
-    object-fit: cover;
-    z-index: 1;
-}
+
 
 .hero-overlay {
     position: absolute;
