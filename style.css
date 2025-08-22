@@ -258,8 +258,8 @@ body {
     }
 }
 
-/* Mobile-specific optimizations */
-@media (max-width: 768px), (hover: none) {
+/* Mobile-specific optimizations - Ultra aggressive */
+@media (max-width: 768px), (hover: none), (pointer: coarse) {
     .hero-background-video {
         /* Enhanced mobile video properties */
         width: 100vw !important;
@@ -270,28 +270,94 @@ body {
         max-height: 100vh !important;
         object-fit: cover !important;
         transform: translate(-50%, -50%) !important;
+        
         /* Force mobile autoplay settings */
         -webkit-playsinline: true !important;
         playsinline: true !important;
         muted: true !important;
         autoplay: true !important;
         loop: true !important;
-        /* Ultimate mobile control prevention */
+        
+        /* Ultimate mobile control prevention - All possible variations */
         -webkit-media-controls: none !important;
         -webkit-media-controls-panel: none !important;
         -webkit-media-controls-overlay-play-button: none !important;
+        -webkit-media-controls-play-button: none !important;
+        -webkit-media-controls-start-playback-button: none !important;
+        -webkit-media-controls-timeline: none !important;
+        -webkit-media-controls-volume-slider: none !important;
+        -webkit-media-controls-mute-button: none !important;
+        -webkit-media-controls-fullscreen-button: none !important;
+        -webkit-media-controls-enclosure: none !important;
         -webkit-appearance: none !important;
         appearance: none !important;
+        
         /* Prevent any mobile interactions */
         pointer-events: none !important;
         touch-action: none !important;
         -webkit-touch-callout: none !important;
         -webkit-user-select: none !important;
         user-select: none !important;
+        -ms-touch-action: none !important;
+        -ms-user-select: none !important;
+        
         /* Mobile performance optimizations */
         will-change: auto !important;
         transform: translate3d(-50%, -50%, 0) !important;
         backface-visibility: hidden !important;
+        
+        /* Force video to stay as background decoration only */
+        z-index: 1 !important;
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        
+        /* Additional mobile-specific hiding */
+        outline: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: none !important;
+        
+        /* Prevent tap highlights and selections */
+        -webkit-tap-highlight-color: transparent !important;
+        -webkit-highlight: none !important;
+        -moz-user-focus: ignore !important;
+        
+        /* Force proper sizing and positioning */
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+    
+    /* Extra aggressive control hiding for mobile webkit browsers */
+    .hero-background-video::-webkit-media-controls,
+    .hero-background-video::-webkit-media-controls-panel,
+    .hero-background-video::-webkit-media-controls-play-button,
+    .hero-background-video::-webkit-media-controls-start-playback-button,
+    .hero-background-video::-webkit-media-controls-timeline,
+    .hero-background-video::-webkit-media-controls-current-time-display,
+    .hero-background-video::-webkit-media-controls-time-remaining-display,
+    .hero-background-video::-webkit-media-controls-mute-button,
+    .hero-background-video::-webkit-media-controls-volume-slider,
+    .hero-background-video::-webkit-media-controls-fullscreen-button,
+    .hero-background-video::-webkit-media-controls-toggle-closed-captions-button,
+    .hero-background-video::-webkit-media-controls-overlay-enclosure,
+    .hero-background-video::-webkit-media-controls-enclosure,
+    .hero-background-video::-webkit-media-controls-overlay-play-button {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        position: absolute !important;
+        top: -99999px !important;
+        left: -99999px !important;
+        z-index: -99999 !important;
+        pointer-events: none !important;
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        content: none !important;
     }
 }
 
