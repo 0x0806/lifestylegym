@@ -724,16 +724,25 @@ p {
         padding: 12px;
         border-radius: 8px;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        background: rgba(255, 255, 255, 0.1);
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        min-width: 48px;
-        min-height: 48px;
+        background: rgba(220, 20, 60, 0.2);
+        border: 2px solid rgba(220, 20, 60, 0.4);
+        min-width: 52px;
+        min-height: 52px;
         align-items: center;
         justify-content: center;
         z-index: 1001;
         position: relative;
         -webkit-tap-highlight-color: transparent;
         touch-action: manipulation;
+        box-shadow: 0 6px 16px rgba(220, 20, 60, 0.3);
+        /* Enhanced visibility and interaction */
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        /* Better mobile interaction */
+        -webkit-user-select: none;
+        user-select: none;
+        outline: none;
     }
 
     .hamburger:hover,
@@ -747,12 +756,20 @@ p {
 
     .hamburger .bar {
         width: 28px;
-        height: 4px;
+        height: 3px;
         background: var(--light-color);
-        margin: 4px 0;
+        margin: 3px 0;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         border-radius: 2px;
-        display: block;
+        display: block !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        /* Enhanced visibility */
+        opacity: 1 !important;
+        visibility: visible !important;
+        position: relative;
+        /* Prevent disappearing */
+        transform: translateZ(0);
+        backface-visibility: hidden;
     }
 
     .hamburger:hover .bar {
@@ -868,6 +885,16 @@ p {
     .hamburger {
         display: none !important;
     }
+}
+
+/* Force hamburger visibility on mobile */
+@media (max-width: 768px) {
+    .hamburger {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
 
     .nav-menu {
         position: static !important;
