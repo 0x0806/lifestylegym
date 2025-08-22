@@ -114,251 +114,61 @@ body {
     overflow-x: hidden;
 }
 
-/* Hero Background Video - Ultra aggressive autoplay setup */
+/* Hero Background Video */
 .hero-background-video {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    z-index: 1;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-3d);
     filter: brightness(0.8) contrast(1.1);
-    /* Completely disable all interactions and controls */
-    pointer-events: none !important;
-    -webkit-touch-callout: none !important;
-    -webkit-user-select: none !important;
-    -khtml-user-select: none !important;
-    -moz-user-select: none !important;
-    -ms-user-select: none !important;
-    user-select: none !important;
-    /* Aggressively remove controls */
-    -webkit-media-controls: none !important;
-    -moz-media-controls: none !important;
-    -ms-media-controls: none !important;
-    media-controls: none !important;
-    /* Ensure autoplay works */
-    -webkit-playsinline: true !important;
-    -moz-playsinline: true !important;
-    -ms-playsinline: true !important;
-    playsinline: true !important;
-    /* Enhanced mobile autoplay support */
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    appearance: none !important;
-    /* Prevent any possible control display */
-    outline: none !important;
-    border: none !important;
-    background: none !important;
-    /* Force video to behave as decoration only */
-    -webkit-user-modify: read-only !important;
-    -moz-user-modify: read-only !important;
-    user-modify: read-only !important;
+    transition: var(--transition);
+    /* Hide all video controls for background video */
+    pointer-events: none;
 }
 
-/* Hide ALL video controls on all browsers - Most aggressive approach */
-.hero-background-video::-webkit-media-controls,
-.hero-background-video::-webkit-media-controls-panel,
-.hero-background-video::-webkit-media-controls-play-button,
-.hero-background-video::-webkit-media-controls-start-playback-button,
-.hero-background-video::-webkit-media-controls-timeline,
-.hero-background-video::-webkit-media-controls-current-time-display,
-.hero-background-video::-webkit-media-controls-time-remaining-display,
-.hero-background-video::-webkit-media-controls-mute-button,
-.hero-background-video::-webkit-media-controls-volume-slider,
-.hero-background-video::-webkit-media-controls-fullscreen-button,
-.hero-background-video::-webkit-media-controls-toggle-closed-captions-button,
-.hero-background-video::-webkit-media-controls-overlay-enclosure,
-.hero-background-video::-webkit-media-controls-enclosure,
-.hero-background-video::-webkit-media-controls-overlay-play-button {
+.hero-background-video::-webkit-media-controls {
     display: none !important;
-    -webkit-appearance: none !important;
-    appearance: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    width: 0 !important;
-    height: 0 !important;
-    overflow: hidden !important;
-    position: absolute !important;
-    top: -99999px !important;
-    left: -99999px !important;
-    z-index: -99999 !important;
-    pointer-events: none !important;
 }
 
-/* Firefox controls hiding */
-.hero-background-video::-moz-media-controls {
+.hero-background-video::-webkit-media-controls-panel {
     display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
 }
 
-/* Remove outline on focus */
-.hero-background-video:focus {
-    outline: none !important;
-    box-shadow: none !important;
-    border: none !important;
+.hero-background-video::-webkit-media-controls-play-button {
+    display: none !important;
 }
 
-/* Ultra-aggressive mobile and all device control removal */
-@media screen {
-    .hero-background-video {
-        /* Force optimal video display */
-        display: block !important;
-        visibility: visible !important;
-        /* Ultimate control removal for all devices */
-        -webkit-appearance: none !important;
-        -moz-appearance: none !important;
-        -ms-appearance: none !important;
-        appearance: none !important;
-        /* Prevent any possible interactions */
-        pointer-events: none !important;
-        touch-action: none !important;
-        -webkit-touch-callout: none !important;
-        /* Mobile-specific autoplay enforcement */
-        -webkit-playsinline: true !important;
-        -moz-playsinline: true !important;
-        playsinline: true !important;
-    }
-    
-    /* Hide any possible control elements universally */
-    .hero-background-video *,
-    .hero-background-video::before,
-    .hero-background-video::after {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        position: absolute !important;
-        top: -99999px !important;
-        left: -99999px !important;
-    }
-    
-    /* Ultimate prevention of any control display */
-    .hero-background-video::-webkit-media-controls-panel,
-    .hero-background-video::-webkit-media-controls,
-    .hero-background-video::-webkit-media-controls-overlay-play-button,
-    .hero-background-video::-webkit-media-controls-start-playback-button {
-        -webkit-appearance: none !important;
-        appearance: none !important;
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        position: absolute !important;
-        top: -99999px !important;
-        left: -99999px !important;
-        width: 0 !important;
-        height: 0 !important;
-        overflow: hidden !important;
-        z-index: -99999 !important;
-        pointer-events: none !important;
-        touch-action: none !important;
-    }
+.hero-background-video::-webkit-media-controls-start-playback-button {
+    display: none !important;
 }
 
-/* Mobile-specific optimizations - Ultra aggressive */
-@media (max-width: 768px), (hover: none), (pointer: coarse) {
-    .hero-background-video {
-        /* Enhanced mobile video properties */
-        width: 100vw !important;
-        height: 100vh !important;
-        min-width: 100vw !important;
-        min-height: 100vh !important;
-        max-width: 100vw !important;
-        max-height: 100vh !important;
-        object-fit: cover !important;
-        transform: translate(-50%, -50%) !important;
-        
-        /* Force mobile autoplay settings */
-        -webkit-playsinline: true !important;
-        playsinline: true !important;
-        muted: true !important;
-        autoplay: true !important;
-        loop: true !important;
-        
-        /* Ultimate mobile control prevention - All possible variations */
-        -webkit-media-controls: none !important;
-        -webkit-media-controls-panel: none !important;
-        -webkit-media-controls-overlay-play-button: none !important;
-        -webkit-media-controls-play-button: none !important;
-        -webkit-media-controls-start-playback-button: none !important;
-        -webkit-media-controls-timeline: none !important;
-        -webkit-media-controls-volume-slider: none !important;
-        -webkit-media-controls-mute-button: none !important;
-        -webkit-media-controls-fullscreen-button: none !important;
-        -webkit-media-controls-enclosure: none !important;
-        -webkit-appearance: none !important;
-        appearance: none !important;
-        
-        /* Prevent any mobile interactions */
-        pointer-events: none !important;
-        touch-action: none !important;
-        -webkit-touch-callout: none !important;
-        -webkit-user-select: none !important;
-        user-select: none !important;
-        -ms-touch-action: none !important;
-        -ms-user-select: none !important;
-        
-        /* Mobile performance optimizations */
-        will-change: auto !important;
-        transform: translate3d(-50%, -50%, 0) !important;
-        backface-visibility: hidden !important;
-        
-        /* Force video to stay as background decoration only */
-        z-index: 1 !important;
-        position: absolute !important;
-        top: 50% !important;
-        left: 50% !important;
-        
-        /* Additional mobile-specific hiding */
-        outline: none !important;
-        border: none !important;
-        box-shadow: none !important;
-        background: none !important;
-        
-        /* Prevent tap highlights and selections */
-        -webkit-tap-highlight-color: transparent !important;
-        -webkit-highlight: none !important;
-        -moz-user-focus: ignore !important;
-        
-        /* Force proper sizing and positioning */
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
-    
-    /* Extra aggressive control hiding for mobile webkit browsers */
-    .hero-background-video::-webkit-media-controls,
-    .hero-background-video::-webkit-media-controls-panel,
-    .hero-background-video::-webkit-media-controls-play-button,
-    .hero-background-video::-webkit-media-controls-start-playback-button,
-    .hero-background-video::-webkit-media-controls-timeline,
-    .hero-background-video::-webkit-media-controls-current-time-display,
-    .hero-background-video::-webkit-media-controls-time-remaining-display,
-    .hero-background-video::-webkit-media-controls-mute-button,
-    .hero-background-video::-webkit-media-controls-volume-slider,
-    .hero-background-video::-webkit-media-controls-fullscreen-button,
-    .hero-background-video::-webkit-media-controls-toggle-closed-captions-button,
-    .hero-background-video::-webkit-media-controls-overlay-enclosure,
-    .hero-background-video::-webkit-media-controls-enclosure,
-    .hero-background-video::-webkit-media-controls-overlay-play-button {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        width: 0 !important;
-        height: 0 !important;
-        overflow: hidden !important;
-        position: absolute !important;
-        top: -99999px !important;
-        left: -99999px !important;
-        z-index: -99999 !important;
-        pointer-events: none !important;
-        -webkit-appearance: none !important;
-        appearance: none !important;
-        content: none !important;
-    }
+.hero-background-video::-webkit-media-controls-timeline {
+    display: none !important;
+}
+
+.hero-background-video::-webkit-media-controls-current-time-display {
+    display: none !important;
+}
+
+.hero-background-video::-webkit-media-controls-time-remaining-display {
+    display: none !important;
+}
+
+.hero-background-video::-webkit-media-controls-mute-button {
+    display: none !important;
+}
+
+.hero-background-video::-webkit-media-controls-volume-slider {
+    display: none !important;
+}
+
+.hero-background-video::-webkit-media-controls-fullscreen-button {
+    display: none !important;
+}
+
+.hero-background-video::-webkit-media-controls-toggle-closed-captions-button {
+    display: none !important;
 }
 
 /* Animations */
@@ -546,73 +356,7 @@ p {
     font-size: 1rem;
     letter-spacing: 0.3px;
     white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.nav-link i {
-    font-size: 0.9rem;
-    opacity: 0.8;
-    transition: all 0.3s ease;
-}
-
-.nav-link:hover i,
-.nav-link.active i {
-    opacity: 1;
-    transform: scale(1.1);
-}
-
-.nav-cta .nav-link {
-    background: var(--gradient-primary);
-    color: var(--light-color);
-    font-weight: 600;
-    box-shadow: 0 4px 15px rgba(220, 20, 60, 0.3);
-    border: 2px solid transparent;
-}
-
-.nav-cta .nav-link:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 25px rgba(220, 20, 60, 0.5);
-    background: linear-gradient(135deg, #dc143c 0%, #b91c1c 50%, #991b1b 100%);
-}
-
-/* Keyboard shortcuts modal */
-.keyboard-shortcuts-modal .shortcuts-content {
-    background: var(--dark-color);
-    padding: 2rem;
-    border-radius: 15px;
-    max-width: 600px;
-    width: 90%;
-    max-height: 80vh;
-    overflow-y: auto;
-    color: var(--light-color);
-}
-
-.shortcuts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin: 1.5rem 0;
-}
-
-.shortcut-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.5rem;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-}
-
-.shortcut-item kbd {
-    background: var(--primary-color);
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    min-width: 24px;
-    text-align: center;
+    display: block;
 }
 
 .nav-link::before {
@@ -634,14 +378,8 @@ p {
     transform: translateY(-1px);
 }
 
-.nav-link:hover::before,
-.nav-link.active::before {
+.nav-link:hover::before {
     width: 30px;
-}
-
-.nav-link.active {
-    color: var(--primary-color);
-    background: rgba(220, 20, 60, 0.1);
 }
 
 .nav-link.cta-btn {
@@ -724,25 +462,16 @@ p {
         padding: 12px;
         border-radius: 8px;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        background: rgba(220, 20, 60, 0.2);
-        border: 2px solid rgba(220, 20, 60, 0.4);
-        min-width: 52px;
-        min-height: 52px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        min-width: 48px;
+        min-height: 48px;
         align-items: center;
         justify-content: center;
         z-index: 1001;
         position: relative;
         -webkit-tap-highlight-color: transparent;
         touch-action: manipulation;
-        box-shadow: 0 6px 16px rgba(220, 20, 60, 0.3);
-        /* Enhanced visibility and interaction */
-        opacity: 1 !important;
-        visibility: visible !important;
-        pointer-events: auto !important;
-        /* Better mobile interaction */
-        -webkit-user-select: none;
-        user-select: none;
-        outline: none;
     }
 
     .hamburger:hover,
@@ -756,20 +485,12 @@ p {
 
     .hamburger .bar {
         width: 28px;
-        height: 3px;
+        height: 4px;
         background: var(--light-color);
-        margin: 3px 0;
+        margin: 4px 0;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         border-radius: 2px;
-        display: block !important;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-        /* Enhanced visibility */
-        opacity: 1 !important;
-        visibility: visible !important;
-        position: relative;
-        /* Prevent disappearing */
-        transform: translateZ(0);
-        backface-visibility: hidden;
+        display: block;
     }
 
     .hamburger:hover .bar {
@@ -871,13 +592,6 @@ p {
         transform: translateY(-3px) !important;
         box-shadow: 0 6px 25px rgba(220, 20, 60, 0.6) !important;
     }
-
-    .nav-link.active {
-        background: rgba(220, 20, 60, 0.25) !important;
-        color: var(--primary-color) !important;
-        border-color: rgba(220, 20, 60, 0.5) !important;
-        font-weight: 600 !important;
-    }
 }
 
 /* Tablet and desktop navigation */
@@ -885,16 +599,6 @@ p {
     .hamburger {
         display: none !important;
     }
-}
-
-/* Force hamburger visibility on mobile */
-@media (max-width: 768px) {
-    .hamburger {
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-    }
-}
 
     .nav-menu {
         position: static !important;
@@ -982,7 +686,18 @@ p {
     z-index: 1;
 }
 
-
+.hero-background-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    z-index: 1;
+}
 
 .hero-overlay {
     position: absolute;
@@ -1968,145 +1683,23 @@ section {
 }
 
 /* Math Challenge Styles */
-.math-challenge {
-    width: 100%;
-}
-
-.math-question-container {
+.math-challenge .captcha-question-container {
     display: flex;
-    justify-content: center;
-    margin-bottom: 1.5rem;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
 }
 
 .math-question {
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 1.5rem 2rem;
-    background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(220, 20, 60, 0.1) 100%);
-    border: 2px solid rgba(255, 107, 53, 0.3);
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
-}
-
-.question-text {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--light-color);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    letter-spacing: 2px;
-    font-family: 'Courier New', monospace;
-}
-
-/* Enhanced input styling for math problems */
-.math-challenge .captcha-input {
-    text-align: center;
-    font-size: 1.2rem;
-    font-weight: 600;
+    gap: 0.5rem;
+    flex: 1;
     padding: 1rem;
-    border: 2px solid rgba(255, 107, 53, 0.3);
-    border-radius: 10px;
     background: rgba(255, 255, 255, 0.1);
-    color: var(--light-color);
-    backdrop-filter: blur(5px);
-}
-
-.math-challenge .captcha-input:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
-    background: rgba(255, 255, 255, 0.15);
-}
-
-/* Math challenge controls */
-.math-challenge .captcha-controls {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    align-items: center;
-    margin: 1.5rem 0;
-}
-
-.math-challenge .captcha-verify {
-    background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
-    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
     color: white;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-    min-height: 48px;
-}
-
-.math-challenge .captcha-verify:hover {
-    background: linear-gradient(135deg, #218838 0%, #1ea874 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
-}
-
-.math-challenge .captcha-refresh {
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    color: var(--light-color);
-    padding: 0.75rem;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    min-height: 48px;
-}
-
-.math-challenge .captcha-refresh:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: var(--primary-color);
-    transform: translateY(-1px);
-}
-
-/* Mobile responsiveness for math challenge */
-@media (max-width: 768px) {
-    .math-question {
-        padding: 1rem 1.5rem;
-    }
-    
-    .question-text {
-        font-size: 1.5rem;
-        letter-spacing: 1px;
-    }
-    
-    .math-challenge .captcha-controls {
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-    
-    .math-challenge .captcha-verify,
-    .math-challenge .captcha-refresh {
-        width: 100%;
-        max-width: 250px;
-    }
-}
-
-@media (max-width: 480px) {
-    .question-text {
-        font-size: 1.3rem;
-    }
-    
-    .math-challenge .captcha-input {
-        font-size: 1.1rem;
-        padding: 0.875rem;
-    }
 }
 
 .captcha-input {
