@@ -1,5 +1,5 @@
-// Text Recognition CAPTCHA
-class SimpleCaptcha {
+// Math CAPTCHA Only
+class MathCaptcha {
     constructor(containerId, formId) {
         this.container = document.getElementById(containerId);
         this.formId = formId;
@@ -7,16 +7,13 @@ class SimpleCaptcha {
         this.isVerified = false;
         this.attempts = 0;
         this.maxAttempts = 3;
-        this.currentText = '';
-        this.canvas = null;
-        this.ctx = null;
-
+        this.currentAnswer = 0;
+        
         this.init();
     }
 
     init() {
         try {
-            // Wait for DOM to be ready
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', () => {
                     this.initializeComponents();
@@ -32,7 +29,6 @@ class SimpleCaptcha {
 
     initializeComponents() {
         try {
-            // Check if container exists
             if (!this.container || !this.challengeContainer) {
                 console.warn('CAPTCHA containers not found, retrying...');
                 setTimeout(() => {
@@ -59,7 +55,6 @@ class SimpleCaptcha {
     handleInitializationError() {
         console.warn('CAPTCHA system failed to initialize, enabling form submission');
 
-        // Show user-friendly message
         if (this.challengeContainer) {
             this.challengeContainer.innerHTML = `
                 <div style="text-align: center; padding: 1rem; background: rgba(40, 167, 69, 0.1); border-radius: 8px; border: 1px solid rgba(40, 167, 69, 0.3);">
@@ -69,40 +64,68 @@ class SimpleCaptcha {
             `;
         }
 
-        // Enable form submission
         this.isVerified = true;
         this.updateSubmitButton(true);
 
-        // Mark container as initialized
         if (this.container) {
             this.container.classList.add('captcha-success');
         }
     }
 
     generateChallenge() {
-        // Generate random text (mix of letters and numbers)
-        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
-        this.currentText = '';
-        for(let i = 0; i < 6; i++) {
-            this.currentText += chars.charAt(Math.floor(Math.random() * chars.length));
+        // Generate simple math problem
+        const num1 = Math.floor(Math.random() * 20) + 1;
+        const num2 = Math.floor(Math.random() * 20) + 1;
+        const operations = ['+', '-', '×'];
+        const operation = operations[Math.floor(Math.random() * operations.length)];
+        
+        let question, answer;
+        
+        switch(operation) {
+            case '+':
+                question = `${num1} + ${num2}`;
+                answer = num1 + num2;
+                break;
+            case '-':
+                // Ensure positive result
+                const larger = Math.max(num1, num2);
+                const smaller = Math.min(num1, num2);
+                question = `${larger} - ${smaller}`;
+                answer = larger - smaller;
+                break;
+            case '×':
+                // Keep numbers smaller for multiplication
+                const smallNum1 = Math.floor(Math.random() * 10) + 1;
+                const smallNum2 = Math.floor(Math.random() * 10) + 1;
+                question = `${smallNum1} × ${smallNum2}`;
+                answer = smallNum1 * smallNum2;
+                break;
         }
+        
+        this.currentAnswer = answer;
 
         const html = `
-            <div class="text-challenge">
+            <div class="math-challenge">
                 <div class="captcha-instruction">
-                    <i class="fas fa-keyboard"></i>
-                    Type the text you see in the image below
+                    <i class="fas fa-calculator"></i>
+                    Solve the math problem below to verify you're human
                 </div>
-                <div class="captcha-canvas-container">
-                    <canvas class="captcha-canvas" width="300" height="100" id="${this.container.id}Canvas"></canvas>
+                <div class="math-question-container">
+                    <div class="math-question">
+                        <span class="question-text">${question} = ?</span>
+                    </div>
                 </div>
                 <div class="captcha-input-container">
-                    <input type="text" class="captcha-input" placeholder="Enter the text above" maxlength="6" autocomplete="off" id="${this.container.id}Input">
+                    <input type="number" class="captcha-input" placeholder="Enter your answer" autocomplete="off" id="${this.container.id}Input">
                 </div>
                 <div class="captcha-controls">
-                    <button type="button" class="captcha-verify">Verify Text</button>
+                    <button type="button" class="captcha-verify">
+                        <i class="fas fa-check"></i>
+                        Verify Answer
+                    </button>
                     <button type="button" class="captcha-refresh">
                         <i class="fas fa-sync-alt"></i>
+                        New Problem
                     </button>
                 </div>
                 <div class="captcha-attempts">Attempts remaining: ${this.maxAttempts - this.attempts}</div>
@@ -110,18 +133,15 @@ class SimpleCaptcha {
         `;
 
         this.challengeContainer.innerHTML = html;
-        this.setupTextChallengeEvents();
-        this.drawCaptchaText();
+        this.setupMathChallengeEvents();
         this.updateSubmitButton(false);
     }
 
     setupEventListeners() {
-        // Store reference to this instance
         this.container.captchaInstance = this;
 
-        // Common event listeners
         this.challengeContainer.addEventListener('click', (e) => {
-            if(e.target.classList.contains('captcha-verify')) {
+            if(e.target.classList.contains('captcha-verify') || e.target.closest('.captcha-verify')) {
                 this.verifyChallenge();
             }
             if(e.target.classList.contains('captcha-refresh') || e.target.closest('.captcha-refresh')) {
@@ -130,7 +150,7 @@ class SimpleCaptcha {
         });
     }
 
-    setupTextChallengeEvents() {
+    setupMathChallengeEvents() {
         const input = this.challengeContainer.querySelector('.captcha-input');
         if(input) {
             // Allow Enter key to verify
@@ -140,93 +160,12 @@ class SimpleCaptcha {
                 }
             });
 
-            // Auto-verify when user types 6 characters
-            input.addEventListener('input', (e) => {
-                if(e.target.value.length === 6) {
-                    setTimeout(() => this.verifyChallenge(), 500);
+            // Focus on input
+            setTimeout(() => {
+                if (window.innerWidth > 768) {
+                    input.focus();
                 }
-            });
-        }
-    }
-
-    drawCaptchaText() {
-        this.canvas = this.challengeContainer.querySelector('.captcha-canvas');
-        if(!this.canvas) return;
-
-        this.ctx = this.canvas.getContext('2d');
-
-        // Clear canvas
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // Set background
-        const gradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
-        gradient.addColorStop(0, '#f8f9fa');
-        gradient.addColorStop(0.5, '#e9ecef');
-        gradient.addColorStop(1, '#dee2e6');
-        this.ctx.fillStyle = gradient;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // Add noise lines
-        this.ctx.strokeStyle = 'rgba(108, 117, 125, 0.3)';
-        this.ctx.lineWidth = 1;
-        for(let i = 0; i < 8; i++) {
-            this.ctx.beginPath();
-            this.ctx.moveTo(Math.random() * this.canvas.width, Math.random() * this.canvas.height);
-            this.ctx.lineTo(Math.random() * this.canvas.width, Math.random() * this.canvas.height);
-            this.ctx.stroke();
-        }
-
-        // Add noise dots
-        this.ctx.fillStyle = 'rgba(108, 117, 125, 0.4)';
-        for(let i = 0; i < 50; i++) {
-            this.ctx.beginPath();
-            this.ctx.arc(Math.random() * this.canvas.width, Math.random() * this.canvas.height, 1, 0, 2 * Math.PI);
-            this.ctx.fill();
-        }
-
-        // Draw text with distortion
-        const colors = ['#ff6b35', '#28a745', '#007bff', '#6f42c1', '#fd7e14'];
-        const fonts = ['Arial', 'Times New Roman', 'Courier New', 'Verdana'];
-
-        for(let i = 0; i < this.currentText.length; i++) {
-            const char = this.currentText[i];
-            const x = 20 + (i * 45) + (Math.random() - 0.5) * 10;
-            const y = 60 + (Math.random() - 0.5) * 15;
-            const rotation = (Math.random() - 0.5) * 0.5;
-            const fontSize = 28 + Math.random() * 8;
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            const font = fonts[Math.floor(Math.random() * fonts.length)];
-
-            this.ctx.save();
-            this.ctx.translate(x, y);
-            this.ctx.rotate(rotation);
-            this.ctx.font = `bold ${fontSize}px ${font}`;
-            this.ctx.fillStyle = color;
-            this.ctx.textAlign = 'center';
-            this.ctx.fillText(char, 0, 0);
-
-            // Add shadow effect
-            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-            this.ctx.fillText(char, 2, 2);
-
-            this.ctx.restore();
-        }
-
-        // Add wave distortion effect
-        this.ctx.globalCompositeOperation = 'source-over';
-        this.ctx.strokeStyle = 'rgba(255, 107, 53, 0.1)';
-        this.ctx.lineWidth = 2;
-        for(let i = 0; i < 3; i++) {
-            this.ctx.beginPath();
-            for(let x = 0; x < this.canvas.width; x += 2) {
-                const y = this.canvas.height / 2 + Math.sin(x * 0.02 + i) * 15;
-                if(x === 0) {
-                    this.ctx.moveTo(x, y);
-                } else {
-                    this.ctx.lineTo(x, y);
-                }
-            }
-            this.ctx.stroke();
+            }, 100);
         }
     }
 
@@ -234,8 +173,8 @@ class SimpleCaptcha {
         const input = this.challengeContainer.querySelector('.captcha-input');
         if(!input) return;
 
-        const userInput = input.value.trim();
-        const isCorrect = userInput.toLowerCase() === this.currentText.toLowerCase();
+        const userAnswer = parseInt(input.value.trim());
+        const isCorrect = userAnswer === this.currentAnswer;
 
         if(isCorrect) {
             this.handleSuccess();
@@ -250,7 +189,7 @@ class SimpleCaptcha {
         this.challengeContainer.innerHTML = `
             <div class="captcha-success-message">
                 <i class="fas fa-check-circle"></i>
-                Verification successful! You may now submit the form.
+                Math problem solved correctly! You may now submit the form.
             </div>
         `;
         this.updateSubmitButton(true);
@@ -273,11 +212,10 @@ class SimpleCaptcha {
             `;
             this.updateSubmitButton(false);
         } else {
-            // Show error message briefly then regenerate
             const errorMessage = `
                 <div class="captcha-error-message">
                     <i class="fas fa-times-circle"></i>
-                    Incorrect selection. ${this.maxAttempts - this.attempts} attempts remaining.
+                    Incorrect answer. ${this.maxAttempts - this.attempts} attempts remaining.
                 </div>
             `;
             this.challengeContainer.insertAdjacentHTML('afterbegin', errorMessage);
@@ -303,7 +241,6 @@ class SimpleCaptcha {
     reset() {
         this.isVerified = false;
         this.attempts = 0;
-        this.selectedImages = [];
         this.container.classList.remove('captcha-success', 'captcha-error');
         this.generateChallenge();
     }
@@ -2332,15 +2269,15 @@ function initializeFormSecurity() {
                 const contactCaptchaContainer = document.getElementById('contactCaptcha');
 
                 if (demoCaptchaContainer) {
-                    demoCaptcha = new SimpleCaptcha('demoCaptcha', 'demo');
-                    console.log('Demo CAPTCHA initialized successfully');
+                    demoCaptcha = new MathCaptcha('demoCaptcha', 'demo');
+                    console.log('Demo Math CAPTCHA initialized successfully');
                 } else {
                     console.warn('Demo CAPTCHA container not found');
                 }
 
                 if (contactCaptchaContainer) {
-                    contactCaptcha = new SimpleCaptcha('contactCaptcha', 'contact');
-                    console.log('Contact CAPTCHA initialized successfully');
+                    contactCaptcha = new MathCaptcha('contactCaptcha', 'contact');
+                    console.log('Contact Math CAPTCHA initialized successfully');
                 } else {
                     console.warn('Contact CAPTCHA container not found');
                 }
