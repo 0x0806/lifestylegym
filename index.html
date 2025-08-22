@@ -63,22 +63,26 @@
     <section id="home" class="hero">
         <div class="hero-background">
             <video class="hero-background-video" 
-                   muted
-                   autoplay
-                   loop 
-                   playsinline
-                   webkit-playsinline
+                   muted="true"
+                   defaultmuted="true"
+                   autoplay="true"
+                   loop="true"
+                   playsinline="true"
+                   webkit-playsinline="true"
                    preload="auto"
-                   disableremoteplaybook
-                   disablepictureinpicture
+                   disableremoteplaybook="true"
+                   disablepictureinpicture="true"
                    x-webkit-airplay="deny"
-                   x5-playsinline
+                   x5-playsinline="true"
                    x5-video-player-type="h5"
                    x5-video-player-fullscreen="false"
-                   x5-video-orientation="portraint"
+                   x5-video-orientation="portrait"
                    t7-video-player-type="inline"
                    controlsList="nodownload nofullscreen noremoteplaybook noplaybackrate"
-                   style="pointer-events: none; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-media-controls: none !important;"
+                   data-setup="{}"
+                   poster=""
+                   src="g1.mp4"
+                   style="pointer-events: none !important; -webkit-touch-callout: none !important; -webkit-user-select: none !important; user-select: none !important; -webkit-media-controls: none !important; outline: none !important; border: none !important;"
                    oncontextmenu="return false;"
                    onselectstart="return false;"
                    ondragstart="return false;"
@@ -86,6 +90,11 @@
                    ontouchstart="return false;"
                    onclick="return false;"
                    ondblclick="return false;"
+                   onplay="this.muted=true;"
+                   onloadstart="this.muted=true;this.volume=0;"
+                   oncanplay="this.muted=true;this.volume=0;"
+                   onloadeddata="this.play().catch(()=>{});"
+                   onloadedmetadata="this.play().catch(()=>{});">
                 <source src="g1.mp4" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
