@@ -1,5 +1,5 @@
-// Math CAPTCHA Only
-class MathCaptcha {
+// Text Recognition CAPTCHA
+class SimpleCaptcha {
     constructor(containerId, formId) {
         this.container = document.getElementById(containerId);
         this.formId = formId;
@@ -7,125 +7,42 @@ class MathCaptcha {
         this.isVerified = false;
         this.attempts = 0;
         this.maxAttempts = 3;
-        this.currentAnswer = 0;
-        
+        this.currentText = '';
+        this.canvas = null;
+        this.ctx = null;
+
         this.init();
     }
 
     init() {
-        try {
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', () => {
-                    this.initializeComponents();
-                });
-            } else {
-                this.initializeComponents();
-            }
-        } catch (error) {
-            console.error('CAPTCHA initialization failed:', error);
-            this.handleInitializationError();
-        }
-    }
-
-    initializeComponents() {
-        try {
-            if (!this.container || !this.challengeContainer) {
-                console.warn('CAPTCHA containers not found, retrying...');
-                setTimeout(() => {
-                    this.container = document.getElementById(this.container?.id || this.formId + 'Captcha');
-                    this.challengeContainer = document.getElementById(this.challengeContainer?.id || this.formId + 'CaptchaChallenge');
-                    if (this.container && this.challengeContainer) {
-                        this.generateChallenge();
-                        this.setupEventListeners();
-                    } else {
-                        this.handleInitializationError();
-                    }
-                }, 500);
-                return;
-            }
-
-            this.generateChallenge();
-            this.setupEventListeners();
-        } catch (error) {
-            console.error('CAPTCHA component initialization failed:', error);
-            this.handleInitializationError();
-        }
-    }
-
-    handleInitializationError() {
-        console.warn('CAPTCHA system failed to initialize, enabling form submission');
-
-        if (this.challengeContainer) {
-            this.challengeContainer.innerHTML = `
-                <div style="text-align: center; padding: 1rem; background: rgba(40, 167, 69, 0.1); border-radius: 8px; border: 1px solid rgba(40, 167, 69, 0.3);">
-                    <i class="fas fa-check-circle" style="color: #28a745; margin-right: 0.5rem;"></i>
-                    <span style="color: #155724;">Security verification completed automatically.</span>
-                </div>
-            `;
-        }
-
-        this.isVerified = true;
-        this.updateSubmitButton(true);
-
-        if (this.container) {
-            this.container.classList.add('captcha-success');
-        }
+        this.generateChallenge();
+        this.setupEventListeners();
     }
 
     generateChallenge() {
-        // Generate simple math problem
-        const num1 = Math.floor(Math.random() * 20) + 1;
-        const num2 = Math.floor(Math.random() * 20) + 1;
-        const operations = ['+', '-', '×'];
-        const operation = operations[Math.floor(Math.random() * operations.length)];
-        
-        let question, answer;
-        
-        switch(operation) {
-            case '+':
-                question = `${num1} + ${num2}`;
-                answer = num1 + num2;
-                break;
-            case '-':
-                // Ensure positive result
-                const larger = Math.max(num1, num2);
-                const smaller = Math.min(num1, num2);
-                question = `${larger} - ${smaller}`;
-                answer = larger - smaller;
-                break;
-            case '×':
-                // Keep numbers smaller for multiplication
-                const smallNum1 = Math.floor(Math.random() * 10) + 1;
-                const smallNum2 = Math.floor(Math.random() * 10) + 1;
-                question = `${smallNum1} × ${smallNum2}`;
-                answer = smallNum1 * smallNum2;
-                break;
+        // Generate random text (mix of letters and numbers)
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+        this.currentText = '';
+        for(let i = 0; i < 6; i++) {
+            this.currentText += chars.charAt(Math.floor(Math.random() * chars.length));
         }
-        
-        this.currentAnswer = answer;
 
         const html = `
-            <div class="math-challenge">
+            <div class="text-challenge">
                 <div class="captcha-instruction">
-                    <i class="fas fa-calculator"></i>
-                    Solve the math problem below to verify you're human
+                    <i class="fas fa-keyboard"></i>
+                    Type the text you see in the image below
                 </div>
-                <div class="math-question-container">
-                    <div class="math-question">
-                        <span class="question-text">${question} = ?</span>
-                    </div>
+                <div class="captcha-canvas-container">
+                    <canvas class="captcha-canvas" width="300" height="100" id="${this.container.id}Canvas"></canvas>
                 </div>
                 <div class="captcha-input-container">
-                    <input type="number" class="captcha-input" placeholder="Enter your answer" autocomplete="off" id="${this.container.id}Input">
+                    <input type="text" class="captcha-input" placeholder="Enter the text above" maxlength="6" autocomplete="off" id="${this.container.id}Input">
                 </div>
                 <div class="captcha-controls">
-                    <button type="button" class="captcha-verify">
-                        <i class="fas fa-check"></i>
-                        Verify Answer
-                    </button>
+                    <button type="button" class="captcha-verify">Verify Text</button>
                     <button type="button" class="captcha-refresh">
                         <i class="fas fa-sync-alt"></i>
-                        New Problem
                     </button>
                 </div>
                 <div class="captcha-attempts">Attempts remaining: ${this.maxAttempts - this.attempts}</div>
@@ -133,15 +50,18 @@ class MathCaptcha {
         `;
 
         this.challengeContainer.innerHTML = html;
-        this.setupMathChallengeEvents();
+        this.setupTextChallengeEvents();
+        this.drawCaptchaText();
         this.updateSubmitButton(false);
     }
 
     setupEventListeners() {
+        // Store reference to this instance
         this.container.captchaInstance = this;
 
+        // Common event listeners
         this.challengeContainer.addEventListener('click', (e) => {
-            if(e.target.classList.contains('captcha-verify') || e.target.closest('.captcha-verify')) {
+            if(e.target.classList.contains('captcha-verify')) {
                 this.verifyChallenge();
             }
             if(e.target.classList.contains('captcha-refresh') || e.target.closest('.captcha-refresh')) {
@@ -150,7 +70,7 @@ class MathCaptcha {
         });
     }
 
-    setupMathChallengeEvents() {
+    setupTextChallengeEvents() {
         const input = this.challengeContainer.querySelector('.captcha-input');
         if(input) {
             // Allow Enter key to verify
@@ -160,12 +80,93 @@ class MathCaptcha {
                 }
             });
 
-            // Focus on input
-            setTimeout(() => {
-                if (window.innerWidth > 768) {
-                    input.focus();
+            // Auto-verify when user types 6 characters
+            input.addEventListener('input', (e) => {
+                if(e.target.value.length === 6) {
+                    setTimeout(() => this.verifyChallenge(), 500);
                 }
-            }, 100);
+            });
+        }
+    }
+
+    drawCaptchaText() {
+        this.canvas = this.challengeContainer.querySelector('.captcha-canvas');
+        if(!this.canvas) return;
+
+        this.ctx = this.canvas.getContext('2d');
+
+        // Clear canvas
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Set background
+        const gradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
+        gradient.addColorStop(0, '#f8f9fa');
+        gradient.addColorStop(0.5, '#e9ecef');
+        gradient.addColorStop(1, '#dee2e6');
+        this.ctx.fillStyle = gradient;
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // Add noise lines
+        this.ctx.strokeStyle = 'rgba(108, 117, 125, 0.3)';
+        this.ctx.lineWidth = 1;
+        for(let i = 0; i < 8; i++) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(Math.random() * this.canvas.width, Math.random() * this.canvas.height);
+            this.ctx.lineTo(Math.random() * this.canvas.width, Math.random() * this.canvas.height);
+            this.ctx.stroke();
+        }
+
+        // Add noise dots
+        this.ctx.fillStyle = 'rgba(108, 117, 125, 0.4)';
+        for(let i = 0; i < 50; i++) {
+            this.ctx.beginPath();
+            this.ctx.arc(Math.random() * this.canvas.width, Math.random() * this.canvas.height, 1, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
+
+        // Draw text with distortion
+        const colors = ['#ff6b35', '#28a745', '#007bff', '#6f42c1', '#fd7e14'];
+        const fonts = ['Arial', 'Times New Roman', 'Courier New', 'Verdana'];
+
+        for(let i = 0; i < this.currentText.length; i++) {
+            const char = this.currentText[i];
+            const x = 20 + (i * 45) + (Math.random() - 0.5) * 10;
+            const y = 60 + (Math.random() - 0.5) * 15;
+            const rotation = (Math.random() - 0.5) * 0.5;
+            const fontSize = 28 + Math.random() * 8;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const font = fonts[Math.floor(Math.random() * fonts.length)];
+
+            this.ctx.save();
+            this.ctx.translate(x, y);
+            this.ctx.rotate(rotation);
+            this.ctx.font = `bold ${fontSize}px ${font}`;
+            this.ctx.fillStyle = color;
+            this.ctx.textAlign = 'center';
+            this.ctx.fillText(char, 0, 0);
+
+            // Add shadow effect
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            this.ctx.fillText(char, 2, 2);
+
+            this.ctx.restore();
+        }
+
+        // Add wave distortion effect
+        this.ctx.globalCompositeOperation = 'source-over';
+        this.ctx.strokeStyle = 'rgba(255, 107, 53, 0.1)';
+        this.ctx.lineWidth = 2;
+        for(let i = 0; i < 3; i++) {
+            this.ctx.beginPath();
+            for(let x = 0; x < this.canvas.width; x += 2) {
+                const y = this.canvas.height / 2 + Math.sin(x * 0.02 + i) * 15;
+                if(x === 0) {
+                    this.ctx.moveTo(x, y);
+                } else {
+                    this.ctx.lineTo(x, y);
+                }
+            }
+            this.ctx.stroke();
         }
     }
 
@@ -173,8 +174,8 @@ class MathCaptcha {
         const input = this.challengeContainer.querySelector('.captcha-input');
         if(!input) return;
 
-        const userAnswer = parseInt(input.value.trim());
-        const isCorrect = userAnswer === this.currentAnswer;
+        const userInput = input.value.trim();
+        const isCorrect = userInput.toLowerCase() === this.currentText.toLowerCase();
 
         if(isCorrect) {
             this.handleSuccess();
@@ -189,7 +190,7 @@ class MathCaptcha {
         this.challengeContainer.innerHTML = `
             <div class="captcha-success-message">
                 <i class="fas fa-check-circle"></i>
-                Math problem solved correctly! You may now submit the form.
+                Verification successful! You may now submit the form.
             </div>
         `;
         this.updateSubmitButton(true);
@@ -212,10 +213,11 @@ class MathCaptcha {
             `;
             this.updateSubmitButton(false);
         } else {
+            // Show error message briefly then regenerate
             const errorMessage = `
                 <div class="captcha-error-message">
                     <i class="fas fa-times-circle"></i>
-                    Incorrect answer. ${this.maxAttempts - this.attempts} attempts remaining.
+                    Incorrect selection. ${this.maxAttempts - this.attempts} attempts remaining.
                 </div>
             `;
             this.challengeContainer.insertAdjacentHTML('afterbegin', errorMessage);
@@ -241,6 +243,7 @@ class MathCaptcha {
     reset() {
         this.isVerified = false;
         this.attempts = 0;
+        this.selectedImages = [];
         this.container.classList.remove('captcha-success', 'captcha-error');
         this.generateChallenge();
     }
@@ -475,1685 +478,120 @@ function checkForSuccessMessage() {
     }
 }
 
-// Complete Navigation System with Proper Section Mapping
-class NavigationController {
-    constructor() {
-        this.navbar = document.getElementById('Navbar');
-        this.hamburger = document.getElementById('hamburger');
-        this.navMenu = document.getElementById('nav-menu');
-        this.navLinks = document.querySelectorAll('.nav-link');
-        this.sections = document.querySelectorAll('section[id]');
-        this.scrollPosition = 0;
-        this.isScrolling = false;
-        this.activeSection = 'home';
+// Navigation functionality with proper mobile initialization
+function initializeNavigation() {
+    const Navbar = document.getElementById('Navbar');
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.getElementById('nav-menu');
+    let scrollPosition = 0;
 
-        // Precise section mapping with proper offsets for accurate positioning
-        this.sectionOffsets = {
-            'home': 0,
-            'about': -80,
-            'services': -80,
-            'trainers': -80,
-            'media': -80,
-            'plans': -80,
-            'demo': -80,
-            'contact': -80
-        };
-
-        // Enhanced section ID mapping for all navigation elements
-        this.sectionMapping = {
-            'home': 'home',
-            'about': 'about',
-            'services': 'services',
-            'trainers': 'trainers',
-            'media': 'media',
-            'plans': 'plans',
-            'demo': 'demo',
-            'contact': 'contact'
-        };
-
-        // Form-specific targets for precise navigation
-        this.formTargets = {
-            'book-demo': 'demo',
-            'contact-form': 'contact',
-            'book-session': 'contact',
-            'join-classes': 'demo',
-            'start-training': 'demo',
-            'book-home-session': 'contact'
-        };
-
-        this.init();
-    }
-
-    init() {
-        this.setupScrollEffects();
-        this.setupMobileMenu();
-        this.setupNavigationLinks();
-        this.setupGlobalNavigation();
-        this.setupActiveNavHighlight();
-        this.setupKeyboardNavigation();
-        this.mapAllNavigationButtons();
-    }
-
-    // Enhanced scroll effects for navbar
-    setupScrollEffects() {
-        let ticking = false;
-
-        const handleScroll = () => {
-            if (!ticking) {
-                requestAnimationFrame(() => {
-                    const scrollY = window.pageYOffset;
-
-                    // Add/remove scrolled class
-                    if (scrollY > 100) {
-                        this.navbar?.classList.add('scrolled');
-                    } else {
-                        this.navbar?.classList.remove('scrolled');
-                    }
-
-                    // Update active section
-                    this.updateActiveSection();
-
-                    ticking = false;
-                });
-                ticking = true;
-            }
-        };
-
-        window.addEventListener('scroll', handleScroll, { passive: true });
-    }
-
-    // Enhanced mobile menu management with better touch handling
-    setupMobileMenu() {
-        if (!this.hamburger || !this.navMenu) {
-            console.warn('Hamburger or nav menu not found, retrying...');
-            setTimeout(() => {
-                this.hamburger = document.getElementById('hamburger');
-                this.navMenu = document.getElementById('nav-menu');
-                if (this.hamburger && this.navMenu) {
-                    this.setupMobileMenu();
-                }
-            }, 100);
-            return;
+    // Scroll effect for navbar
+    window.addEventListener('scroll', () => {
+        if (Navbar && window.scrollY > 100) {
+            Navbar.classList.add('scrolled');
+        } else if (Navbar) {
+            Navbar.classList.remove('scrolled');
         }
+    }, { passive: true });
 
-        // Force hamburger visibility on mobile
-        this.ensureHamburgerVisibility();
-
-        let touchStartTime = 0;
-        let hasBeenTouched = false;
-
+    // Mobile menu toggle with better mobile handling
+    if (hamburger && navMenu) {
+        // Enhanced click/touch handler for mobile
         const toggleMenu = (e) => {
-            if (e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-
-            const isActive = this.hamburger.classList.contains('active');
-            console.log('Toggle menu called, currently active:', isActive);
-
-            if (!isActive) {
-                this.openMobileMenu();
-            } else {
-                this.closeMobileMenu();
-            }
-        };
-
-        // Enhanced touch handling for mobile
-        this.hamburger.addEventListener('touchstart', (e) => {
-            touchStartTime = Date.now();
-            hasBeenTouched = true;
-            this.hamburger.style.transform = 'scale(0.95)';
-
-            // Visual feedback
-            this.hamburger.style.background = 'rgba(220, 20, 60, 0.3)';
-        }, { passive: true });
-
-        this.hamburger.addEventListener('touchend', (e) => {
             e.preventDefault();
             e.stopPropagation();
-
-            const touchDuration = Date.now() - touchStartTime;
-            this.hamburger.style.transform = 'scale(1)';
-            this.hamburger.style.background = 'rgba(220, 20, 60, 0.2)';
-
-            // Only toggle if it was a quick tap (not a scroll)
-            if (touchDuration < 500 && hasBeenTouched) {
-                setTimeout(() => toggleMenu(e), 50);
+            
+            const isActive = hamburger.classList.contains('active');
+            
+            if (!isActive) {
+                // Opening menu
+                scrollPosition = window.pageYOffset;
+                hamburger.classList.add('active');
+                navMenu.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                document.body.style.position = 'fixed';
+                document.body.style.top = `-${scrollPosition}px`;
+                document.body.style.width = '100%';
+            } else {
+                // Closing menu
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+                document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                window.scrollTo(0, scrollPosition);
             }
+        };
 
-            hasBeenTouched = false;
+        // Add both click and touchstart for better mobile support
+        hamburger.addEventListener('click', toggleMenu);
+        hamburger.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            toggleMenu(e);
         }, { passive: false });
 
-        // Fallback click handler for devices that don't trigger touch events
-        this.hamburger.addEventListener('click', (e) => {
-            if (!hasBeenTouched) {
-                toggleMenu(e);
+        // Close menu when clicking outside
+        const closeMenu = () => {
+            if (hamburger.classList.contains('active')) {
+                hamburger.classList.remove('active');
+                navMenu.classList.remove('active');
+                document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                window.scrollTo(0, scrollPosition);
             }
-        });
+        };
 
-        // Add keyboard support
-        this.hamburger.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                toggleMenu(e);
-            }
-        });
-
-        // Close menu on outside clicks
+        // Handle clicks outside menu
         document.addEventListener('click', (e) => {
-            if (!this.navMenu.contains(e.target) && !this.hamburger.contains(e.target)) {
-                this.closeMobileMenu();
+            if (!navMenu.contains(e.target) && !hamburger.contains(e.target)) {
+                closeMenu();
             }
         });
 
-        // Close menu on escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                this.closeMobileMenu();
+        // Handle touches outside menu for mobile
+        document.addEventListener('touchstart', (e) => {
+            if (!navMenu.contains(e.target) && !hamburger.contains(e.target)) {
+                closeMenu();
             }
-        });
+        }, { passive: true });
 
-        // Close menu when any nav link is clicked
-        this.navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                this.closeMobileMenu();
-            });
-        });
-
-        // Ensure hamburger stays visible on resize
-        window.addEventListener('resize', () => {
-            if (window.innerWidth <= 768) {
-                this.ensureHamburgerVisibility();
-            }
+        // Close mobile menu when clicking on nav links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            const handleLinkClick = () => {
+                closeMenu();
+            };
+            
+            link.addEventListener('click', handleLinkClick);
+            link.addEventListener('touchstart', handleLinkClick, { passive: true });
         });
     }
+}
+
+// Smooth scrolling for navigation links
+function scrollToSection(sectionId) {
+    const section = document.getElementById(sectionId);
+    if (section) {
+        const navHeight = document.querySelector('.Navbar').offsetHeight;
+        const targetPosition = section.offsetTop - navHeight - 20;
 
-    // Method to ensure hamburger menu is always visible on mobile
-    ensureHamburgerVisibility() {
-        if (this.hamburger && window.innerWidth <= 768) {
-            // Force display and visibility
-            this.hamburger.style.display = 'flex';
-            this.hamburger.style.visibility = 'visible';
-            this.hamburger.style.opacity = '1';
-            this.hamburger.style.pointerEvents = 'auto';
-            this.hamburger.style.position = 'relative';
-            this.hamburger.style.zIndex = '1001';
-
-            // Ensure bars are visible
-            const bars = this.hamburger.querySelectorAll('.bar');
-            bars.forEach(bar => {
-                bar.style.display = 'block';
-                bar.style.visibility = 'visible';
-                bar.style.opacity = '1';
-            });
-
-            console.log('Hamburger visibility enforced');
-        }
-    }
-
-    openMobileMenu() {
-        this.scrollPosition = window.pageYOffset;
-        this.hamburger.classList.add('active');
-        this.navMenu.classList.add('active');
-
-        // Update ARIA attributes
-        this.hamburger.setAttribute('aria-expanded', 'true');
-        this.navMenu.setAttribute('aria-hidden', 'false');
-
-        // Prevent background scroll
-        document.body.style.overflow = 'hidden';
-        document.body.style.position = 'fixed';
-        document.body.style.top = `-${this.scrollPosition}px`;
-        document.body.style.width = '100%';
-
-        // Focus management for accessibility
-        setTimeout(() => {
-            this.navLinks[0]?.focus();
-        }, 100);
-
-        console.log('Mobile menu opened');
-    }
-
-    closeMobileMenu() {
-        if (!this.hamburger.classList.contains('active')) return;
-
-        this.hamburger.classList.remove('active');
-        this.navMenu.classList.remove('active');
-
-        // Update ARIA attributes
-        this.hamburger.setAttribute('aria-expanded', 'false');
-        this.navMenu.setAttribute('aria-hidden', 'true');
-
-        // Restore scroll position
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.width = '';
-        window.scrollTo(0, this.scrollPosition);
-
-        // Return focus to hamburger button
-        this.hamburger.focus();
-
-        console.log('Mobile menu closed');
-    }
-
-    // Setup navigation links with proper section mapping
-    setupNavigationLinks() {
-        this.navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-
-                // Get section ID from multiple attributes with priority
-                let sectionId = link.getAttribute('data-section') || 
-                               link.getAttribute('href')?.substring(1);
-
-                // If no direct mapping found, check text content
-                if (!sectionId) {
-                    const textContent = link.textContent.toLowerCase().trim();
-                    if (textContent.includes('book') && textContent.includes('demo')) {
-                        sectionId = 'demo';
-                    } else if (textContent.includes('contact')) {
-                        sectionId = 'contact';
-                    } else {
-                        sectionId = textContent;
-                    }
-                }
-
-                // Navigate to the appropriate section
-                if (this.sectionMapping[sectionId]) {
-                    this.scrollToSection(this.sectionMapping[sectionId]);
-                } else {
-                    console.warn(`No section mapping found for: ${sectionId}`);
-                }
-            });
-        });
-    }
-
-    // Map all navigation buttons throughout the site with enhanced precision
-    mapAllNavigationButtons() {
-        console.log('Mapping all navigation buttons with enhanced precision...');
-
-        // Map primary navigation first
-        this.mapPrimaryNavigation();
-
-        // Map hero section buttons
-        this.mapHeroButtons();
-
-        // Map service section buttons with enhanced targeting
-        this.mapServiceButtons();
-
-        // Map plan section buttons
-        this.mapPlanButtons();
-
-        // Map trainer section interactions
-        this.mapTrainerButtons();
-
-        // Map media section interactions
-        this.mapMediaButtons();
-
-        // Map contact card interactions
-        this.mapContactCards();
-
-        // Map about section interactions
-        this.mapAboutSection();
-
-        // Map demo section interactions
-        this.mapDemoSection();
-
-        // Map any remaining unmapped buttons
-        this.mapRemainingButtons();
-
-        // Map footer and social links
-        this.mapFooterNavigation();
-
-        // Map data-nav-target buttons globally
-        this.mapDataNavTargetButtons();
-
-        // Map scroll indicator
-        this.mapScrollIndicator();
-
-        // Map keyboard navigation
-        this.mapKeyboardNavigation();
-
-        // Map touch navigation for mobile
-        this.mapTouchNavigation();
-
-        // Map any remaining unmapped buttons
-        this.mapRemainingButtons();
-
-        // Final verification of all navigation elements
-        this.verifyNavigationMapping();
-        console.log('All navigation buttons mapped successfully with enhanced precision');
-    }
-
-    // Verify all navigation elements are properly mapped
-    verifyNavigationMapping() {
-        const unmappedElements = document.querySelectorAll(`
-            button:not([data-nav-mapped]):not([type="submit"]),
-            .btn:not([data-nav-mapped]):not([type="submit"]),
-            [onclick]:not([data-nav-mapped]),
-            a[href^="#"]:not([data-nav-mapped]):not(.social-link):not([href="#"])
-        `);
-
-        if (unmappedElements.length > 0) {
-            console.warn(`Found ${unmappedElements.length} unmapped navigation elements:`, unmappedElements);
-
-            // Try to map these elements
-            unmappedElements.forEach(element => {
-                const elementText = element.textContent.toLowerCase().trim();
-                const elementType = element.tagName.toLowerCase();
-
-                console.log(`Attempting to map unmapped ${elementType}: "${elementText}"`);
-
-                // Last resort mapping
-                if (elementText.includes('demo') || elementText.includes('book') || elementText.includes('free')) {
-                    this.mapElementToSection(element, 'demo');
-                } else if (elementText.includes('contact') || elementText.includes('message')) {
-                    this.mapElementToSection(element, 'contact');
-                } else if (elementText.includes('service')) {
-                    this.mapElementToSection(element, 'services');
-                } else if (elementText.includes('about')) {
-                    this.mapElementToSection(element, 'about');
-                } else if (elementText.includes('home')) {
-                    this.mapElementToSection(element, 'home');
-                }
-            });
-        } else {
-            console.log('All navigation elements successfully mapped!');
-        }
-    }
-
-    // Helper method to map individual elements
-    mapElementToSection(element, sectionId) {
-        if (!element || !this.sectionMapping[sectionId]) return;
-
-        element.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            if (sectionId === 'demo' || sectionId === 'contact') {
-                this.scrollToFormSection(sectionId);
-            } else {
-                this.scrollToSection(sectionId);
-            }
-
-            console.log(`Emergency mapped element navigated to: ${sectionId}`);
-        });
-
-        element.setAttribute('data-nav-mapped', 'true');
-        element.style.cursor = 'pointer';
-        console.log(`Emergency mapped: ${element.textContent.trim()} -> ${sectionId}`);
-    }
-
-    // Enhanced primary navigation mapping
-    mapPrimaryNavigation() {
-        // Enhanced navbar navigation with better targeting
-        this.navLinks.forEach(link => {
-            const href = link.getAttribute('href');
-            const dataSection = link.getAttribute('data-section');
-            const sectionId = dataSection || (href ? href.substring(1) : null);
-
-            if (sectionId && this.sectionMapping[sectionId]) {
-                // Remove any existing listeners to prevent duplicates
-                const newLink = link.cloneNode(true);
-                link.parentNode.replaceChild(newLink, link);
-
-                newLink.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    // Special handling for form sections
-                    if (sectionId === 'demo' || sectionId === 'contact') {
-                        this.scrollToFormSection(sectionId);
-                    } else {
-                        this.scrollToSection(sectionId);
-                    }
-
-                    // Close mobile menu after navigation
-                    this.closeMobileMenu();
-
-                    console.log(`Primary nav: Navigated to ${sectionId}`);
-                });
-
-                console.log(`Mapped primary navigation: ${sectionId}`);
-            }
-        });
-
-        // Update navLinks reference after cloning
-        this.navLinks = document.querySelectorAll('.nav-link');
-    }
-
-    // Enhanced contact cards mapping
-    mapContactCards() {
-        const contactCards = document.querySelectorAll('.contact-card');
-        contactCards.forEach((card, index) => {
-            card.style.cursor = 'pointer';
-            card.style.transition = 'transform 0.2s ease, box-shadow 0.2s ease';
-
-            // Remove existing listeners
-            const newCard = card.cloneNode(true);
-            card.parentNode.replaceChild(newCard, card);
-
-            newCard.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                const icon = newCard.querySelector('i');
-                const cardText = newCard.textContent.toLowerCase();
-
-                if (icon) {
-                    if (icon.classList.contains('fa-phone-alt') || cardText.includes('call')) {
-                        // Phone card - open phone dialer
-                        window.open('tel:+971581790093', '_self');
-                        console.log('Contact card: Opened phone dialer');
-                    } else if (icon.classList.contains('fa-envelope') || cardText.includes('email')) {
-                        // Email card - scroll to contact form
-                        this.scrollToFormSection('contact');
-                        console.log('Contact card: Navigated to contact form');
-                    } else if (icon.classList.contains('fa-map-marker-alt') || cardText.includes('visit')) {
-                        // Location card - open maps
-                        window.open('https://maps.google.com/?q=25.301111,55.374061', '_blank');
-                        console.log('Contact card: Opened maps');
-                    } else if (icon.classList.contains('fa-clock') || cardText.includes('hours')) {
-                        // Hours card - scroll to demo booking
-                        this.scrollToFormSection('demo');
-                        console.log('Contact card: Navigated to demo booking');
-                    } else {
-                        // Default action - scroll to contact form
-                        this.scrollToFormSection('contact');
-                        console.log('Contact card: Default navigation to contact form');
-                    }
-                }
-            });
-
-            // Add hover effects
-            newCard.addEventListener('mouseenter', () => {
-                newCard.style.transform = 'translateY(-2px)';
-                newCard.style.boxShadow = '0 5px 20px rgba(0,0,0,0.1)';
-            });
-
-            newCard.addEventListener('mouseleave', () => {
-                newCard.style.transform = 'translateY(0)';
-                newCard.style.boxShadow = '';
-            });
-
-            console.log(`Mapped contact card ${index + 1}`);
-        });
-    }
-
-    // Enhanced about section mapping
-    mapAboutSection() {
-        // About cards navigation to services
-        const aboutCards = document.querySelectorAll('.about-card');
-        aboutCards.forEach((card, index) => {
-            card.style.cursor = 'pointer';
-            card.style.transition = 'transform 0.2s ease';
-
-            // Remove existing listeners
-            const newCard = card.cloneNode(true);
-            card.parentNode.replaceChild(newCard, card);
-
-            newCard.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                this.scrollToSection('services');
-                console.log(`About card ${index + 1}: Navigated to services`);
-            });
-
-            newCard.addEventListener('mouseenter', () => {
-                newCard.style.transform = 'scale(1.02)';
-            });
-
-            newCard.addEventListener('mouseleave', () => {
-                newCard.style.transform = 'scale(1)';
-            });
-
-            console.log(`Mapped about card ${index + 1}`);
-        });
-
-        // Stats in hero section with enhanced targeting
-        const heroStats = document.querySelectorAll('.hero .stat');
-        heroStats.forEach((stat, index) => {
-            stat.style.cursor = 'pointer';
-            stat.style.transition = 'transform 0.2s ease';
-
-            // Remove existing listeners
-            const newStat = stat.cloneNode(true);
-            stat.parentNode.replaceChild(newStat, stat);
-
-            newStat.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                if (index === 0) { // 24/7 stat - contact for availability
-                    this.scrollToFormSection('contact');
-                    console.log('Hero stat: 24/7 - Navigated to contact');
-                } else if (index === 1) { // Customers stat - about us
-                    this.scrollToSection('about');
-                    console.log('Hero stat: Customers - Navigated to about');
-                } else { // Experience stat - trainers
-                    this.scrollToSection('trainers');
-                    console.log('Hero stat: Experience - Navigated to trainers');
-                }
-            });
-
-            newStat.addEventListener('mouseenter', () => {
-                newStat.style.transform = 'scale(1.05)';
-            });
-
-            newStat.addEventListener('mouseleave', () => {
-                newStat.style.transform = 'scale(1)';
-            });
-
-            console.log(`Mapped hero stat ${index + 1}`);
-        });
-    }
-
-    // Enhanced demo section mapping
-    mapDemoSection() {
-        // Demo benefits navigation
-        const benefitElements = document.querySelectorAll('.benefit');
-        benefitElements.forEach((benefit, index) => {
-            benefit.style.cursor = 'pointer';
-            benefit.style.transition = 'transform 0.2s ease';
-
-            // Remove existing listeners
-            const newBenefit = benefit.cloneNode(true);
-            benefit.parentNode.replaceChild(newBenefit, benefit);
-
-            newBenefit.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                // Scroll to demo form and focus on first input
-                this.scrollToFormSection('demo');
-                setTimeout(() => {
-                    const firstInput = document.querySelector('#demoForm input[type="text"]');
-                    if (firstInput && window.innerWidth > 768) {
-                        firstInput.focus();
-                    }
-                }, 1200);
-
-                console.log(`Demo benefit ${index + 1}: Navigated to demo form`);
-            });
-
-            newBenefit.addEventListener('mouseenter', () => {
-                newBenefit.style.transform = 'translateX(5px)';
-            });
-
-            newBenefit.addEventListener('mouseleave', () => {
-                newBenefit.style.transform = 'translateX(0)';
-            });
-
-            console.log(`Mapped demo benefit ${index + 1}`);
-        });
-    }
-
-    // Map any remaining unmapped buttons with comprehensive coverage
-    mapRemainingButtons() {
-        // Find all clickable elements that might need navigation
-        const allClickableElements = document.querySelectorAll(`
-            button:not([data-nav-mapped]), 
-            .btn:not([data-nav-mapped]),
-            [onclick]:not([data-nav-mapped]),
-            [data-nav-target]:not([data-nav-mapped]),
-            a[href^="#"]:not([data-nav-mapped]):not(.nav-link)
-        `);
-
-        allClickableElements.forEach((element, index) => {
-            const elementText = element.textContent.toLowerCase().trim();
-            const isFormButton = element.type === 'submit' || element.form;
-            const hasOnclick = element.hasAttribute('onclick');
-            const dataTarget = element.getAttribute('data-nav-target');
-            const href = element.getAttribute('href');
-
-            // Skip form submission buttons and already mapped elements
-            if (isFormButton || element.hasAttribute('data-nav-mapped')) {
-                return;
-            }
-
-            let targetSection = null;
-
-            // Check data-nav-target first
-            if (dataTarget && this.sectionMapping[dataTarget]) {
-                targetSection = dataTarget;
-            }
-            // Check href for hash links
-            else if (href && href.startsWith('#')) {
-                const sectionId = href.substring(1);
-                if (this.sectionMapping[sectionId]) {
-                    targetSection = sectionId;
-                }
-            }
-            // Parse onclick for scrollToSection calls
-            else if (hasOnclick) {
-                const onclickValue = element.getAttribute('onclick');
-                const sectionMatch = onclickValue.match(/scrollToSection\(['"]([^'"]+)['"]\)/);
-                if (sectionMatch && this.sectionMapping[sectionMatch[1]]) {
-                    targetSection = sectionMatch[1];
-                }
-            }
-            // Determine target based on text content
-            else {
-                if (elementText.includes('book') && (elementText.includes('demo') || elementText.includes('free'))) {
-                    targetSection = 'demo';
-                } else if (elementText.includes('book') && elementText.includes('home')) {
-                    targetSection = 'contact';
-                } else if (elementText.includes('contact') || elementText.includes('message') || elementText.includes('email')) {
-                    targetSection = 'contact';
-                } else if (elementText.includes('service') || elementText.includes('explore')) {
-                    targetSection = 'services';
-                } else if (elementText.includes('plan') || elementText.includes('pricing') || elementText.includes('membership')) {
-                    targetSection = 'plans';
-                } else if (elementText.includes('trainer') || elementText.includes('team')) {
-                    targetSection = 'trainers';
-                } else if (elementText.includes('media') || elementText.includes('video') || elementText.includes('gallery')) {
-                    targetSection = 'media';
-                } else if (elementText.includes('about') || elementText.includes('story')) {
-                    targetSection = 'about';
-                } else if (elementText.includes('home') || elementText.includes('top')) {
-                    targetSection = 'home';
-                } else if (elementText.includes('demo') || elementText.includes('trial')) {
-                    targetSection = 'demo';
-                } else if (elementText.includes('join') || elementText.includes('classes')) {
-                    targetSection = 'demo';
-                } else if (elementText.includes('start') || elementText.includes('training')) {
-                    targetSection = 'demo';
-                } else if (elementText.includes('session')) {
-                    // Determine session type
-                    if (elementText.includes('home') || elementText.includes('wellness')) {
-                        targetSection = 'contact';
-                    } else {
-                        targetSection = 'demo';
-                    }
-                }
-            }
-
-            if (targetSection && this.sectionMapping[targetSection]) {
-                // Remove existing listeners and onclick
-                const newElement = element.cloneNode(true);
-                element.parentNode.replaceChild(newElement, element);
-                newElement.removeAttribute('onclick');
-
-                newElement.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    if (targetSection === 'demo' || targetSection === 'contact') {
-                        this.scrollToFormSection(targetSection);
-                        console.log(`Element: "${elementText}" - Navigated to ${targetSection} form`);
-                    } else {
-                        this.scrollToSection(targetSection);
-                        console.log(`Element: "${elementText}" - Navigated to ${targetSection} section`);
-                    }
-                });
-
-                // Mark as mapped
-                newElement.setAttribute('data-nav-mapped', 'true');
-                console.log(`Mapped element: "${elementText}" -> ${targetSection}`);
-            }
-        });
-
-        // Also map any elements with specific classes that might be interactive
-        const interactiveElements = document.querySelectorAll(`
-            .contact-card:not([data-nav-mapped]),
-            .about-card:not([data-nav-mapped]),
-            .trainer-card:not([data-nav-mapped]),
-            .plan-card:not([data-nav-mapped]),
-            .service-card:not([data-nav-mapped]),
-            .benefit:not([data-nav-mapped]),
-            .stat:not([data-nav-mapped]),
-            .Logo-3D:not([data-nav-mapped])
-        `);
-
-        interactiveElements.forEach(element => {
-            if (element.hasAttribute('data-nav-mapped')) return;
-
-            element.style.cursor = 'pointer';
-            let targetSection = null;
-
-            if (element.classList.contains('contact-card')) {
-                const cardText = element.textContent.toLowerCase();
-                if (cardText.includes('phone') || cardText.includes('call')) {
-                    element.addEventListener('click', () => window.open('tel:+971581790093', '_self'));
-                    element.setAttribute('data-nav-mapped', 'true');
-                    return;
-                } else if (cardText.includes('map') || cardText.includes('visit')) {
-                    element.addEventListener('click', () => window.open('https://maps.google.com/?q=25.301111,55.374061', '_blank'));
-                    element.setAttribute('data-nav-mapped', 'true');
-                    return;
-                } else {
-                    targetSection = 'contact';
-                }
-            } else if (element.classList.contains('about-card')) {
-                targetSection = 'services';
-            } else if (element.classList.contains('trainer-card')) {
-                targetSection = 'demo';
-            } else if (element.classList.contains('plan-card')) {
-                targetSection = 'demo';
-            } else if (element.classList.contains('service-card')) {
-                const serviceTitle = element.querySelector('h3')?.textContent.toLowerCase() || '';
-                if (serviceTitle.includes('home') || serviceTitle.includes('wellness')) {
-                    targetSection = 'contact';
-                } else {
-                    targetSection = 'demo';
-                }
-            } else if (element.classList.contains('benefit')) {
-                targetSection = 'demo';
-            } else if (element.classList.contains('stat')) {
-                const statText = element.textContent.toLowerCase();
-                if (statText.includes('24') || statText.includes('hours')) {
-                    targetSection = 'contact';
-                } else if (statText.includes('customer') || statText.includes('trained')) {
-                    targetSection = 'about';
-                } else {
-                    targetSection = 'trainers';
-                }
-            } else if (element.classList.contains('Logo-3D')) {
-                targetSection = 'home';
-            }
-
-            if (targetSection) {
-                element.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    if (targetSection === 'demo' || targetSection === 'contact') {
-                        this.scrollToFormSection(targetSection);
-                    } else {
-                        this.scrollToSection(targetSection);
-                    }
-                });
-
-                element.setAttribute('data-nav-mapped', 'true');
-                console.log(`Mapped interactive element: ${element.className} -> ${targetSection}`);
-            }
-        });
-    }
-
-    mapHeroButtons() {
-        // Hero "Book Free Demo" button with enhanced targeting
-        const heroBookDemoBtn = document.querySelector('.hero-buttons .btn-primary');
-        if (heroBookDemoBtn) {
-            // Remove existing listeners
-            const newBtn = heroBookDemoBtn.cloneNode(true);
-            heroBookDemoBtn.parentNode.replaceChild(newBtn, heroBookDemoBtn);
-
-            newBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                this.scrollToFormSection('demo');
-                console.log('Hero: Book Free Demo - Navigated to demo form');
-
-                // Focus on first form field after navigation
-                setTimeout(() => {
-                    const firstInput = document.querySelector('#demoForm input[type="text"]');
-                    if (firstInput && window.innerWidth > 768) {
-                        firstInput.focus();
-                    }
-                }, 1200);
-            });
-
-            console.log('Mapped hero Book Free Demo button');
-        }
-
-        // Hero "Explore Services" button with enhanced targeting
-        const heroExploreBtn = document.querySelector('.hero-buttons .btn-secondary');
-        if (heroExploreBtn) {
-            // Remove existing listeners
-            const newBtn = heroExploreBtn.cloneNode(true);
-            heroExploreBtn.parentNode.replaceChild(newBtn, heroExploreBtn);
-
-            newBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                this.scrollToSection('services');
-                console.log('Hero: Explore Services - Navigated to services section');
-            });
-
-            console.log('Mapped hero Explore Services button');
-        }
-
-        // Map any other buttons in hero section with data-nav-target
-        const allHeroButtons = document.querySelectorAll('.hero .btn, .hero-buttons .btn');
-        allHeroButtons.forEach((button, index) => {
-            const buttonText = button.textContent.toLowerCase().trim();
-            const dataTarget = button.getAttribute('data-nav-target');
-
-            // Skip already processed buttons
-            if (button.classList.contains('btn-primary') || button.classList.contains('btn-secondary')) {
-                return;
-            }
-
-            if (dataTarget && this.sectionMapping[dataTarget]) {
-                // Remove existing listeners
-                const newButton = button.cloneNode(true);
-                button.parentNode.replaceChild(newButton, button);
-
-                newButton.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    if (dataTarget === 'demo' || dataTarget === 'contact') {
-                        this.scrollToFormSection(dataTarget);
-                        console.log(`Hero button: "${buttonText}" - Navigated to ${dataTarget} form`);
-                    } else {
-                        this.scrollToSection(dataTarget);
-                        console.log(`Hero button: "${buttonText}" - Navigated to ${dataTarget} section`);
-                    }
-                });
-
-                console.log(`Mapped hero button ${index + 1}: "${buttonText}" -> ${dataTarget}`);
-            }
-        });
-    }
-
-    mapServiceButtons() {
-        // All service card buttons with enhanced mapping and precise targeting
-        const serviceButtons = document.querySelectorAll('.service-card .btn');
-        serviceButtons.forEach((button, index) => {
-            const buttonText = button.textContent.toLowerCase().trim();
-
-            // Remove existing listeners to prevent duplicates
-            const newButton = button.cloneNode(true);
-            button.parentNode.replaceChild(newButton, button);
-
-            newButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                const serviceCard = newButton.closest('.service-card');
-                const serviceTitle = serviceCard?.querySelector('h3')?.textContent.toLowerCase() || '';
-
-                // Enhanced button text matching with service context
-                if (buttonText.includes('book home') || buttonText.includes('home session') || serviceTitle.includes('home')) {
-                    this.scrollToFormSection('contact');
-                    console.log(`Service button: "${buttonText}" - Navigated to contact form for home service`);
-                } else if (buttonText.includes('demo') || buttonText.includes('book demo')) {
-                    this.scrollToFormSection('demo');
-                    console.log(`Service button: "${buttonText}" - Navigated to demo form`);
-                } else if (buttonText.includes('join classes') || serviceTitle.includes('group')) {
-                    this.scrollToFormSection('demo');
-                    console.log(`Service button: "${buttonText}" - Navigated to demo form for group classes`);
-                } else if (buttonText.includes('start training') || serviceTitle.includes('training')) {
-                    this.scrollToFormSection('demo');
-                    console.log(`Service button: "${buttonText}" - Navigated to demo form for training`);
-                } else if (buttonText.includes('book session') || buttonText.includes('session')) {
-                    // Determine form based on service type
-                    if (serviceTitle.includes('wellness') || serviceTitle.includes('home')) {
-                        this.scrollToFormSection('contact');
-                        console.log(`Service button: "${buttonText}" - Navigated to contact form for wellness/home service`);
-                    } else {
-                        this.scrollToFormSection('demo');
-                        console.log(`Service button: "${buttonText}" - Navigated to demo form for session booking`);
-                    }
-                } else {
-                    // Enhanced default behavior based on service type
-                    if (serviceTitle.includes('home') || serviceTitle.includes('wellness') || serviceTitle.includes('massage')) {
-                        this.scrollToFormSection('contact');
-                        console.log(`Service button: "${buttonText}" - Default navigation to contact form (service: ${serviceTitle})`);
-                    } else {
-                        this.scrollToFormSection('demo');
-                        console.log(`Service button: "${buttonText}" - Default navigation to demo form (service: ${serviceTitle})`);
-                    }
-                }
-
-                // Pre-fill service information in forms
-                setTimeout(() => {
-                    if (serviceTitle) {
-                        const serviceSelect = document.getElementById('service');
-                        const messageField = document.getElementById('message') || document.getElementById('contactMessage');
-
-                        if (serviceSelect) {
-                            // Map service titles to select options
-                            if (serviceTitle.includes('home')) {
-                                serviceSelect.value = 'home-training';
-                            } else if (serviceTitle.includes('personal')) {
-                                serviceSelect.value = 'personal-training';
-                            } else if (serviceTitle.includes('group')) {
-                                serviceSelect.value = 'group-classes';
-                            } else if (serviceTitle.includes('weight')) {
-                                serviceSelect.value = 'personal-training';
-                            } else if (serviceTitle.includes('wellness')) {
-                                serviceSelect.value = 'general-fitness';
-                            }
-                        }
-
-                        if (messageField && !messageField.value) {
-                            messageField.value = `I'm interested in ${serviceTitle}.`;
-                        }
-                    }
-                }, 1000);
-            });
-
-            // Add visual feedback
-            newButton.addEventListener('mouseenter', () => {
-                newButton.style.transform = 'translateY(-2px)';
-                newButton.style.boxShadow = '0 5px 15px rgba(0,0,0,0.2)';
-            });
-
-            newButton.addEventListener('mouseleave', () => {
-                newButton.style.transform = 'translateY(0)';
-                newButton.style.boxShadow = '';
-            });
-
-            console.log(`Mapped service button ${index + 1}: "${buttonText}"`);
-        });
-    }
-
-    mapPlanButtons() {
-        // All plan card buttons with enhanced targeting and form pre-filling
-        const planButtons = document.querySelectorAll('.plan-card .btn');
-        planButtons.forEach((button, index) => {
-            // Remove existing listeners to prevent duplicates
-            const newButton = button.cloneNode(true);
-            button.parentNode.replaceChild(newButton, button);
-
-            newButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                // Get plan information for better form pre-filling
-                const planCard = newButton.closest('.plan-card');
-                const planName = planCard?.querySelector('h3')?.textContent || '';
-                const planPrice = planCard?.querySelector('.amount')?.textContent || '';
-
-                // Always go to demo form for plan bookings
-                this.scrollToFormSection('demo');
-                console.log(`Plan button: "${planName}" - Navigated to demo form`);
-
-                // Enhanced form pre-filling after navigation
-                setTimeout(() => {
-                    const planSelect = document.getElementById('planChoice');
-                    const messageField = document.getElementById('message');
-
-                    if (planSelect && planName) {
-                        const planLower = planName.toLowerCase();
-                        if (planLower.includes('basic')) {
-                            planSelect.value = 'basic';
-                        } else if (planLower.includes('premium')) {
-                            planSelect.value = 'premium';
-                        } else if (planLower.includes('vip')) {
-                            planSelect.value = 'vip-single';
-                        }
-
-                        // Trigger change event to update form
-                        planSelect.dispatchEvent(new Event('change', { bubbles: true }));
-                    }
-
-                    if (messageField && planName && !messageField.value) {
-                        let message = `I'm interested in the ${planName}`;
-                        if (planPrice) {
-                            message += ` (AED ${planPrice}/month)`;
-                        }
-                        message += '. Please provide more details about this membership.';
-                        messageField.value = message;
-                    }
-                }, 1200);
-            });
-
-            // Add visual feedback
-            newButton.addEventListener('mouseenter', () => {
-                newButton.style.transform = 'translateY(-3px)';
-                newButton.style.boxShadow = '0 8px 25px rgba(255, 107, 53, 0.3)';
-            });
-
-            newButton.addEventListener('mouseleave', () => {
-                newButton.style.transform = 'translateY(0)';
-                newButton.style.boxShadow = '';
-            });
-
-            console.log(`Mapped plan button ${index + 1}: "${planName}"`);
-        });
-    }
-
-    mapTrainerButtons() {
-        // Trainer cards - clicking leads to demo booking form
-        const trainerCards = document.querySelectorAll('.trainer-card');
-        trainerCards.forEach(card => {
-            card.style.cursor = 'pointer';
-            card.addEventListener('click', (e) => {
-                // Don't trigger if clicking on social links
-                if (!e.target.closest('.social-links')) {
-                    const trainerName = card.querySelector('h3')?.textContent || '';
-                    this.scrollToFormSection('demo');
-
-                    // Optional: Pre-fill trainer preference in demo form
-                    setTimeout(() => {
-                        const messageField = document.getElementById('message');
-                        if (messageField && trainerName && !messageField.value) {
-                            messageField.value = `I would like to book a demo session with ${trainerName}.`;
-                        }
-                    }, 1000);
-                }
-            });
-        });
-
-        // Trainer social links (keep their original functionality)
-        const trainerSocialLinks = document.querySelectorAll('.trainer-card .social-links a');
-        trainerSocialLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent card click
-            });
-        });
-    }
-
-    mapMediaButtons() {
-        // Video cards - clicking play button or video area
-        const videoCards = document.querySelectorAll('.video-card');
-        videoCards.forEach(card => {
-            const videoInfo = card.querySelector('.video-info');
-            if (videoInfo) {
-                videoInfo.style.cursor = 'pointer';
-                videoInfo.addEventListener('click', () => {
-                    // Trigger video play
-                    const playBtn = card.querySelector('.play-btn');
-                    if (playBtn) {
-                        playBtn.click();
-                    }
-                });
-            }
-        });
-    }
-
-    mapDataNavTargetButtons() {
-        // Map all buttons with data-nav-target attribute
-        const dataNavButtons = document.querySelectorAll('[data-nav-target]');
-        dataNavButtons.forEach(button => {
-            const targetSection = button.getAttribute('data-nav-target');
-            if (this.sectionMapping[targetSection]) {
-                button.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.scrollToSection(targetSection);
-                });
-            }
-        });
-    }
-
-    mapScrollIndicator() {
-        // Scroll indicator in hero section
-        const scrollIndicator = document.querySelector('.scroll-indicator');
-        if (scrollIndicator) {
-            scrollIndicator.style.cursor = 'pointer';
-            scrollIndicator.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                this.scrollToSection('about');
-                console.log('Scroll indicator: Navigated to about section');
-            });
-            scrollIndicator.setAttribute('data-nav-mapped', 'true');
-        }
-
-        // Also handle scroll arrow specifically
-        const scrollArrow = document.querySelector('.scroll-arrow');
-        if (scrollArrow) {
-            scrollArrow.style.cursor = 'pointer';
-            scrollArrow.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                this.scrollToSection('about');
-                console.log('Scroll arrow: Navigated to about section');
-            });
-            scrollArrow.setAttribute('data-nav-mapped', 'true');
-        }
-    }
-
-    mapMiscellaneousButtons() {
-        // Demo section benefits - clicking scrolls to demo form
-        const benefitElements = document.querySelectorAll('.benefit');
-        benefitElements.forEach(benefit => {
-            benefit.style.cursor = 'pointer';
-            benefit.addEventListener('click', () => {
-                this.scrollToFormSection('demo');
-            });
-        });
-
-        // About cards - clicking leads to services
-        const aboutCards = document.querySelectorAll('.about-card');
-        aboutCards.forEach(card => {
-            card.style.cursor = 'pointer';
-            card.addEventListener('click', () => {
-                this.scrollToSection('services');
-            });
-        });
-
-        // Contact cards - make them interactive with better targeting
-        const contactCards = document.querySelectorAll('.contact-card');
-        contactCards.forEach((card, index) => {
-            card.style.cursor = 'pointer';
-            card.addEventListener('click', (e) => {
-                e.preventDefault();
-
-                const icon = card.querySelector('i');
-                const cardText = card.textContent.toLowerCase();
-
-                if (icon) {
-                    if (icon.classList.contains('fa-phone-alt') || cardText.includes('call')) {
-                        // Phone card - open phone dialer
-                        window.open('tel:+971581790093', '_self');
-                    } else if (icon.classList.contains('fa-envelope') || cardText.includes('email')) {
-                        // Email card - scroll to contact form instead of email client
-                        this.scrollToFormSection('contact');
-                    } else if (icon.classList.contains('fa-map-marker-alt') || cardText.includes('visit')) {
-                        // Location card - open maps
-                        window.open('https://maps.google.com/?q=25.301111,55.374061', '_blank');
-                    } else if (icon.classList.contains('fa-clock') || cardText.includes('hours')) {
-                        // Hours card - scroll to demo booking
-                        this.scrollToFormSection('demo');
-                    } else {
-                        // Default action - scroll to contact form
-                        this.scrollToFormSection('contact');
-                    }
-                }
-            });
-        });
-
-        // WhatsApp chat button
-        const whatsappChat = document.getElementById('whatsappChat');
-        if (whatsappChat) {
-            whatsappChat.addEventListener('click', (e) => {
-                console.log('WhatsApp chat opened');
-            });
-        }
-
-        // Back to top button
-        const backToTop = document.getElementById('backtotop');
-        if (backToTop) {
-            backToTop.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.scrollToSection('home');
-            });
-        }
-
-        // Logo elements in navbar
-        const navLogo = document.querySelector('.nav-logo .Logo-3D');
-        if (navLogo) {
-            navLogo.style.cursor = 'pointer';
-            navLogo.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.scrollToSection('home');
-            });
-        }
-
-        // Stats in hero section - enhanced with form targeting
-        const heroStats = document.querySelectorAll('.hero .stat');
-        heroStats.forEach((stat, index) => {
-            stat.style.cursor = 'pointer';
-            stat.addEventListener('click', () => {
-                if (index === 0) { // 24/7 stat
-                    this.scrollToFormSection('contact');
-                } else if (index === 1) { // Customers stat
-                    this.scrollToSection('about');
-                } else { // Experience stat
-                    this.scrollToSection('trainers');
-                }
-            });
-        });
-
-        // Handle all buttons with data-nav-target attribute
-        const dataNavButtons = document.querySelectorAll('[data-nav-target]');
-        dataNavButtons.forEach(button => {
-            const targetSection = button.getAttribute('data-nav-target');
-
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-
-                if (targetSection === 'demo' || targetSection === 'contact') {
-                    this.scrollToFormSection(targetSection);
-                } else if (this.sectionMapping[targetSection]) {
-                    this.scrollToSection(targetSection);
-                }
-            });
-        });
-
-        // Remove old onclick handlers and replace with proper event listeners
-        const onclickButtons = document.querySelectorAll('[onclick*="scrollToSection"]');
-        onclickButtons.forEach(button => {
-            const onclickValue = button.getAttribute('onclick');
-            button.removeAttribute('onclick');
-
-            if (onclickValue) {
-                const sectionMatch = onclickValue.match(/scrollToSection\(['"]([^'"]+)['"]\)/);
-                if (sectionMatch) {
-                    const sectionId = sectionMatch[1];
-                    button.addEventListener('click', (e) => {
-                        e.preventDefault();
-
-                        if (sectionId === 'demo' || sectionId === 'contact') {
-                            this.scrollToFormSection(sectionId);
-                        } else {
-                            this.scrollToSection(sectionId);
-                        }
-                    });
-                }
-            }
-        });
-    }
-
-    mapFooterNavigation() {
-        // Footer logo navigation
-        const footerLogo = document.querySelector('.footer-logo .Logo-3D');
-        if (footerLogo) {
-            footerLogo.style.cursor = 'pointer';
-            footerLogo.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.scrollToSection('home');
-            });
-        }
-
-        // Social media links (keep their original hrefs but add smooth scroll for internal links)
-        const socialLinks = document.querySelectorAll('.social-link');
-        socialLinks.forEach(link => {
-            const href = link.getAttribute('href');
-            if (href && href.startsWith('#')) {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const sectionId = href.substring(1);
-                    if (this.sectionMapping[sectionId]) {
-                        this.scrollToSection(sectionId);
-                    }
-                });
-            }
-        });
-    }
-
-    // Setup global navigation for buttons throughout the site
-    setupGlobalNavigation() {
-        // Make scrollToSection globally accessible
-        window.scrollToSection = (sectionId) => this.scrollToSection(sectionId);
-
-        // Handle logo clicks to go to home
-        const logoElements = document.querySelectorAll('.Logo-3D, .nav-logo');
-        logoElements.forEach(logo => {
-            logo.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.scrollToSection('home');
-            });
-            logo.style.cursor = 'pointer';
-        });
-
-        // Handle any hash links in the document
-        document.addEventListener('click', (e) => {
-            const link = e.target.closest('a[href^="#"]');
-            if (link && !link.classList.contains('nav-link')) {
-                e.preventDefault();
-                const sectionId = link.getAttribute('href').substring(1);
-                if (this.sectionMapping[sectionId]) {
-                    this.scrollToSection(sectionId);
-                }
-            }
-        });
-    }
-
-    // Enhanced section scrolling with proper offset handling
-    scrollToSection(sectionId) {
-        const section = document.getElementById(sectionId);
-        if (!section) {
-            console.warn(`Section with id '${sectionId}' not found`);
-            return;
-        }
-
-        // Close mobile menu if open
-        this.closeMobileMenu();
-
-        const navHeight = this.navbar?.offsetHeight || 80;
-        const offset = this.sectionOffsets[sectionId] || -80;
-        const targetPosition = section.offsetTop + offset;
-
-        // Smooth scroll to target position
         window.scrollTo({
-            top: Math.max(0, targetPosition),
+            top: targetPosition,
             behavior: 'smooth'
         });
-
-        // Update URL without triggering scroll event
-        if (history.pushState) {
-            history.pushState(null, null, `#${sectionId}`);
-        }
-
-        // Set scrolling flag to prevent conflicts with scroll detection
-        this.isScrolling = true;
-        setTimeout(() => {
-            this.isScrolling = false;
-        }, 1200);
-
-        // Update active navigation immediately
-        this.setActiveNavLink(sectionId);
-
-        // Log navigation for debugging
-        console.log(`Navigated to section: ${sectionId}`);
-    }
-
-    // New method for form-specific scrolling
-    scrollToFormSection(sectionId) {
-        this.scrollToSection(sectionId);
-
-        // Additional focus on the form element after scrolling
-        setTimeout(() => {
-            let formElement = null;
-
-            if (sectionId === 'demo') {
-                formElement = document.getElementById('demoForm');
-            } else if (sectionId === 'contact') {
-                formElement = document.getElementById('contactForm');
-            }
-
-            if (formElement) {
-                // Smooth scroll to center the form in view
-                formElement.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-
-                // Optional: Focus on first input field
-                setTimeout(() => {
-                    const firstInput = formElement.querySelector('input[type="text"], input[type="email"]');
-                    if (firstInput && window.innerWidth > 768) { // Only on desktop to avoid mobile keyboard issues
-                        firstInput.focus();
-                    }
-                }, 500);
-            }
-        }, 800); // Wait for section scroll to complete
-    }
-
-    // Active navigation highlighting
-    setupActiveNavHighlight() {
-        this.updateActiveSection();
-    }
-
-    updateActiveSection() {
-        if (this.isScrolling) return;
-
-        const scrollY = window.pageYOffset;
-        const windowHeight = window.innerHeight;
-        let currentSection = 'home';
-
-        // Offset for section detection
-        const offset = 120;
-
-        // Find current section based on scroll position
-        for (const section of this.sections) {
-            const sectionTop = section.offsetTop - offset;
-            const sectionBottom = sectionTop + section.offsetHeight;
-
-            if (scrollY >= sectionTop && scrollY < sectionBottom) {
-                currentSection = section.id;
-                break;
-            }
-        }
-
-        // Handle edge cases
-        if (scrollY + windowHeight >= document.documentElement.scrollHeight - 100) {
-            currentSection = 'contact';
-        }
-
-        if (scrollY < 50) {
-            currentSection = 'home';
-        }
-
-        // Update active section if changed
-        if (currentSection !== this.activeSection) {
-            this.activeSection = currentSection;
-            this.setActiveNavLink(currentSection);
-        }
-    }
-
-    setActiveNavLink(sectionId) {
-        // Remove active class from all nav links
-        this.navLinks.forEach(link => {
-            link.classList.remove('active');
-        });
-
-        // Add active class to current section link
-        const activeLink = document.querySelector(`[data-section="${sectionId}"], .nav-link[href="#${sectionId}"]`);
-        if (activeLink && activeLink.classList.contains('nav-link')) {
-            activeLink.classList.add('active');
-
-            // Update URL hash if different
-            if (window.location.hash !== `#${sectionId}`) {
-                history.replaceState(null, null, `#${sectionId}`);
-            }
-        }
-    }
-
-    // Enhanced keyboard navigation
-    setupKeyboardNavigation() {
-        // Navigation links keyboard support
-        this.navLinks.forEach((link, index) => {
-            link.addEventListener('keydown', (e) => {
-                switch (e.key) {
-                    case 'ArrowDown':
-                    case 'ArrowRight':
-                        e.preventDefault();
-                        const nextIndex = (index + 1) % this.navLinks.length;
-                        this.navLinks[nextIndex].focus();
-                        break;
-
-                    case 'ArrowUp':
-                    case 'ArrowLeft':
-                        e.preventDefault();
-                        const prevIndex = index === 0 ? this.navLinks.length - 1 : index - 1;
-                        this.navLinks[prevIndex].focus();
-                        break;
-
-                    case 'Home':
-                        e.preventDefault();
-                        this.navLinks[0].focus();
-                        break;
-
-                    case 'End':
-                        e.preventDefault();
-                        this.navLinks[this.navLinks.length - 1].focus();
-                        break;
-
-                    case 'Enter':
-                    case ' ':
-                        e.preventDefault();
-                        link.click();
-                        break;
-                }
-            });
-        });
-
-        // Global keyboard shortcuts for navigation
-        document.addEventListener('keydown', (e) => {
-            // Only trigger if not typing in an input
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) {
-                return;
-            }
-
-            // Number keys for quick section navigation
-            const sectionKeys = {
-                '1': 'home',
-                '2': 'about', 
-                '3': 'services',
-                '4': 'trainers',
-                '5': 'media',
-                '6': 'plans',
-                '7': 'demo',
-                '8': 'contact'
-            };
-
-            if (sectionKeys[e.key]) {
-                e.preventDefault();
-                this.scrollToSection(sectionKeys[e.key]);
-            }
-
-            // Arrow keys for section navigation
-            if (e.ctrlKey || e.metaKey) {
-                switch (e.key) {
-                    case 'ArrowUp':
-                        e.preventDefault();
-                        this.scrollToSection('home');
-                        break;
-                    case 'ArrowDown':
-                        e.preventDefault();
-                        this.scrollToSection('contact');
-                        break;
-                }
-            }
-        });
-    }
-
-    // Public method to programmatically navigate to a section
-    navigateToSection(sectionId) {
-        if (this.sectionMapping[sectionId]) {
-            this.scrollToSection(this.sectionMapping[sectionId]);
-        } else {
-            console.warn(`Invalid section ID: ${sectionId}`);
-        }
-    }
-
-    // Public method to get current active section
-    getCurrentSection() {
-        return this.activeSection;
-    }
-
-    // Public method to get all available sections
-    getAvailableSections() {
-        return Object.keys(this.sectionMapping);
-    }
-
-    // Enhanced keyboard navigation mapping
-    mapKeyboardNavigation() {
-        // Add keyboard shortcuts info
-        const keyboardShortcuts = {
-            '1': 'home',
-            '2': 'about',
-            '3': 'services', 
-            '4': 'trainers',
-            '5': 'media',
-            '6': 'plans',
-            '7': 'demo',
-            '8': 'contact',
-            'h': 'home',
-            'a': 'about',
-            's': 'services',
-            't': 'trainers',
-            'm': 'media',
-            'p': 'plans',
-            'd': 'demo',
-            'c': 'contact'
-        };
-
-        // Display keyboard shortcuts on Alt+K
-        document.addEventListener('keydown', (e) => {
-            if (e.altKey && e.key === 'k') {
-                e.preventDefault();
-                this.showKeyboardShortcuts(keyboardShortcuts);
-            }
-        });
-    }
-
-    // Touch navigation for mobile devices
-    mapTouchNavigation() {
-        let touchStartY = 0;
-        let touchEndY = 0;
-
-        // Swipe navigation for mobile
-        document.addEventListener('touchstart', (e) => {
-            touchStartY = e.changedTouches[0].screenY;
-        }, { passive: true });
-
-        document.addEventListener('touchend', (e) => {
-            touchEndY = e.changedTouches[0].screenY;
-            this.handleSwipeNavigation(touchStartY, touchEndY);
-        }, { passive: true });
-    }
-
-    // Handle swipe navigation
-    handleSwipeNavigation(startY, endY) {
-        const minSwipeDistance = 100;
-        const swipeDistance = Math.abs(startY - endY);
-
-        if (swipeDistance < minSwipeDistance) return;
-
-        const sections = Object.keys(this.sectionMapping);
-        const currentIndex = sections.indexOf(this.activeSection);
-
-        if (startY > endY && currentIndex < sections.length - 1) {
-            // Swipe up - next section
-            this.scrollToSection(sections[currentIndex + 1]);
-        } else if (startY < endY && currentIndex > 0) {
-            // Swipe down - previous section
-            this.scrollToSection(sections[currentIndex - 1]);
-        }
-    }
-
-    // Show keyboard shortcuts modal
-    showKeyboardShortcuts(shortcuts) {
-        const modal = document.createElement('div');
-        modal.className = 'keyboard-shortcuts-modal';
-        modal.innerHTML = `
-            <div class="shortcuts-content">
-                <h3>Keyboard Shortcuts</h3>
-                <div class="shortcuts-grid">
-                    ${Object.entries(shortcuts).map(([key, section]) => 
-                        `<div class="shortcut-item">
-                            <kbd>${key}</kbd>
-                            <span>${section.charAt(0).toUpperCase() + section.slice(1)}</span>
-                        </div>`
-                    ).join('')}
-                </div>
-                <p>Press <kbd>Esc</kbd> to close this dialog</p>
-            </div>
-        `;
-
-        modal.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-        `;
-
-        document.body.appendChild(modal);
-
-        // Close on Escape or click outside
-        const closeModal = () => {
-            document.body.removeChild(modal);
-        };
-
-        document.addEventListener('keydown', function escHandler(e) {
-            if (e.key === 'Escape') {
-                closeModal();
-                document.removeEventListener('keydown', escHandler);
-            }
-        });
-
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-        });
     }
 }
 
-// Global navigation controller instance
-let navigationController;
-
-// Initialize navigation system
-function initializeNavigation() {
-    navigationController = new NavigationController();
-
-    // Ensure all buttons are properly mapped after initialization
-    setTimeout(() => {
-        navigationController.mapAllNavigationButtons();
-        console.log('Navigation system fully initialized and mapped');
-    }, 100);
-}
-
-// Legacy function for backward compatibility
-function scrollToSection(sectionId) {
-    if (navigationController) {
-        navigationController.scrollToSection(sectionId);
-    } else {
-        console.warn('Navigation controller not initialized');
-    }
-}
+// Add click listeners to nav links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1);
+        scrollToSection(targetId);
+    });
+});
 
 // Intersection Observer for animations
 const observerOptions = {
@@ -2257,43 +695,12 @@ let demoCaptcha, contactCaptcha, formSecurity;
 
 // Initialize security and CAPTCHA systems
 function initializeFormSecurity() {
-    try {
-        // Initialize form security
-        formSecurity = new FormSecurity();
+    // Initialize form security
+    formSecurity = new FormSecurity();
 
-        // Wait for DOM elements to be ready before initializing CAPTCHA
-        setTimeout(() => {
-            try {
-                // Check if CAPTCHA containers exist before initializing
-                const demoCaptchaContainer = document.getElementById('demoCaptcha');
-                const contactCaptchaContainer = document.getElementById('contactCaptcha');
-
-                if (demoCaptchaContainer) {
-                    demoCaptcha = new MathCaptcha('demoCaptcha', 'demo');
-                    console.log('Demo Math CAPTCHA initialized successfully');
-                } else {
-                    console.warn('Demo CAPTCHA container not found');
-                }
-
-                if (contactCaptchaContainer) {
-                    contactCaptcha = new MathCaptcha('contactCaptcha', 'contact');
-                    console.log('Contact Math CAPTCHA initialized successfully');
-                } else {
-                    console.warn('Contact CAPTCHA container not found');
-                }
-            } catch (captchaError) {
-                console.error('CAPTCHA initialization error:', captchaError);
-                // Fallback: Allow form submission without CAPTCHA if initialization fails
-                const submitBtns = document.querySelectorAll('#demoSubmitBtn, #contactSubmitBtn');
-                submitBtns.forEach(btn => {
-                    if (btn) btn.disabled = false;
-                });
-            }
-        }, 500);
-
-    } catch (error) {
-        console.error('Form security initialization error:', error);
-    }
+    // Initialize simple CAPTCHA systems
+    demoCaptcha = new SimpleCaptcha('demoCaptcha', 'demo');
+    contactCaptcha = new SimpleCaptcha('contactCaptcha', 'contact');
 }
 
 // Enhanced FormSubmit handler with mobile support
@@ -2343,6 +750,13 @@ async function submitFormWithFormSubmit(form, formType) {
             // Reset form
             form.reset();
 
+            // Reset CAPTCHA
+            if (formType === 'demo' && demoCaptcha) {
+                demoCaptcha.reset();
+            } else if (formType === 'contact' && contactCaptcha) {
+                contactCaptcha.reset();
+            }
+
             // Record submission for rate limiting
             formSecurity.recordSubmission();
 
@@ -2354,7 +768,7 @@ async function submitFormWithFormSubmit(form, formType) {
         } else {
             // If response is not ok, still try to process as FormSubmit might have succeeded
             console.log('Response status:', response.status);
-
+            
             // FormSubmit often returns non-200 status but still processes the form
             // So we'll show success message anyway
             if (formType === 'demo') {
@@ -2366,13 +780,20 @@ async function submitFormWithFormSubmit(form, formType) {
             // Reset form
             form.reset();
 
+            // Reset CAPTCHA
+            if (formType === 'demo' && demoCaptcha) {
+                demoCaptcha.reset();
+            } else if (formType === 'contact' && contactCaptcha) {
+                contactCaptcha.reset();
+            }
+
             // Record submission for rate limiting
             formSecurity.recordSubmission();
         }
 
     } catch (error) {
         console.error('Form submission error:', error);
-
+        
         // For mobile, even if there's an error, FormSubmit might have processed it
         // Show a more user-friendly message
         if (formType === 'demo') {
@@ -2384,6 +805,12 @@ async function submitFormWithFormSubmit(form, formType) {
         // Reset form even on error
         form.reset();
 
+        // Reset CAPTCHA
+        if (formType === 'demo' && demoCaptcha) {
+            demoCaptcha.reset();
+        } else if (formType === 'contact' && contactCaptcha) {
+            contactCaptcha.reset();
+        }
     } finally {
         // Reset button
         submitBtn.innerHTML = originalBtnText;
@@ -2675,16 +1102,8 @@ class VideoPlayer {
 
     attachEventListeners() {
         // Play button click
-        if (this.playBtn) {
-            this.playBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                this.togglePlay();
-            });
-        }
-        if (this.playPauseBtn) {
-            this.playPauseBtn.addEventListener('click', () => this.togglePlay());
-        }
+        this.playBtn.addEventListener('click', () => this.togglePlay());
+        this.playPauseBtn.addEventListener('click', () => this.togglePlay());
 
         // Video events
         this.video.addEventListener('loadedmetadata', () => this.updateTimeDisplay());
@@ -2719,47 +1138,20 @@ class VideoPlayer {
         }
     }
 
-    async playVideo() {
-        try {
-            // Pause all other videos first
-            document.querySelectorAll('.gym-video').forEach(v => {
-                if (v !== this.video && !v.paused) {
-                    v.pause();
-                    const vCard = v.closest('.video-card');
-                    const vOverlay = vCard?.querySelector('.video-overlay');
-                    const vPlayBtn = vCard?.querySelector('.play-pause-btn i');
-                    if (vOverlay) vOverlay.classList.remove('playing');
-                    if (vPlayBtn) vPlayBtn.className = 'fas fa-play';
-                }
-            });
-
-            // Ensure video is ready
-            if (this.video.readyState < 2) {
-                this.video.load();
-                await new Promise(resolve => {
-                    this.video.addEventListener('loadeddata', resolve, { once: true });
-                });
+    playVideo() {
+        // Pause all other videos first
+        document.querySelectorAll('.gym-video').forEach(v => {
+            if (v !== this.video && !v.paused) {
+                v.pause();
+                v.closest('.video-card').querySelector('.video-overlay').classList.remove('playing');
+                v.closest('.video-card').querySelector('.play-pause-btn i').className = 'fas fa-play';
             }
+        });
 
-            await this.video.play();
-            if (this.overlay) this.overlay.classList.add('playing');
-            if (this.playPauseBtn) this.playPauseBtn.querySelector('i').className = 'fas fa-pause';
-            this.isPlaying = true;
-            console.log('Video playing successfully');
-        } catch (error) {
-            console.error('Error playing video:', error);
-            // Fallback attempt
-            setTimeout(async () => {
-                try {
-                    await this.video.play();
-                    if (this.overlay) this.overlay.classList.add('playing');
-                    if (this.playPauseBtn) this.playPauseBtn.querySelector('i').className = 'fas fa-pause';
-                    this.isPlaying = true;
-                } catch (e) {
-                    console.error('Video playback failed:', e);
-                }
-            }, 200);
-        }
+        this.video.play();
+        this.overlay.classList.add('playing');
+        this.playPauseBtn.querySelector('i').className = 'fas fa-pause';
+        this.isPlaying = true;
     }
 
     pauseVideo() {
@@ -2836,633 +1228,67 @@ class VideoPlayer {
     }
 }
 
-// Initialize video players with error handling
+// Initialize video players
 function initializeVideoPlayers() {
     const videoCards = document.querySelectorAll('.video-card');
-    videoCards.forEach((card, index) => {
-        const video = card.querySelector('.gym-video');
-        if (video) {
-            try {
-                // Add error handling for video loading
-                video.addEventListener('error', (e) => {
-                    console.warn(`Video ${index + 1} loading error:`, e);
-                    handleVideoError(video, card);
-                });
-
-                video.addEventListener('loadstart', () => {
-                    console.log(`Video ${index + 1} started loading`);
-                });
-
-                video.addEventListener('canplay', () => {
-                    console.log(`Video ${index + 1} can play`);
-                });
-
-                // Initialize video player
-                new VideoPlayer(card);
-            } catch (error) {
-                console.error(`Error initializing video player ${index + 1}:`, error);
-                handleVideoError(video, card);
-            }
-        }
+    videoCards.forEach(card => {
+        new VideoPlayer(card);
     });
 }
 
-// Enhanced video loading error handler with retry functionality
-function handleVideoError(video, card) {
-    console.warn('Video loading error, attempting recovery...');
-
-    const overlay = card.querySelector('.video-overlay');
-    const playBtn = card.querySelector('.play-btn');
-    const videoInfo = card.querySelector('.video-info h3');
-
-    // Try to reload video source
-    const sources = video.querySelectorAll('source');
-    let retryCount = 0;
-    const maxRetries = 2;
-
-    const attemptReload = () => {
-        if (retryCount < maxRetries && sources.length > 0) {
-            retryCount++;
-            console.log(`Video retry attempt ${retryCount}/${maxRetries}`);
-
-            // Try next source or reload current
-            const currentSource = retryCount <= sources.length ? 
-                sources[retryCount - 1].src : sources[0].src;
-
-            video.src = currentSource;
-            video.load();
-
-            // Show loading state
-            if (playBtn) {
-                playBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                playBtn.title = 'Loading video...';
-            }
-
-            // Set timeout for retry
-            setTimeout(() => {
-                if (video.readyState < 2) {
-                    attemptReload();
-                } else {
-                    console.log('Video recovered successfully');
-                    if (playBtn) {
-                        playBtn.innerHTML = '<i class="fas fa-play"></i>';
-                        playBtn.title = 'Play video';
-                    }
-                }
-            }, 2000);
-
-        } else {
-            // All retries failed, show error state
-            console.error('Video failed to load after all retries');
-            showVideoErrorState();
-        }
-    };
-
-    const showVideoErrorState = () => {
-        if (overlay && playBtn) {
-            playBtn.innerHTML = '<i class="fas fa-image"></i>';
-            playBtn.style.background = 'rgba(108, 117, 125, 0.8)';
-            playBtn.title = 'Video not available - showing placeholder';
-
-            // Create fallback functionality
-            playBtn.onclick = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                // Show notification that video is unavailable
-                const notification = document.createElement('div');
-                notification.style.cssText = `
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: rgba(0, 0, 0, 0.9);
-                    color: white;
-                    padding: 1rem 2rem;
-                    border-radius: 8px;
-                    z-index: 10000;
-                    text-align: center;
-                `;
-                notification.innerHTML = `
-                    <i class="fas fa-exclamation-circle" style="color: #ffc107; margin-bottom: 0.5rem; display: block; font-size: 2rem;"></i>
-                    <h4 style="margin: 0.5rem 0;">Video Unavailable</h4>
-                    <p style="margin: 0; opacity: 0.8;">This video is temporarily unavailable. Please try again later.</p>
-                `;
-
-                document.body.appendChild(notification);
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 3000);
-            };
-        }
-
-        // Style video container as placeholder
-        if (video) {
-            const container = video.closest('.video-container');
-            if (container) {
-                container.style.background = `
-                    linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%),
-                    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill-opacity='0.1'%3E%3Cpolygon fill='%23000' points='50 0 60 40 100 50 60 60 50 100 40 60 0 50 40 40'/%3E%3C/g%3E%3C/svg%3E") center/50px 50px
-                `;
-                container.style.display = 'flex';
-                container.style.alignItems = 'center';
-                container.style.justifyContent = 'center';
-                container.style.position = 'relative';
-
-                // Add placeholder text
-                const placeholder = document.createElement('div');
-                placeholder.style.cssText = `
-                    position: absolute;
-                    bottom: 10px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    background: rgba(0, 0, 0, 0.7);
-                    color: white;
-                    padding: 0.25rem 0.5rem;
-                    border-radius: 4px;
-                    font-size: 0.8rem;
-                `;
-                placeholder.textContent = 'Video Preview';
-                container.appendChild(placeholder);
-            }
-
-            // Hide the actual video element
-            video.style.opacity = '0';
-        }
-    };
-
-    // Start retry process
-    attemptReload();
-}
-
-// Auto-play videos function with ultra-aggressive mobile support
+// Auto-play videos function
 function initializeAutoplayVideos() {
-    // Play hero background video with ultra-aggressive mobile autoplay
+    // Play hero background video
     const heroVideo = document.querySelector('.hero-background-video');
     if (heroVideo) {
-        // Add error handling for video source
-        heroVideo.addEventListener('error', (e) => {
-            console.log('Hero video error, trying fallback:', e);
-            // Hide video and show background color instead
-            heroVideo.style.display = 'none';
-            const heroSection = document.querySelector('.hero');
-            if (heroSection) {
-                heroSection.style.background = 'linear-gradient(135deg, #000000 0%, #1a0000 100%)';
-            }
-        });
+        heroVideo.removeAttribute('controls');
+        heroVideo.controls = false;
+        heroVideo.muted = true;
+        heroVideo.playsInline = true;
+        heroVideo.autoplay = true;
+        heroVideo.loop = true;
+        heroVideo.preload = 'auto';
+        heroVideo.setAttribute('playsinline', '');
+        heroVideo.setAttribute('webkit-playsinline', '');
+        heroVideo.setAttribute('disableremoteplayback', '');
+        heroVideo.setAttribute('disablepictureinpicture', '');
+        heroVideo.style.pointerEvents = 'none';
 
-        heroVideo.addEventListener('loadstart', () => {
-            console.log('Hero video loading started');
-        });
-
-        heroVideo.addEventListener('canplay', () => {
-            console.log('Hero video can play');
-        });
-
-        // Add error handling for video source
-        heroVideo.addEventListener('error', (e) => {
-            console.log('Hero video error, trying fallback:', e);
-            // Hide video and show background color instead
-            heroVideo.style.display = 'none';
-            const heroSection = document.querySelector('.hero');
-            if (heroSection) {
-                heroSection.style.background = 'linear-gradient(135deg, #000000 0%, #1a0000 100%)';
-            }
-        });
-
-        heroVideo.addEventListener('loadstart', () => {
-            console.log('Hero video loading started');
-        });
-
-        heroVideo.addEventListener('canplay', () => {
-            console.log('Hero video can play');
-        });
-
-        // Add error handling for video source
-        heroVideo.addEventListener('error', (e) => {
-            console.log('Hero video error, trying fallback:', e);
-            // Hide video and show background color instead
-            heroVideo.style.display = 'none';
-            const heroSection = document.querySelector('.hero');
-            if (heroSection) {
-                heroSection.style.background = 'linear-gradient(135deg, #000000 0%, #1a0000 100%)';
-            }
-        });
-
-        heroVideo.addEventListener('loadstart', () => {
-            console.log('Hero video loading started');
-        });
-
-        heroVideo.addEventListener('canplay', () => {
-            console.log('Hero video can play');
-        });
-
-        // Add video source and configuration for autoplay, loop, muted, and playsinline
-        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-                         window.innerWidth <= 768 || 
-                         'ontouchstart' in window || 
-                         navigator.maxTouchPoints > 0;
-
-        // Immediately set video source to prevent loading delays
-        if (!heroVideo.src && heroVideo.querySelector('source')) {
-            heroVideo.src = heroVideo.querySelector('source').src;
-        }
-
-        // Ultra-aggressive video configuration
-        const configureVideo = () => {
-            // Remove all possible controls and interactions
-            heroVideo.removeAttribute('controls');
-            heroVideo.controls = false;
-
-            // Set all autoplay-required attributes
-            heroVideo.muted = true;
-            heroVideo.defaultMuted = true;
-            heroVideo.volume = 0;
-            heroVideo.autoplay = true;
-            heroVideo.loop = true;
-            heroVideo.playsInline = true;
-            heroVideo.preload = 'auto';
-
-            // Force all HTML attributes for maximum compatibility
-            const attrs = {
-                'muted': 'true',
-                'autoplay': 'true',
-                'loop': 'true',
-                'playsinline': 'true',
-                'webkit-playsinline': 'true',
-                'defaultMuted': 'true',
-                'preload': 'auto',
-                'disableremoteplaybook': 'true',
-                'disablepictureinpicture': 'true',
-                'x-webkit-airplay': 'deny',
-                'controlsList': 'nodownload nofullscreen noremoteplaybook noplaybackrate'
-            };
-
-            // Mobile-specific attributes for all devices
-            if (isMobile) {
-                attrs['x5-playsinline'] = 'true';
-                attrs['x5-video-player-type'] = 'h5';
-                attrs['x5-video-player-fullscreen'] = 'false';
-                attrs['x5-video-orientation'] = 'portrait';
-                attrs['t7-video-player-type'] = 'inline';
-                attrs['webkit-playsinline'] = '';
-                attrs['playsinline'] = '';
-            }
-
-            // Apply all attributes
-            Object.entries(attrs).forEach(([key, value]) => {
-                heroVideo.setAttribute(key, value);
+        const playVideo = () => {
+            heroVideo.currentTime = 0;
+            heroVideo.play().catch(e => {
+                console.log('Hero background video autoplay prevented by browser policy');
             });
         };
 
-        // Aggressive style enforcement
-        const enforceBackgroundBehavior = () => {
-            const styles = {
-                'pointer-events': 'none',
-                'outline': 'none',
-                '-webkit-touch-callout': 'none',
-                '-webkit-user-select': 'none',
-                'user-select': 'none',
-                '-webkit-appearance': 'none',
-                'appearance': 'none',
-                '-webkit-media-controls': 'none',
-                '-webkit-media-controls-panel': 'none',
-                '-webkit-media-controls-play-button': 'none',
-                '-webkit-media-controls-start-playback-button': 'none',
-                '-webkit-media-controls-overlay-play-button': 'none',
-                'display': 'block'
-            };
-
-            Object.entries(styles).forEach(([prop, value]) => {
-                heroVideo.style.setProperty(prop, value, 'important');
-            });
-
-            // Reapply video configuration
-            configureVideo();
-        };
-
-        // Immediate configuration
-        configureVideo();
-        enforceBackgroundBehavior();
-
-        // Monitor and enforce settings every 50ms
-        const monitorInterval = setInterval(() => {
-            enforceBackgroundBehavior();
-
-            // Ensure video stays muted and configured
-            if (heroVideo.volume > 0) heroVideo.volume = 0;
-            if (!heroVideo.muted) heroVideo.muted = true;
-            if (heroVideo.controls) heroVideo.controls = false;
-        }, 50);
-
-        // Enhanced autoplay function with better error handling
-        const attemptAutoplay = async (retryCount = 0) => {
-            try {
-                // Reset to known good state
-                heroVideo.currentTime = 0;
-                heroVideo.muted = true;
-                heroVideo.volume = 0;
-
-                // Attempt to play
-                const playPromise = heroVideo.play();
-
-                if (playPromise !== undefined) {
-                    await playPromise;
-                    console.log('Background video autoplay successful');
-                    clearInterval(monitorInterval); // Stop aggressive monitoring once playing
-                    return true;
-                }
-                return false;
-            } catch (error) {
-                console.log('Autoplay failed, will retry:', error);
-
-                // Retry logic with exponential backoff
-                if (retryCount < 5) {
-                    const delay = Math.min(100 * Math.pow(2, retryCount), 2000);
-                    setTimeout(() => {
-                        configureVideo();
-                        attemptAutoplay(retryCount + 1);
-                    }, delay);
-                } else {
-                    console.log('Retry failed:', error);
-                }
-                return false;
-            }
-        };
-
-        // Immediate play attempts for mobile
-        if (isMobile) {
-            // Force immediate load
-            heroVideo.load();
-
-            // Multiple immediate attempts
-            setTimeout(() => attemptAutoplay(0), 50);
-            setTimeout(() => attemptAutoplay(0), 200);
-            setTimeout(() => attemptAutoplay(0), 500);
-            setTimeout(() => attemptAutoplay(0), 1000);
-        }
-
-        // Event-based autoplay attempts
-        const videoReadyEvents = ['loadedmetadata', 'loadeddata', 'canplay', 'canplaythrough'];
-        videoReadyEvents.forEach(eventName => {
-            heroVideo.addEventListener(eventName, () => attemptAutoplay(0), { once: true, passive: true });
-        });
-
-        // Force initial load
-        heroVideo.load();
-
-        // Try immediate play if video is already ready
         if (heroVideo.readyState >= 2) {
-            attemptAutoplay(0);
+            playVideo();
+        } else {
+            heroVideo.addEventListener('loadeddata', playVideo, { once: true });
         }
 
-        // User interaction fallback for stubborn mobile browsers
-        let userInteracted = false;
-        const playOnInteraction = async () => {
-            if (!userInteracted) {
-                userInteracted = true;
-                configureVideo();
-                await attemptAutoplay(0);
-            }
-        };
-
-        // Capture ANY user interaction
-        const interactionEvents = ['touchstart', 'touchend', 'touchmove', 'click', 'mousedown', 'keydown', 'scroll'];
-        interactionEvents.forEach(event => {
-            document.addEventListener(event, playOnInteraction, { once: true, passive: true });
-            window.addEventListener(event, playOnInteraction, { once: true, passive: true });
-        });
-
-        // Prevent video pausing
-        heroVideo.addEventListener('pause', () => {
-            if (userInteracted) {
-                setTimeout(() => {
-                    if (heroVideo.paused) {
-                        configureVideo();
-                        attemptAutoplay(0);
-                    }
-                }, 10);
-            }
-        });
-
-        // Block all user interactions with video
-        const blockInteraction = (e) => {
+        heroVideo.addEventListener('contextmenu', (e) => {
             e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
             return false;
-        };
-
-        const eventsToBlock = [
-            'click', 'dblclick', 'mousedown', 'mouseup', 'mousemove',
-            'touchstart', 'touchend', 'touchmove', 'touchcancel',
-            'contextmenu', 'selectstart', 'dragstart', 'drag', 'dragend',
-            'gesturestart', 'gesturechange', 'gestureend'
-        ];
-
-        eventsToBlock.forEach(eventType => {
-            heroVideo.addEventListener(eventType, blockInteraction, { passive: false, capture: true });
-        });
-
-        // Handle page visibility and focus changes
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden && heroVideo.paused) {
-                setTimeout(() => {
-                    configureVideo();
-                    attemptAutoplay(0);
-                }, 100);
-            }
-        });
-
-        window.addEventListener('focus', () => {
-            if (heroVideo.paused) {
-                setTimeout(() => {
-                    configureVideo();
-                    attemptAutoplay(0);
-                }, 100);
-            }
-        });
-
-        // Handle orientation changes
-        window.addEventListener('orientationchange', () => {
-            setTimeout(() => {
-                configureVideo();
-                if (heroVideo.paused) {
-                    attemptAutoplay(0);
-                }
-            }, 600);
-        });
-
-        // Success logging
-        heroVideo.addEventListener('play', () => {
-            console.log('Background video is now playing');
-        });
-
-        heroVideo.addEventListener('playing', () => {
-            console.log('Background video is playing smoothly');
         });
     }
 
-    // Enhanced media section videos configuration
+    // Media section videos - disable autoplay, show controls
     const mediaVideos = document.querySelectorAll('#media .gym-video');
     mediaVideos.forEach((video, index) => {
         if (!video) return;
 
-        try {
-            // Configure video properties
-            video.muted = true;
-            video.playsInline = true;
-            video.loop = true;
-            video.autoplay = false;
-            video.preload = 'metadata';
-            video.removeAttribute('autoplay');
-            video.controls = false;
-            video.setAttribute('playsinline', '');
-            video.setAttribute('webkit-playsinline', '');
+        video.muted = true;
+        video.playsInline = true;
+        video.loop = true;
+        video.autoplay = false;
+        video.preload = 'metadata';
+        video.removeAttribute('autoplay');
 
-            let loadAttempts = 0;
-            const maxLoadAttempts = 3;
-
-            // Enhanced error handling with retry logic
-            video.addEventListener('error', (e) => {
-                console.warn(`Media video ${index + 1} error (attempt ${loadAttempts + 1}):`, e);
-
-                if (loadAttempts < maxLoadAttempts) {
-                    loadAttempts++;
-                    console.log(`Retrying video load for video ${index + 1}...`);
-
-                    setTimeout(() => {
-                        try {
-                            video.load();
-                        } catch (retryError) {
-                            console.error(`Retry failed for video ${index + 1}:`, retryError);
-                        }
-                    }, 1000 * loadAttempts);
-                } else {
-                    const card = video.closest('.video-card');
-                    if (card) {
-                        handleVideoError(video, card);
-                    }
-                }
-            });
-
-            // Success handler
-            video.addEventListener('loadeddata', () => {
-                console.log(`Media video ${index + 1} loaded successfully`);
-                loadAttempts = 0; // Reset counter on success
-
-                // Ensure overlay is properly configured
-                const overlay = video.closest('.video-container')?.querySelector('.video-overlay');
-                if (overlay) {
-                    overlay.style.display = 'flex';
-                    overlay.classList.remove('playing');
-
-                    const playBtn = overlay.querySelector('.play-btn');
-                    if (playBtn) {
-                        playBtn.innerHTML = '<i class="fas fa-play"></i>';
-                        playBtn.style.background = '';
-                        playBtn.title = 'Play video';
-                    }
-                }
-            });
-
-            // Loading state handler
-            video.addEventListener('loadstart', () => {
-                console.log(`Video ${index + 1} loading started`);
-                const overlay = video.closest('.video-container')?.querySelector('.video-overlay');
-                const playBtn = overlay?.querySelector('.play-btn');
-                if (playBtn) {
-                    playBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                }
-            });
-
-            // Can play handler
-            video.addEventListener('canplay', () => {
-                console.log(`Video ${index + 1} can play`);
-                const overlay = video.closest('.video-container')?.querySelector('.video-overlay');
-                const playBtn = overlay?.querySelector('.play-btn');
-                if (playBtn && playBtn.innerHTML.includes('spinner')) {
-                    playBtn.innerHTML = '<i class="fas fa-play"></i>';
-                }
-            });
-
-            // Initial load attempt
-            video.load();
-
-        } catch (error) {
-            console.error(`Error configuring media video ${index + 1}:`, error);
-            const card = video.closest('.video-card');
-            if (card) {
-                handleVideoError(video, card);
-            }
-        }
-
-        // Add direct click handler for immediate play with enhanced error handling
-        const playBtn = video.closest('.video-container')?.querySelector('.play-btn');
-        if (playBtn) {
-            playBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-
-                try {
-                    // Show loading state
-                    playBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-
-                    // Pause all other videos first
-                    document.querySelectorAll('#media .gym-video').forEach(v => {
-                        if (v !== video && !v.paused) {
-                            v.pause();
-                            const vOverlay = v.closest('.video-container')?.querySelector('.video-overlay');
-                            if (vOverlay) vOverlay.classList.remove('playing');
-                        }
-                    });
-
-                    // Ensure video is loaded
-                    if (video.readyState < 2) {
-                        video.load();
-                        await new Promise((resolve, reject) => {
-                            const timeout = setTimeout(() => reject(new Error('Video load timeout')), 5000);
-                            video.addEventListener('loadeddata', () => {
-                                clearTimeout(timeout);
-                                resolve();
-                            }, { once: true });
-                        });
-                    }
-
-                    // Play the clicked video
-                    await video.play();
-                    if (overlay) overlay.classList.add('playing');
-                    playBtn.style.display = 'none'; // Hide play button when playing
-                    console.log('Media video playing:', index);
-                } catch (error) {
-                    console.error('Error playing video:', error);
-                    // Reset play button
-                    playBtn.innerHTML = '<i class="fas fa-play"></i>';
-
-                    // Show error state
-                    playBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
-                    playBtn.style.background = 'rgba(220, 53, 69, 0.8)';
-                    playBtn.title = 'Video playback failed';
-
-                    // Try fallback after delay
-                    setTimeout(async () => {
-                        try {
-                            playBtn.innerHTML = '<i class="fas fa-play"></i>';
-                            playBtn.style.background = '';
-                            playBtn.title = '';
-                            await video.play();
-                            if (overlay) overlay.classList.add('playing');
-                            playBtn.style.display = 'none';
-                        } catch (e) {
-                            console.error('Fallback play failed:', e);
-                            playBtn.innerHTML = '<i class="fas fa-times"></i>';
-                            playBtn.style.background = 'rgba(220, 53, 69, 0.8)';
-                        }
-                    }, 1000);
-                }
-            });
+        const overlay = video.closest('.video-container')?.querySelector('.video-overlay');
+        if (overlay) {
+            overlay.style.display = 'flex';
+            overlay.classList.remove('playing');
         }
     });
 }
