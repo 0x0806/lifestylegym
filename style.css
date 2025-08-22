@@ -1968,23 +1968,145 @@ section {
 }
 
 /* Math Challenge Styles */
-.math-challenge .captcha-question-container {
+.math-challenge {
+    width: 100%;
+}
+
+.math-question-container {
     display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .math-question {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    flex: 1;
+    justify-content: center;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(220, 20, 60, 0.1) 100%);
+    border: 2px solid rgba(255, 107, 53, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.question-text {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--light-color);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 2px;
+    font-family: 'Courier New', monospace;
+}
+
+/* Enhanced input styling for math problems */
+.math-challenge .captcha-input {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 600;
     padding: 1rem;
+    border: 2px solid rgba(255, 107, 53, 0.3);
+    border-radius: 10px;
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    font-size: 1.1rem;
+    color: var(--light-color);
+    backdrop-filter: blur(5px);
+}
+
+.math-challenge .captcha-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.2);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Math challenge controls */
+.math-challenge .captcha-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    margin: 1.5rem 0;
+}
+
+.math-challenge .captcha-verify {
+    background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
+    border: none;
     color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    min-height: 48px;
+}
+
+.math-challenge .captcha-verify:hover {
+    background: linear-gradient(135deg, #218838 0%, #1ea874 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.math-challenge .captcha-refresh {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    color: var(--light-color);
+    padding: 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 48px;
+}
+
+.math-challenge .captcha-refresh:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+/* Mobile responsiveness for math challenge */
+@media (max-width: 768px) {
+    .math-question {
+        padding: 1rem 1.5rem;
+    }
+    
+    .question-text {
+        font-size: 1.5rem;
+        letter-spacing: 1px;
+    }
+    
+    .math-challenge .captcha-controls {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .math-challenge .captcha-verify,
+    .math-challenge .captcha-refresh {
+        width: 100%;
+        max-width: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .question-text {
+        font-size: 1.3rem;
+    }
+    
+    .math-challenge .captcha-input {
+        font-size: 1.1rem;
+        padding: 0.875rem;
+    }
 }
 
 .captcha-input {
