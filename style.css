@@ -293,6 +293,23 @@ p {
     box-sizing: border-box;
 }
 
+@media (max-width: 768px) {
+    .nav-container {
+        padding: 0 20px !important;
+        height: 70px !important;
+        position: relative !important;
+    }
+    
+    .nav-logo {
+        order: 1 !important;
+        flex: 1 !important;
+    }
+    
+    .nav-menu {
+        order: 3 !important;
+    }
+}
+
 .nav-logo {
     flex-shrink: 0;
 }
@@ -417,6 +434,8 @@ p {
     min-height: 44px;
     align-items: center;
     justify-content: center;
+    z-index: 1001;
+    position: relative;
 }
 
 .hamburger:hover {
@@ -457,21 +476,22 @@ p {
 @media (max-width: 768px) {
     .hamburger {
         display: flex !important;
-        flex-direction: column;
-        cursor: pointer;
-        padding: 12px;
-        border-radius: 8px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        background: rgba(255, 255, 255, 0.1);
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        min-width: 48px;
-        min-height: 48px;
-        align-items: center;
-        justify-content: center;
-        z-index: 1001;
-        position: relative;
-        -webkit-tap-highlight-color: transparent;
-        touch-action: manipulation;
+        flex-direction: column !important;
+        cursor: pointer !important;
+        padding: 12px !important;
+        border-radius: 8px !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: 2px solid rgba(255, 255, 255, 0.1) !important;
+        min-width: 48px !important;
+        min-height: 48px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        z-index: 1001 !important;
+        position: relative !important;
+        -webkit-tap-highlight-color: transparent !important;
+        touch-action: manipulation !important;
+        order: 2 !important;
     }
 
     .hamburger:hover,
