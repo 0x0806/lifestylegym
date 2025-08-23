@@ -498,8 +498,10 @@ function initializeNavigation() {
     if (hamburger && navMenu) {
         // Enhanced click/touch handler for mobile
         const toggleMenu = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
             
             const isActive = hamburger.classList.contains('active');
             
@@ -524,12 +526,19 @@ function initializeNavigation() {
             }
         };
 
-        // Add both click and touchstart for better mobile support
-        hamburger.addEventListener('click', toggleMenu);
-        hamburger.addEventListener('touchstart', (e) => {
+        // Add click event listener
+        hamburger.addEventListener('click', function(e) {
             e.preventDefault();
+            e.stopPropagation();
             toggleMenu(e);
-        }, { passive: false });
+        });
+
+        // Add touch event for mobile
+        hamburger.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleMenu(e);
+        });
 
         // Close menu when clicking outside
         const closeMenu = () => {
@@ -552,11 +561,11 @@ function initializeNavigation() {
         });
 
         // Handle touches outside menu for mobile
-        document.addEventListener('touchstart', (e) => {
+        document.addEventListener('touchend', (e) => {
             if (!navMenu.contains(e.target) && !hamburger.contains(e.target)) {
                 closeMenu();
             }
-        }, { passive: true });
+        });
 
         // Close mobile menu when clicking on nav links
         document.querySelectorAll('.nav-link').forEach(link => {
@@ -565,7 +574,7 @@ function initializeNavigation() {
             };
             
             link.addEventListener('click', handleLinkClick);
-            link.addEventListener('touchstart', handleLinkClick, { passive: true });
+            link.addEventListener('touchend', handleLinkClick);
         });
     }
 }
