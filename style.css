@@ -946,6 +946,18 @@ section {
     grid-template-columns: 2fr 1fr;
     gap: 4rem;
     align-items: center;
+    width: 100%;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .about-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: center;
+        width: 100%;
+        margin: 0 auto;
+    }
 }
 
 .about-text {
@@ -1040,6 +1052,9 @@ section {
     gap: clamp(1.5rem, 3vw, 2rem);
     width: 100%;
     padding: 0;
+    margin: 0 auto;
+    justify-items: center;
+    align-items: stretch;
 }
 
 .service-card {
@@ -1289,6 +1304,9 @@ section {
     gap: clamp(1.5rem, 3vw, 2rem);
     width: 100%;
     justify-content: center;
+    margin: 0 auto;
+    justify-items: center;
+    align-items: stretch;
 }
 
 .video-card {
@@ -2485,6 +2503,16 @@ section {
     margin: 0 auto;
 }
 
+@media (max-width: 768px) {
+    .contact-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        width: 100%;
+        margin: 0 auto;
+        text-align: center;
+    }
+}
+
 .contact-info {
     display: grid;
     grid-template-columns: 1fr;
@@ -2970,6 +2998,14 @@ section {
 @media (max-width: 768px) {
     .container {
         padding: 0 clamp(16px, 4vw, 24px);
+        margin: 0 auto;
+        width: 100%;
+        max-width: 100vw;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
     }
 
     /* Enhanced mobile form styling */
@@ -3220,6 +3256,12 @@ section {
         padding: 0 clamp(8px, 3vw, 16px);
         width: 100%;
         max-width: 100vw;
+        margin: 0 auto;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
     }
 
     /* Ultra-mobile optimizations */
@@ -3526,7 +3568,11 @@ section {
     .service-card,
     .contact-card {
         padding: 1.5rem 1rem;
-        max-width: 350px;
+        max-width: 100%;
+        width: 100%;
+        margin: 0 auto;
+        box-sizing: border-box;
+        text-align: center;
     }
 
     .about-card h3,
@@ -3552,7 +3598,10 @@ section {
     }
 
     .trainer-card {
-        max-width: 350px;
+        max-width: 100%;
+        width: 100%;
+        margin: 0 auto;
+        box-sizing: border-box;
     }
 
     .trainer-image {
@@ -3569,12 +3618,19 @@ section {
     }
 
     .video-card {
-        max-width: 350px;
+        max-width: 100%;
+        width: 100%;
+        margin: 0 auto;
+        box-sizing: border-box;
     }
 
     .plan-card {
         padding: 1.5rem;
-        max-width: 350px;
+        max-width: 100%;
+        width: 100%;
+        margin: 0 auto;
+        box-sizing: border-box;
+        text-align: center;
     }
 
     .plan-price .amount {
@@ -3589,7 +3645,10 @@ section {
     .demo-form,
     .contact-form {
         padding: 1.5rem 1rem;
-        max-width: 450px;
+        max-width: 100%;
+        width: 100%;
+        margin: 0 auto;
+        box-sizing: border-box;
     }
 
     .booking-form h3,
@@ -3626,7 +3685,11 @@ section {
     /* Contact Section - Small Screens */
     .contact-card {
         padding: 1.5rem 1.2rem;
-        max-width: 380px;
+        max-width: 100%;
+        width: 100%;
+        margin: 0 auto;
+        box-sizing: border-box;
+        text-align: center;
     }
 
     .contact-card h3 {
@@ -3650,6 +3713,10 @@ section {
 
     .contact-form {
         padding: 1.8rem 1.2rem;
+        max-width: 100%;
+        width: 100%;
+        margin: 0 auto;
+        box-sizing: border-box;
     }
 
     .contact-form h3 {
@@ -3674,7 +3741,11 @@ section {
     }
 
     .footer-section {
-        max-width: 350px;
+        max-width: 100%;
+        width: 100%;
+        margin: 0 auto;
+        box-sizing: border-box;
+        text-align: center;
     }
 
     .footer-section h3 {
@@ -3972,7 +4043,13 @@ section {
     .plans-grid {
         grid-template-columns: 1fr;
         gap: clamp(1rem, 4vw, 2rem);
-        padding: 0 clamp(8px, 2vw, 16px);
+        padding: 0;
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        display: grid;
+        justify-items: center;
+        align-items: center;
     }
 }
 
