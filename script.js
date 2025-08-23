@@ -585,70 +585,121 @@ function initializeNavigation() {
             }
         });
 
-        // Close mobile menu when clicking on nav links
-        document.querySelectorAll('.nav-link').forEach(link => {
-            const handleLinkClick = () => {
-                closeMenu();
-            };
-            
-            link.addEventListener('click', handleLinkClick);
-            link.addEventListener('touchend', handleLinkClick);
-        });
+        // Navigation links will be handled by initializeNavigationEvents function
+        // Removing duplicate handlers to prevent conflicts
     }
 }
 
-// Smooth scrolling for navigation links
+// Enhanced smooth scrolling for navigation links
 function scrollToSection(sectionId) {
     // Remove # if it exists at the beginning
     const cleanSectionId = sectionId.startsWith('#') ? sectionId.substring(1) : sectionId;
     const section = document.getElementById(cleanSectionId);
+    
+    console.log('Scrolling to section:', cleanSectionId, 'Element found:', !!section);
     
     if (section) {
         const navbar = document.querySelector('.Navbar');
         const navHeight = navbar ? navbar.offsetHeight : 80;
         const targetPosition = section.offsetTop - navHeight - 20;
 
-        // Close mobile menu if open
-        const hamburger = document.getElementById('hamburger');
-        const navMenu = document.getElementById('nav-menu');
-        if (hamburger && navMenu && hamburger.classList.contains('active')) {
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
-            document.body.style.overflow = '';
-            document.body.style.position = '';
-            document.body.style.top = '';
-            document.body.style.width = '';
-        }
+        console.log('Target position:', targetPosition);
 
+        // Force scroll immediately
         window.scrollTo({
             top: targetPosition,
             behavior: 'smooth'
         });
+
+        // Also try alternative method for better browser compatibility
+        setTimeout(() => {
+            section.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start',
+                inline: 'nearest' 
+            });
+            
+            // Adjust for navbar height after scrollIntoView
+            setTimeout(() => {
+                window.scrollBy(0, -(navHeight + 20));
+            }, 100);
+        }, 50);
+
+        // Update URL without causing page jump
+        if (history.pushState) {
+            history.pushState(null, null, '#' + cleanSectionId);
+        }
+    } else {
+        console.warn('Section not found:', cleanSectionId);
     }
 }
 
-// Add click listeners to nav links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const targetId = this.getAttribute('href');
-        scrollToSection(targetId);
+// Enhanced navigation event handling
+function initializeNavigationEvents() {
+    // Handle all navigation links with proper mobile menu closure
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            
+            // Only handle internal anchor links
+            if (href && href.startsWith('#')) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Close mobile menu immediately
+                const hamburger = document.getElementById('hamburger');
+                const navMenu = document.getElementById('nav-menu');
+                if (hamburger && navMenu && hamburger.classList.contains('active')) {
+                    hamburger.classList.remove('active');
+                    navMenu.classList.remove('active');
+                    document.body.style.overflow = '';
+                    document.body.style.position = '';
+                    document.body.style.top = '';
+                    document.body.style.width = '';
+                }
+                
+                const targetId = href.substring(1);
+                
+                // Small delay to allow menu to close, then scroll
+                setTimeout(() => {
+                    scrollToSection(targetId);
+                }, 100);
+            }
+        });
     });
-});
 
-// Add click listeners to buttons that scroll to sections
-document.addEventListener('click', function(e) {
-    // Handle buttons with onclick="scrollToSection(...)"
-    if (e.target.closest('button[onclick*="scrollToSection"]')) {
-        const button = e.target.closest('button');
-        const onclickValue = button.getAttribute('onclick');
-        const match = onclickValue.match(/scrollToSection\(['"]([^'"]+)['"]\)/);
-        if (match) {
+    // Handle buttons with onclick scrollToSection
+    document.addEventListener('click', function(e) {
+        const button = e.target.closest('button[onclick*="scrollToSection"]');
+        if (button) {
             e.preventDefault();
-            scrollToSection(match[1]);
+            e.stopPropagation();
+            
+            const onclickValue = button.getAttribute('onclick');
+            const match = onclickValue.match(/scrollToSection\(['"]([^'"]+)['"]\)/);
+            if (match) {
+                scrollToSection(match[1]);
+            }
         }
-    }
-});
+    });
+
+    // Handle direct anchor clicks (fallback)
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        // Skip if already handled by nav-link
+        if (!anchor.classList.contains('nav-link')) {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href && href.startsWith('#')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const targetId = href.substring(1);
+                    scrollToSection(targetId);
+                }
+            });
+        }
+    });
+}
 
 // Intersection Observer for animations
 const observerOptions = {
@@ -1474,6 +1525,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Initialize navigation
         initializeNavigation();
+
+        // Initialize navigation events
+        initializeNavigationEvents();
 
         // Initialize form security and CAPTCHA systems
         initializeFormSecurity();
