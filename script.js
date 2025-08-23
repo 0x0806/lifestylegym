@@ -484,6 +484,16 @@ function initializeNavigation() {
     const hamburger = document.getElementById('hamburger');
     const navMenu = document.getElementById('nav-menu');
     let scrollPosition = 0;
+    
+    console.log('Initializing navigation...');
+    console.log('Hamburger element:', hamburger);
+    console.log('Nav menu element:', navMenu);
+    
+    // Force hamburger to be visible on mobile
+    if (window.innerWidth <= 768 && hamburger) {
+        hamburger.style.display = 'flex';
+        console.log('Forced hamburger to be visible on mobile');
+    }
 
     // Scroll effect for navbar
     window.addEventListener('scroll', () => {
@@ -496,17 +506,22 @@ function initializeNavigation() {
 
     // Mobile menu toggle with better mobile handling
     if (hamburger && navMenu) {
+        console.log('Hamburger and nav menu found, setting up event listeners');
+        
         // Enhanced click/touch handler for mobile
         const toggleMenu = (e) => {
+            console.log('Toggle menu called');
             if (e) {
                 e.preventDefault();
                 e.stopPropagation();
             }
             
             const isActive = hamburger.classList.contains('active');
+            console.log('Menu is currently active:', isActive);
             
             if (!isActive) {
                 // Opening menu
+                console.log('Opening menu');
                 scrollPosition = window.pageYOffset;
                 hamburger.classList.add('active');
                 navMenu.classList.add('active');
@@ -516,6 +531,7 @@ function initializeNavigation() {
                 document.body.style.width = '100%';
             } else {
                 // Closing menu
+                console.log('Closing menu');
                 hamburger.classList.remove('active');
                 navMenu.classList.remove('active');
                 document.body.style.overflow = '';
@@ -528,17 +544,19 @@ function initializeNavigation() {
 
         // Add click event listener
         hamburger.addEventListener('click', function(e) {
+            console.log('Hamburger clicked');
             e.preventDefault();
             e.stopPropagation();
             toggleMenu(e);
         });
 
         // Add touch event for mobile
-        hamburger.addEventListener('touchend', function(e) {
+        hamburger.addEventListener('touchstart', function(e) {
+            console.log('Hamburger touched');
             e.preventDefault();
             e.stopPropagation();
             toggleMenu(e);
-        });
+        }, { passive: false });
 
         // Close menu when clicking outside
         const closeMenu = () => {
