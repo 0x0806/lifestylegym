@@ -570,18 +570,19 @@ function initializeNavigation() {
     }
 }
 
-// Smooth scrolling for navigation links
+// Enhanced smooth scrolling with comprehensive section validation
 function scrollToSection(sectionId) {
     // Remove # if it exists at the beginning
     const cleanSectionId = sectionId.startsWith('#') ? sectionId.substring(1) : sectionId;
     const section = document.getElementById(cleanSectionId);
     
+    console.log(`Attempting to scroll to section: ${cleanSectionId}`);
+    
+    // Validate that the section exists
     if (section) {
-        const navbar = document.querySelector('.Navbar');
-        const navHeight = navbar ? navbar.offsetHeight : 80;
-        const targetPosition = section.offsetTop - navHeight - 20;
-
-        // Close mobile menu if open
+        console.log(`Found section: ${cleanSectionId}, scrolling...`);
+        
+        // Close mobile menu first if open
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('nav-menu');
         if (hamburger && navMenu && hamburger.classList.contains('active')) {
@@ -593,35 +594,188 @@ function scrollToSection(sectionId) {
             document.body.style.width = '';
         }
 
-        window.scrollTo({
-            top: targetPosition,
-            behavior: 'smooth'
-        });
+        // Wait a moment for mobile menu animation to complete
+        setTimeout(() => {
+            const navbar = document.querySelector('.Navbar');
+            const navHeight = navbar ? navbar.offsetHeight : 80;
+            
+            // Get fresh section position in case page layout changed
+            const sectionElement = document.getElementById(cleanSectionId);
+            const targetPosition = Math.max(0, sectionElement.offsetTop - navHeight - 20);
+
+            // Add active state to corresponding nav link
+            updateActiveNavLink(cleanSectionId);
+
+            // Use both scrollTo methods for better browser compatibility
+            try {
+                window.scrollTo({
+                    top: targetPosition,
+                    behavior: 'smooth'
+                });
+            } catch (e) {
+                // Fallback for older browsers
+                window.scrollTo(0, targetPosition);
+            }
+
+            // Update URL hash without triggering hashchange event
+            if (history.pushState) {
+                history.pushState(null, null, '#' + cleanSectionId);
+            }
+            
+            console.log(`Scrolled to position: ${targetPosition} for section: ${cleanSectionId}`);
+        }, hamburger && hamburger.classList.contains('active') ? 300 : 50);
+
+    } else {
+        console.error(`Section with ID '${cleanSectionId}' not found!`);
+        console.log('Available sections:', Array.from(document.querySelectorAll('section[id]')).map(s => s.id));
     }
 }
 
-// Add click listeners to nav links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const targetId = this.getAttribute('href');
-        scrollToSection(targetId);
+// Update active navigation link
+function updateActiveNavLink(sectionId) {
+    const cleanSectionId = sectionId.startsWith('#') ? sectionId.substring(1) : sectionId;
+    
+    // Remove active class from all nav links
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
     });
-});
-
-// Add click listeners to buttons that scroll to sections
-document.addEventListener('click', function(e) {
-    // Handle buttons with onclick="scrollToSection(...)"
-    if (e.target.closest('button[onclick*="scrollToSection"]')) {
-        const button = e.target.closest('button');
-        const onclickValue = button.getAttribute('onclick');
-        const match = onclickValue.match(/scrollToSection\(['"]([^'"]+)['"]\)/);
-        if (match) {
-            e.preventDefault();
-            scrollToSection(match[1]);
-        }
+    
+    // Add active class to current nav link
+    const activeLink = document.querySelector(`.nav-link[href="#${cleanSectionId}"]`);
+    if (activeLink) {
+        activeLink.classList.add('active');
+        console.log(`Set active nav link for: ${cleanSectionId}`);
+    } else {
+        console.log(`No nav link found for section: ${cleanSectionId}`);
     }
-});
+}
+
+// Enhanced navigation mapping with comprehensive button handling
+function initializeNavigationMapping() {
+    // Create a comprehensive mapping of all navigation targets
+    const navigationMap = {
+        '#home': 'home',
+        '#about': 'about', 
+        '#services': 'services',
+        '#trainers': 'trainers',
+        '#media': 'media',
+        '#plans': 'plans',
+        '#contact': 'contact',
+        '#demo': 'demo'
+    };
+
+    // Verify all sections exist and log for debugging
+    Object.keys(navigationMap).forEach(hash => {
+        const sectionId = hash.substring(1);
+        const section = document.getElementById(sectionId);
+        if (!section) {
+            console.warn(`Section with ID '${sectionId}' not found`);
+        } else {
+            console.log(`✓ Section found: ${sectionId}`);
+        }
+    });
+
+    // Add click listeners to all navigation links in navbar
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (href && href.startsWith('#')) {
+                e.preventDefault();
+                e.stopPropagation();
+                scrollToSection(href);
+            }
+        });
+    });
+
+    // Add click listeners to all anchor links with hash
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href');
+            if (navigationMap[href]) {
+                e.preventDefault();
+                e.stopPropagation();
+                scrollToSection(href);
+            }
+        });
+    });
+
+    // Global click handler for various navigation elements
+    document.addEventListener('click', function(e) {
+        // Handle buttons with onclick="scrollToSection(...)"
+        const button = e.target.closest('button[onclick*="scrollToSection"]');
+        if (button) {
+            e.preventDefault();
+            e.stopPropagation();
+            const onclickValue = button.getAttribute('onclick');
+            const match = onclickValue.match(/scrollToSection\(['"]([^'"]+)['"]\)/);
+            if (match) {
+                const targetSection = match[1];
+                const targetId = targetSection.startsWith('#') ? targetSection : '#' + targetSection;
+                if (navigationMap[targetId]) {
+                    console.log(`Button clicked for section: ${targetId}`);
+                    scrollToSection(targetId);
+                }
+            }
+            return;
+        }
+
+        // Handle any element with data-scroll-to attribute
+        const scrollElement = e.target.closest('[data-scroll-to]');
+        if (scrollElement) {
+            e.preventDefault();
+            e.stopPropagation();
+            const targetId = scrollElement.getAttribute('data-scroll-to');
+            if (targetId && navigationMap[targetId]) {
+                console.log(`Data-scroll-to clicked for section: ${targetId}`);
+                scrollToSection(targetId);
+            }
+            return;
+        }
+
+        // Handle nav links that might be clicked indirectly
+        const navLink = e.target.closest('.nav-link');
+        if (navLink && navLink.getAttribute('href')) {
+            const href = navLink.getAttribute('href');
+            if (href.startsWith('#') && navigationMap[href]) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log(`Nav link clicked for section: ${href}`);
+                scrollToSection(href);
+            }
+        }
+    });
+
+    // Additional event handler for touch devices
+    document.addEventListener('touchend', function(e) {
+        // Handle nav links on touch devices
+        const navLink = e.target.closest('.nav-link');
+        if (navLink && navLink.getAttribute('href')) {
+            const href = navLink.getAttribute('href');
+            if (href.startsWith('#') && navigationMap[href]) {
+                e.preventDefault();
+                console.log(`Touch navigation to section: ${href}`);
+                scrollToSection(href);
+            }
+        }
+    }, { passive: false });
+
+    // Handle hash changes in URL
+    window.addEventListener('hashchange', function() {
+        const hash = window.location.hash;
+        if (hash && navigationMap[hash]) {
+            scrollToSection(hash);
+        }
+    });
+
+    // Handle initial page load with hash
+    if (window.location.hash && navigationMap[window.location.hash]) {
+        setTimeout(() => {
+            scrollToSection(window.location.hash);
+        }, 100);
+    }
+}
+
+// Call the navigation mapping initialization
 
 // Intersection Observer for animations
 const observerOptions = {
@@ -1447,6 +1601,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Initialize navigation
         initializeNavigation();
+        
+        // Initialize navigation mapping
+        initializeNavigationMapping();
 
         // Initialize form security and CAPTCHA systems
         initializeFormSecurity();
