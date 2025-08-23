@@ -582,10 +582,24 @@ function scrollToSection(sectionId) {
     if (section) {
         console.log(`Found section: ${cleanSectionId}, scrolling...`);
         
+        // Prevent any default hash behavior
+        if (window.event) {
+            window.event.preventDefault();
+            window.event.stopPropagation();
+        }
+        
+        // Cancel any existing scroll animations immediately
+        if (window.currentScrollAnimation) {
+            cancelAnimationFrame(window.currentScrollAnimation);
+            window.currentScrollAnimation = null;
+        }
+        
         // Close mobile menu first if open
         const hamburger = document.getElementById('hamburger');
         const navMenu = document.getElementById('nav-menu');
-        if (hamburger && navMenu && hamburger.classList.contains('active')) {
+        const isMobileMenuOpen = hamburger && navMenu && hamburger.classList.contains('active');
+        
+        if (isMobileMenuOpen) {
             hamburger.classList.remove('active');
             navMenu.classList.remove('active');
             document.body.style.overflow = '';
@@ -594,41 +608,91 @@ function scrollToSection(sectionId) {
             document.body.style.width = '';
         }
 
-        // Wait a moment for mobile menu animation to complete
-        setTimeout(() => {
-            const navbar = document.querySelector('.Navbar');
-            const navHeight = navbar ? navbar.offsetHeight : 80;
-            
-            // Get fresh section position in case page layout changed
-            const sectionElement = document.getElementById(cleanSectionId);
-            const targetPosition = Math.max(0, sectionElement.offsetTop - navHeight - 20);
+        // Function to perform the actual scroll
+        const performScroll = () => {
+            // Wait a frame to ensure DOM is settled
+            requestAnimationFrame(() => {
+                // Calculate target position
+                const navbar = document.querySelector('.Navbar');
+                const navHeight = navbar ? navbar.offsetHeight : 80;
+                
+                // Get the section's position relative to the document
+                const sectionRect = section.getBoundingClientRect();
+                const absoluteTop = sectionRect.top + window.pageYOffset;
+                const targetPosition = Math.max(0, absoluteTop - navHeight - 20);
+                
+                console.log(`Scrolling to position: ${targetPosition} for section: ${cleanSectionId}`);
+                
+                // Update active nav link immediately
+                updateActiveNavLink(cleanSectionId);
+                
+                // Disable smooth scroll temporarily if browser doesn't support it well
+                const supportsScrollBehavior = 'scrollBehavior' in document.documentElement.style;
+                
+                if (supportsScrollBehavior && Math.abs(targetPosition - window.pageYOffset) > 50) {
+                    // Use smooth scrolling for large distances
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                } else {
+                    // Use custom smooth scroll for better control
+                    smoothScrollTo(targetPosition, 800);
+                }
+                
+                // Update URL hash after scroll starts
+                setTimeout(() => {
+                    if (history.replaceState) {
+                        try {
+                            history.replaceState(null, null, '#' + cleanSectionId);
+                        } catch (e) {
+                            console.warn('Failed to update URL hash:', e);
+                        }
+                    }
+                }, 100);
+            });
+        };
 
-            // Add active state to corresponding nav link
-            updateActiveNavLink(cleanSectionId);
-
-            // Use both scrollTo methods for better browser compatibility
-            try {
-                window.scrollTo({
-                    top: targetPosition,
-                    behavior: 'smooth'
-                });
-            } catch (e) {
-                // Fallback for older browsers
-                window.scrollTo(0, targetPosition);
-            }
-
-            // Update URL hash without triggering hashchange event
-            if (history.pushState) {
-                history.pushState(null, null, '#' + cleanSectionId);
-            }
-            
-            console.log(`Scrolled to position: ${targetPosition} for section: ${cleanSectionId}`);
-        }, hamburger && hamburger.classList.contains('active') ? 300 : 50);
+        // Execute scroll immediately or after mobile menu closes
+        if (isMobileMenuOpen) {
+            setTimeout(performScroll, 150);
+        } else {
+            performScroll();
+        }
 
     } else {
         console.error(`Section with ID '${cleanSectionId}' not found!`);
         console.log('Available sections:', Array.from(document.querySelectorAll('section[id]')).map(s => s.id));
     }
+}
+
+// Custom smooth scroll function for better browser compatibility
+function smoothScrollTo(targetY, duration = 800) {
+    const startY = window.pageYOffset;
+    const difference = targetY - startY;
+    const startTime = performance.now();
+
+    function step(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function for smooth animation
+        const easeInOutCubic = progress < 0.5 
+            ? 4 * progress * progress * progress 
+            : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+        
+        const currentY = startY + (difference * easeInOutCubic);
+        window.scrollTo(0, currentY);
+        
+        if (progress < 1) {
+            window.currentScrollAnimation = requestAnimationFrame(step);
+        } else {
+            window.currentScrollAnimation = null;
+            console.log(`Scroll completed to position: ${Math.round(window.pageYOffset)}`);
+        }
+    }
+    
+    window.currentScrollAnimation = requestAnimationFrame(step);
 }
 
 // Update active navigation link
@@ -675,50 +739,74 @@ function initializeNavigationMapping() {
         }
     });
 
+    // Remove any existing onclick attributes and add proper event listeners
+    document.querySelectorAll('button[onclick*="scrollToSection"]').forEach(button => {
+        const onclickValue = button.getAttribute('onclick');
+        const match = onclickValue.match(/scrollToSection\(['"]([^'"]+)['"]\)/);
+        if (match) {
+            const targetSection = match[1];
+            // Remove the onclick attribute
+            button.removeAttribute('onclick');
+            // Add proper event listener
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                const targetId = targetSection.startsWith('#') ? targetSection : '#' + targetSection;
+                console.log(`Button clicked for section: ${targetId}`);
+                
+                // Store the event reference and execute scroll
+                window.event = e;
+                scrollToSection(targetId);
+                return false;
+            }, { passive: false });
+        }
+    });
+
     // Add click listeners to all navigation links in navbar
     document.querySelectorAll('.nav-link').forEach(link => {
+        // Remove any existing onclick handlers first
+        link.removeAttribute('onclick');
+        
         link.addEventListener('click', function (e) {
             const href = this.getAttribute('href');
             if (href && href.startsWith('#')) {
                 e.preventDefault();
                 e.stopPropagation();
+                e.stopImmediatePropagation();
+                console.log(`Nav link clicked for section: ${href}`);
+                
+                // Store the event reference and execute scroll
+                window.event = e;
                 scrollToSection(href);
+                return false;
             }
-        });
+        }, { passive: false });
     });
 
     // Add click listeners to all anchor links with hash
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            const href = this.getAttribute('href');
-            if (navigationMap[href]) {
-                e.preventDefault();
-                e.stopPropagation();
-                scrollToSection(href);
-            }
-        });
+        // Skip if it's already a nav-link (to avoid duplicate listeners)
+        if (!anchor.classList.contains('nav-link')) {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (navigationMap[href]) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    console.log(`Anchor clicked for section: ${href}`);
+                    
+                    // Store the event reference and execute scroll immediately
+                    window.event = e;
+                    scrollToSection(href);
+                    return false;
+                }
+            }, { passive: false });
+        }
     });
 
-    // Global click handler for various navigation elements
+    // Global click handler for any missed navigation elements
     document.addEventListener('click', function(e) {
-        // Handle buttons with onclick="scrollToSection(...)"
-        const button = e.target.closest('button[onclick*="scrollToSection"]');
-        if (button) {
-            e.preventDefault();
-            e.stopPropagation();
-            const onclickValue = button.getAttribute('onclick');
-            const match = onclickValue.match(/scrollToSection\(['"]([^'"]+)['"]\)/);
-            if (match) {
-                const targetSection = match[1];
-                const targetId = targetSection.startsWith('#') ? targetSection : '#' + targetSection;
-                if (navigationMap[targetId]) {
-                    console.log(`Button clicked for section: ${targetId}`);
-                    scrollToSection(targetId);
-                }
-            }
-            return;
-        }
-
         // Handle any element with data-scroll-to attribute
         const scrollElement = e.target.closest('[data-scroll-to]');
         if (scrollElement) {
@@ -730,18 +818,6 @@ function initializeNavigationMapping() {
                 scrollToSection(targetId);
             }
             return;
-        }
-
-        // Handle nav links that might be clicked indirectly
-        const navLink = e.target.closest('.nav-link');
-        if (navLink && navLink.getAttribute('href')) {
-            const href = navLink.getAttribute('href');
-            if (href.startsWith('#') && navigationMap[href]) {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log(`Nav link clicked for section: ${href}`);
-                scrollToSection(href);
-            }
         }
     });
 
@@ -759,19 +835,28 @@ function initializeNavigationMapping() {
         }
     }, { passive: false });
 
-    // Handle hash changes in URL
-    window.addEventListener('hashchange', function() {
+    // Handle hash changes in URL (but prevent infinite loops)
+    let hashChangeInProgress = false;
+    window.addEventListener('hashchange', function(e) {
+        if (hashChangeInProgress) return;
+        
         const hash = window.location.hash;
         if (hash && navigationMap[hash]) {
+            console.log(`Hash change detected: ${hash}`);
+            hashChangeInProgress = true;
             scrollToSection(hash);
+            setTimeout(() => {
+                hashChangeInProgress = false;
+            }, 1000);
         }
     });
 
     // Handle initial page load with hash
     if (window.location.hash && navigationMap[window.location.hash]) {
+        console.log(`Initial hash detected: ${window.location.hash}`);
         setTimeout(() => {
             scrollToSection(window.location.hash);
-        }, 100);
+        }, 1000); // Increased delay for better reliability
     }
 }
 
@@ -1585,14 +1670,14 @@ function initializeMobileEnhancements() {
     });
 }
 
+// Make scrollToSection globally available
+window.scrollToSection = scrollToSection;
+
 // Initialize all components when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     console.log('New Lifestyle Gym website loaded successfully!');
 
     try {
-        // Always scroll to top first
-        window.scrollTo(0, 0);
-
         // Check for success messages first
         checkForSuccessMessage();
 
@@ -1602,8 +1687,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialize navigation
         initializeNavigation();
         
-        // Initialize navigation mapping
-        initializeNavigationMapping();
+        // Initialize navigation mapping - wait a bit for DOM to be fully ready
+        setTimeout(() => {
+            initializeNavigationMapping();
+        }, 200);
 
         // Initialize form security and CAPTCHA systems
         initializeFormSecurity();
@@ -1630,5 +1717,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     } catch (error) {
         console.warn('Non-critical initialization error:', error);
+    }
+});
+
+// Additional initialization after full page load (including images, videos)
+window.addEventListener('load', () => {
+    // Ensure scroll position is correct after all content is loaded
+    if (window.location.hash) {
+        const hash = window.location.hash;
+        const navigationMap = {
+            '#home': 'home',
+            '#about': 'about', 
+            '#services': 'services',
+            '#trainers': 'trainers',
+            '#media': 'media',
+            '#plans': 'plans',
+            '#contact': 'contact',
+            '#demo': 'demo'
+        };
+        
+        if (navigationMap[hash]) {
+            console.log(`Window load - scrolling to: ${hash}`);
+            setTimeout(() => {
+                scrollToSection(hash);
+            }, 300);
+        }
     }
 });
