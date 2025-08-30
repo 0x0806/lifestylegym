@@ -1,3 +1,4 @@
+
 // Text Recognition CAPTCHA
 class SimpleCaptcha {
     constructor(containerId, formId) {
