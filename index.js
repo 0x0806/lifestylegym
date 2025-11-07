@@ -895,35 +895,113 @@ app.post('/api/newsletter', [
     }
 });
 
-// Error handling middleware
+// Enhanced error handling middleware
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ 
-        success: false, 
-        message: 'Something went wrong!' 
+    logger.error('Unhandled error:', {
+        error: err.message,
+        stack: err.stack,
+        url: req.url,
+        method: req.method,
+        ip: req.ip,
+        userAgent: req.get('User-Agent')
+    });
+
+    // Don't leak error details in production
+    const isDevelopment = process.env.NODE_ENV !== 'production';
+
+    res.status(err.status || 500).json({
+        success: false,
+        error: process.env.NODE_ENV === 'production'
+            ? 'Internal server error. Please try again later.'
+            : err.message,
+        ...(isDevelopment && { stack: err.stack, details: err })
     });
 });
 
-// 404 handler
+// Enhanced 404 handler
 app.use((req, res) => {
+    logger.warn(`404 - Route not found: ${req.method} ${req.url}`, {
+        ip: req.ip,
+        userAgent: req.get('User-Agent')
+    });
+
+    // For API routes, return JSON 404
+    if (req.path.startsWith('/api/')) {
+        return res.status(404).json({
+            success: false,
+            error: 'API endpoint not found'
+        });
+    }
+
+    // For all other routes, serve the SPA
     res.status(404).sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-    console.log('SIGTERM received, shutting down gracefully');
-    process.exit(0);
+// Graceful shutdown handlers
+const gracefulShutdown = (signal) => {
+    logger.info(`${signal} received, shutting down gracefully`);
+
+    // Close server and database connections
+    server.close(() => {
+        logger.info('HTTP server closed');
+
+        // Close other resources
+        if (transporter) {
+            transporter.close();
+        }
+
+        logger.info('Graceful shutdown completed');
+        process.exit(0);
+    });
+
+    // Force close after 10 seconds
+    setTimeout(() => {
+        logger.error('Could not close connections in time, forcefully shutting down');
+        process.exit(1);
+    }, 10000);
+};
+
+// Handle process signals
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (err) => {
+    logger.error('Uncaught Exception:', err);
+    process.exit(1);
 });
 
-process.on('SIGINT', () => {
-    console.log('SIGINT received, shutting down gracefully');
-    process.exit(0);
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+    logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    process.exit(1);
 });
 
-// Start the server
-app.listen(PORT, '0.0.0.0', () => {
+// Start the server with enhanced logging
+const server = app.listen(PORT, '0.0.0.0', () => {
+    logger.info('🚀 New Lifestyle Gym server started successfully', {
+        port: PORT,
+        environment: process.env.NODE_ENV || 'development',
+        emailConfigured: !!process.env.SMTP_USER,
+        nodeVersion: process.version,
+        platform: process.platform,
+        timestamp: new Date().toISOString()
+    });
+
     console.log(`🚀 New Lifestyle Gym website running on port ${PORT}`);
     console.log(`🌐 Visit: http://localhost:${PORT}`);
     console.log(`📧 Email configured: ${process.env.SMTP_USER ? 'Yes' : 'No'}`);
     console.log(`🔒 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+    console.log(`🔐 CAPTCHA endpoint: http://localhost:${PORT}/api/captcha`);
 });
+
+// Create logs directory if it doesn't exist
+const fs = require('fs');
+const path = require('path');
+const logsDir = path.join(__dirname, 'logs');
+
+if (!fs.existsSync(logsDir)) {
+    fs.mkdirSync(logsDir, { recursive: true });
+    logger.info('Created logs directory');
+}
