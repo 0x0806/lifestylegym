@@ -8,6 +8,12 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const nodemailer = require('nodemailer');
+const Joi = require('joi');
+const DOMPurify = require('isomorphic-dompurify');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const winston = require('winston');
+const crypto = require('crypto');
 require('dotenv').config();
 
 const app = express();
