@@ -1,6 +1,6 @@
 
-// Text Recognition CAPTCHA
-class SimpleCaptcha {
+// Enhanced Multi-Type CAPTCHA System
+class EnhancedCaptcha {
     constructor(containerId, formId) {
         this.container = document.getElementById(containerId);
         this.formId = formId;
@@ -8,52 +8,54 @@ class SimpleCaptcha {
         this.isVerified = false;
         this.attempts = 0;
         this.maxAttempts = 3;
-        this.currentText = '';
-        this.canvas = null;
-        this.ctx = null;
+        this.currentType = 'text'; // text, math, selection, audio
+        this.currentAnswer = null;
+        this.audioSupported = false;
+        this.isHighContrast = false;
+        this.language = 'en'; // en, ar
 
+        // Initialize
         this.init();
     }
 
     init() {
-        this.generateChallenge();
+        this.checkAccessibility();
         this.setupEventListeners();
+        this.selectRandomType();
+        this.generateChallenge();
     }
 
-    generateChallenge() {
-        // Generate random text (mix of letters and numbers)
-        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
-        this.currentText = '';
-        for(let i = 0; i < 6; i++) {
-            this.currentText += chars.charAt(Math.floor(Math.random() * chars.length));
+    checkAccessibility() {
+        // Check for reduced motion preference
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.body.classList.add('reduced-motion');
         }
 
-        const html = `
-            <div class="text-challenge">
-                <div class="captcha-instruction">
-                    <i class="fas fa-keyboard"></i>
-                    Type the text you see in the image below
-                </div>
-                <div class="captcha-canvas-container">
-                    <canvas class="captcha-canvas" width="300" height="100" id="${this.container.id}Canvas"></canvas>
-                </div>
-                <div class="captcha-input-container">
-                    <input type="text" class="captcha-input" placeholder="Enter the text above" maxlength="6" autocomplete="off" id="${this.container.id}Input">
-                </div>
-                <div class="captcha-controls">
-                    <button type="button" class="captcha-verify">Verify Text</button>
-                    <button type="button" class="captcha-refresh">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
-                </div>
-                <div class="captcha-attempts">Attempts remaining: ${this.maxAttempts - this.attempts}</div>
-            </div>
-        `;
+        // Check for high contrast mode
+        if (window.matchMedia('(prefers-contrast: high)').matches) {
+            this.isHighContrast = true;
+            document.body.classList.add('high-contrast');
+        }
 
-        this.challengeContainer.innerHTML = html;
-        this.setupTextChallengeEvents();
-        this.drawCaptchaText();
-        this.updateSubmitButton(false);
+        // Check for audio support
+        this.audioSupported = 'speechSynthesis' in window;
+
+        // Detect preferred language
+        const userLang = navigator.language || navigator.userLanguage;
+        if (userLang.startsWith('ar')) {
+            this.language = 'ar';
+        }
+    }
+
+    selectRandomType() {
+        const types = ['text', 'math', 'selection'];
+        if (this.audioSupported) {
+            types.push('audio');
+        }
+
+        // Avoid same type twice in a row if possible
+        const availableTypes = types.filter(t => t !== this.currentType);
+        this.currentType = availableTypes[Math.floor(Math.random() * availableTypes.length)];
     }
 
     setupEventListeners() {
@@ -66,31 +68,310 @@ class SimpleCaptcha {
                 this.verifyChallenge();
             }
             if(e.target.classList.contains('captcha-refresh') || e.target.closest('.captcha-refresh')) {
+                this.selectRandomType();
+                this.generateChallenge();
+            }
+            if(e.target.classList.contains('captcha-audio')) {
+                this.playAudioChallenge();
+            }
+            if(e.target.classList.contains('captcha-type-switch')) {
+                this.switchCaptchaType();
+            }
+        });
+
+        // Keyboard support
+        this.challengeContainer.addEventListener('keydown', (e) => {
+            if(e.key === 'Enter' && !e.target.classList.contains('captcha-input')) {
+                this.verifyChallenge();
+            }
+            if(e.key === 'r' && e.ctrlKey) {
+                e.preventDefault();
+                this.selectRandomType();
                 this.generateChallenge();
             }
         });
     }
 
-    setupTextChallengeEvents() {
-        const input = this.challengeContainer.querySelector('.captcha-input');
-        if(input) {
-            // Allow Enter key to verify
-            input.addEventListener('keypress', (e) => {
-                if(e.key === 'Enter') {
-                    this.verifyChallenge();
-                }
-            });
+    generateChallenge() {
+        this.attempts = 0;
+        this.isVerified = false;
+        this.container.classList.remove('captcha-success', 'captcha-error');
 
-            // Auto-verify when user types 6 characters
-            input.addEventListener('input', (e) => {
-                if(e.target.value.length === 6) {
-                    setTimeout(() => this.verifyChallenge(), 500);
-                }
-            });
+        let html = '';
+
+        switch(this.currentType) {
+            case 'text':
+                html = this.generateTextChallenge();
+                break;
+            case 'math':
+                html = this.generateMathChallenge();
+                break;
+            case 'selection':
+                html = this.generateSelectionChallenge();
+                break;
+            case 'audio':
+                html = this.generateAudioChallenge();
+                break;
+        }
+
+        this.challengeContainer.innerHTML = html;
+        this.setupTypeSpecificEvents();
+        this.updateSubmitButton(false);
+    }
+
+    generateTextChallenge() {
+        // Generate cleaner text (less distortion, better fonts)
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+        this.currentAnswer = '';
+        for(let i = 0; i < 5; i++) {
+            this.currentAnswer += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+
+        return `
+            <div class="captcha-challenge text-challenge">
+                <div class="captcha-header">
+                    <h3 class="captcha-title">
+                        <i class="fas fa-keyboard" aria-hidden="true"></i>
+                        ${this.language === 'ar' ? 'اكتب النص الذي تراه' : 'Type the text you see'}
+                    </h3>
+                    <div class="captcha-controls" role="toolbar">
+                        ${this.audioSupported ? `<button type="button" class="captcha-audio" aria-label="${this.language === 'ar' ? 'استمع للتحدي' : 'Listen to challenge'}">
+                            <i class="fas fa-volume-up" aria-hidden="true"></i>
+                        </button>` : ''}
+                        <button type="button" class="captcha-type-switch" aria-label="${this.language === 'ar' ? 'تغيير نوع التحقق' : 'Change verification type'}">
+                            <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="captcha-refresh" aria-label="${this.language === 'ar' ? 'تحديث' : 'Refresh'}">
+                            <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="captcha-canvas-container" role="img" aria-label="${this.language === 'ar' ? 'صورة تحتوي على نص للتحقق' : 'Image containing verification text'}">
+                    <canvas class="captcha-canvas" width="320" height="100" id="${this.container.id}Canvas"></canvas>
+                </div>
+                <div class="captcha-input-container">
+                    <label for="${this.container.id}Input" class="captcha-label">
+                        ${this.language === 'ar' ? 'أدخل النص' : 'Enter the text'}
+                    </label>
+                    <input
+                        type="text"
+                        class="captcha-input"
+                        id="${this.container.id}Input"
+                        placeholder="${this.language === 'ar' ? 'أدخل النص أعلاه' : 'Enter the text above'}"
+                        maxlength="5"
+                        autocomplete="off"
+                        aria-required="true"
+                        aria-describedby="captcha-help-${this.container.id}"
+                    >
+                </div>
+                <button type="button" class="captcha-verify" aria-label="${this.language === 'ar' ? 'تحقق' : 'Verify'}">
+                    ${this.language === 'ar' ? 'تحقق' : 'Verify'}
+                </button>
+                <div id="captcha-help-${this.container.id}" class="captcha-help">
+                    ${this.language === 'ar' ? 'محاولات متبقية:' : 'Attempts remaining:'} ${this.maxAttempts - this.attempts}
+                </div>
+            </div>
+        `;
+    }
+
+    generateMathChallenge() {
+        const num1 = Math.floor(Math.random() * 10) + 1;
+        const num2 = Math.floor(Math.random() * 10) + 1;
+        const operations = ['+', '-'];
+        const operation = operations[Math.floor(Math.random() * operations.length)];
+
+        this.currentAnswer = operation === '+' ? num1 + num2 : num1 - num2;
+        if (this.currentAnswer < 0) {
+            this.currentAnswer = num1 + num2; // Ensure positive answer
+        }
+
+        return `
+            <div class="captcha-challenge math-challenge">
+                <div class="captcha-header">
+                    <h3 class="captcha-title">
+                        <i class="fas fa-calculator" aria-hidden="true"></i>
+                        ${this.language === 'ar' ? 'حل المسألة الرياضية' : 'Solve the math problem'}
+                    </h3>
+                    <div class="captcha-controls" role="toolbar">
+                        ${this.audioSupported ? `<button type="button" class="captcha-audio" aria-label="${this.language === 'ar' ? 'استمع للمسألة' : 'Listen to problem'}">
+                            <i class="fas fa-volume-up" aria-hidden="true"></i>
+                        </button>` : ''}
+                        <button type="button" class="captcha-type-switch" aria-label="${this.language === 'ar' ? 'تغيير نوع التحقق' : 'Change verification type'}">
+                            <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="captcha-refresh" aria-label="${this.language === 'ar' ? 'تحديث' : 'Refresh'}">
+                            <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="math-problem" role="img" aria-label="${this.language === 'ar' ? `مسألة حسابية: ${num1} ${operation === '+' ? 'زائد' : 'ناقص'} ${num2}` : `Math problem: ${num1} ${operation} ${num2}`}">
+                    <span class="math-number">${num1}</span>
+                    <span class="math-operator">${operation}</span>
+                    <span class="math-number">${num2}</span>
+                    <span class="math-equals">=</span>
+                    <span class="math-question">?</span>
+                </div>
+                <div class="captcha-input-container">
+                    <label for="${this.container.id}Input" class="captcha-label">
+                        ${this.language === 'ar' ? 'الإجابة' : 'Your answer'}
+                    </label>
+                    <input
+                        type="number"
+                        class="captcha-input"
+                        id="${this.container.id}Input"
+                        placeholder="${this.language === 'ar' ? 'أدخل الإجابة' : 'Enter your answer'}"
+                        min="0"
+                        max="20"
+                        aria-required="true"
+                        aria-describedby="captcha-help-${this.container.id}"
+                    >
+                </div>
+                <button type="button" class="captcha-verify" aria-label="${this.language === 'ar' ? 'تحقق' : 'Verify'}">
+                    ${this.language === 'ar' ? 'تحقق' : 'Verify'}
+                </button>
+                <div id="captcha-help-${this.container.id}" class="captcha-help">
+                    ${this.language === 'ar' ? 'محاولات متبقية:' : 'Attempts remaining:'} ${this.maxAttempts - this.attempts}
+                </div>
+            </div>
+        `;
+    }
+
+    generateSelectionChallenge() {
+        const targetWords = ['GYM', 'FIT', 'FITNESS', 'HEALTH', 'WORKOUT'];
+        const otherWords = ['RUN', 'PLAY', 'SPORT', 'GAME', 'JUMP', 'WALK', 'MOVE'];
+
+        this.currentAnswer = targetWords[Math.floor(Math.random() * targetWords.length)];
+
+        // Create word grid
+        const allWords = [...otherWords];
+        allWords.splice(Math.floor(Math.random() * (allWords.length + 1)), 0, this.currentAnswer);
+
+        // Shuffle
+        for(let i = allWords.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [allWords[i], allWords[j]] = [allWords[j], allWords[i]];
+        }
+
+        const wordGrid = allWords.map(word => `
+            <button
+                type="button"
+                class="word-option ${word === this.currentAnswer ? 'correct' : 'incorrect'}"
+                data-word="${word}"
+                aria-label="${this.language === 'ar' ? `كلمة: ${word}` : `Word: ${word}`}"
+            >
+                ${word}
+            </button>
+        `).join('');
+
+        return `
+            <div class="captcha-challenge selection-challenge">
+                <div class="captcha-header">
+                    <h3 class="captcha-title">
+                        <i class="fas fa-mouse-pointer" aria-hidden="true"></i>
+                        ${this.language === 'ar' ? `انقر على كلمة "${this.currentAnswer}"` : `Click on the word "${this.currentAnswer}"`}
+                    </h3>
+                    <div class="captcha-controls" role="toolbar">
+                        ${this.audioSupported ? `<button type="button" class="captcha-audio" aria-label="${this.language === 'ar' ? 'استمع للتعليمات' : 'Listen to instructions'}">
+                            <i class="fas fa-volume-up" aria-hidden="true"></i>
+                        </button>` : ''}
+                        <button type="button" class="captcha-type-switch" aria-label="${this.language === 'ar' ? 'تغيير نوع التحقق' : 'Change verification type'}">
+                            <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="captcha-refresh" aria-label="${this.language === 'ar' ? 'تحديث' : 'Refresh'}">
+                            <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="word-grid" role="group" aria-label="${this.language === 'ar' ? 'شبكة الكلمات للتحقق' : 'Word grid for verification'}">
+                    ${wordGrid}
+                </div>
+                <button type="button" class="captcha-verify" aria-label="${this.language === 'ar' ? 'تحقق' : 'Verify'}" disabled>
+                    ${this.language === 'ar' ? 'تحقق' : 'Verify'}
+                </button>
+                <div id="captcha-help-${this.container.id}" class="captcha-help">
+                    ${this.language === 'ar' ? 'محاولات متبقية:' : 'Attempts remaining:'} ${this.maxAttempts - this.attempts}
+                </div>
+            </div>
+        `;
+    }
+
+    generateAudioChallenge() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+        this.currentAnswer = '';
+        for(let i = 0; i < 4; i++) {
+            this.currentAnswer += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+
+        return `
+            <div class="captcha-challenge audio-challenge">
+                <div class="captcha-header">
+                    <h3 class="captcha-title">
+                        <i class="fas fa-headphones" aria-hidden="true"></i>
+                        ${this.language === 'ar' ? 'استمع للأحرف' : 'Listen to the letters'}
+                    </h3>
+                    <div class="captcha-controls" role="toolbar">
+                        <button type="button" class="captcha-audio" aria-label="${this.language === 'ar' ? 'استمع مرة أخرى' : 'Play again'}">
+                            <i class="fas fa-volume-up" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="captcha-type-switch" aria-label="${this.language === 'ar' ? 'تغيير نوع التحقق' : 'Change verification type'}">
+                            <i class="fas fa-exchange-alt" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="captcha-refresh" aria-label="${this.language === 'ar' ? 'تحديث' : 'Refresh'}">
+                            <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="audio-instructions">
+                    <p>${this.language === 'ar' ? 'اضغط على زر التشغيل واسمع الأحرف، ثم أدخلها' : 'Press the play button and listen to the letters, then type them'}</p>
+                    <button type="button" class="audio-play-btn" aria-label="${this.language === 'ar' ? 'تشغيل الصوت' : 'Play audio'}">
+                        <i class="fas fa-play" aria-hidden="true"></i>
+                        ${this.language === 'ar' ? 'تشغيل' : 'Play'}
+                    </button>
+                </div>
+                <div class="captcha-input-container">
+                    <label for="${this.container.id}Input" class="captcha-label">
+                        ${this.language === 'ar' ? 'الأحرف التي سمعتها' : 'Letters you heard'}
+                    </label>
+                    <input
+                        type="text"
+                        class="captcha-input"
+                        id="${this.container.id}Input"
+                        placeholder="${this.language === 'ar' ? 'أدخل 4 أحرف' : 'Enter 4 letters'}"
+                        maxlength="4"
+                        autocomplete="off"
+                        aria-required="true"
+                        aria-describedby="captcha-help-${this.container.id}"
+                    >
+                </div>
+                <button type="button" class="captcha-verify" aria-label="${this.language === 'ar' ? 'تحقق' : 'Verify'}">
+                    ${this.language === 'ar' ? 'تحقق' : 'Verify'}
+                </button>
+                <div id="captcha-help-${this.container.id}" class="captcha-help">
+                    ${this.language === 'ar' ? 'محاولات متبقية:' : 'Attempts remaining:'} ${this.maxAttempts - this.attempts}
+                </div>
+            </div>
+        `;
+    }
+
+    setupTypeSpecificEvents() {
+        switch(this.currentType) {
+            case 'text':
+                this.drawTextCaptcha();
+                this.setupTextEvents();
+                break;
+            case 'math':
+                this.setupMathEvents();
+                break;
+            case 'selection':
+                this.setupSelectionEvents();
+                break;
+            case 'audio':
+                this.setupAudioEvents();
+                break;
         }
     }
 
-    drawCaptchaText() {
+    drawTextCaptcha() {
         this.canvas = this.challengeContainer.querySelector('.captcha-canvas');
         if(!this.canvas) return;
 
@@ -99,84 +380,226 @@ class SimpleCaptcha {
         // Clear canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Set background
-        const gradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
-        gradient.addColorStop(0, '#f8f9fa');
-        gradient.addColorStop(0.5, '#e9ecef');
-        gradient.addColorStop(1, '#dee2e6');
-        this.ctx.fillStyle = gradient;
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        // Set clean background
+        if (this.isHighContrast) {
+            this.ctx.fillStyle = '#ffffff';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        } else {
+            const gradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, 0);
+            gradient.addColorStop(0, '#f8f9fa');
+            gradient.addColorStop(1, '#e9ecef');
+            this.ctx.fillStyle = gradient;
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        }
 
-        // Add noise lines
-        this.ctx.strokeStyle = 'rgba(108, 117, 125, 0.3)';
+        // Minimal noise for accessibility
+        this.ctx.strokeStyle = this.isHighContrast ? '#cccccc' : 'rgba(108, 117, 125, 0.2)';
         this.ctx.lineWidth = 1;
-        for(let i = 0; i < 8; i++) {
+        for(let i = 0; i < 3; i++) {
             this.ctx.beginPath();
             this.ctx.moveTo(Math.random() * this.canvas.width, Math.random() * this.canvas.height);
             this.ctx.lineTo(Math.random() * this.canvas.width, Math.random() * this.canvas.height);
             this.ctx.stroke();
         }
 
-        // Add noise dots
-        this.ctx.fillStyle = 'rgba(108, 117, 125, 0.4)';
-        for(let i = 0; i < 50; i++) {
-            this.ctx.beginPath();
-            this.ctx.arc(Math.random() * this.canvas.width, Math.random() * this.canvas.height, 1, 0, 2 * Math.PI);
-            this.ctx.fill();
-        }
+        // Draw clean text
+        const textColor = this.isHighContrast ? '#000000' : '#2c3e50';
+        const fontSize = 36;
+        const fontFamily = 'Arial, sans-serif';
 
-        // Draw text with distortion
-        const colors = ['#ff6b35', '#28a745', '#007bff', '#6f42c1', '#fd7e14'];
-        const fonts = ['Arial', 'Times New Roman', 'Courier New', 'Verdana'];
+        this.ctx.font = `bold ${fontSize}px ${fontFamily}`;
+        this.ctx.fillStyle = textColor;
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
 
-        for(let i = 0; i < this.currentText.length; i++) {
-            const char = this.currentText[i];
-            const x = 20 + (i * 45) + (Math.random() - 0.5) * 10;
-            const y = 60 + (Math.random() - 0.5) * 15;
-            const rotation = (Math.random() - 0.5) * 0.5;
-            const fontSize = 28 + Math.random() * 8;
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            const font = fonts[Math.floor(Math.random() * fonts.length)];
+        // Draw each character with minimal distortion
+        for(let i = 0; i < this.currentAnswer.length; i++) {
+            const char = this.currentAnswer[i];
+            const x = 40 + (i * 55);
+            const y = 50 + (Math.random() - 0.5) * 5; // Minimal vertical variation
 
             this.ctx.save();
             this.ctx.translate(x, y);
-            this.ctx.rotate(rotation);
-            this.ctx.font = `bold ${fontSize}px ${font}`;
-            this.ctx.fillStyle = color;
-            this.ctx.textAlign = 'center';
+            // Very slight rotation for readability
+            this.ctx.rotate((Math.random() - 0.5) * 0.1);
             this.ctx.fillText(char, 0, 0);
-
-            // Add shadow effect
-            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-            this.ctx.fillText(char, 2, 2);
-
             this.ctx.restore();
-        }
-
-        // Add wave distortion effect
-        this.ctx.globalCompositeOperation = 'source-over';
-        this.ctx.strokeStyle = 'rgba(255, 107, 53, 0.1)';
-        this.ctx.lineWidth = 2;
-        for(let i = 0; i < 3; i++) {
-            this.ctx.beginPath();
-            for(let x = 0; x < this.canvas.width; x += 2) {
-                const y = this.canvas.height / 2 + Math.sin(x * 0.02 + i) * 15;
-                if(x === 0) {
-                    this.ctx.moveTo(x, y);
-                } else {
-                    this.ctx.lineTo(x, y);
-                }
-            }
-            this.ctx.stroke();
         }
     }
 
-    verifyChallenge() {
+    setupTextEvents() {
         const input = this.challengeContainer.querySelector('.captcha-input');
-        if(!input) return;
+        if(input) {
+            input.addEventListener('keypress', (e) => {
+                if(e.key === 'Enter') {
+                    this.verifyChallenge();
+                }
+            });
 
-        const userInput = input.value.trim();
-        const isCorrect = userInput.toLowerCase() === this.currentText.toLowerCase();
+            input.addEventListener('input', (e) => {
+                if(e.target.value.length === 5) {
+                    setTimeout(() => this.verifyChallenge(), 500);
+                }
+            });
+        }
+    }
+
+    setupMathEvents() {
+        const input = this.challengeContainer.querySelector('.captcha-input');
+        if(input) {
+            input.addEventListener('keypress', (e) => {
+                if(e.key === 'Enter') {
+                    this.verifyChallenge();
+                }
+            });
+
+            input.addEventListener('input', (e) => {
+                const value = parseInt(e.target.value);
+                if(value >= 0 && value <= 20) {
+                    setTimeout(() => this.verifyChallenge(), 500);
+                }
+            });
+        }
+    }
+
+    setupSelectionEvents() {
+        const wordOptions = this.challengeContainer.querySelectorAll('.word-option');
+        const verifyBtn = this.challengeContainer.querySelector('.captcha-verify');
+        let selectedWord = null;
+
+        wordOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                // Remove previous selection
+                wordOptions.forEach(opt => opt.classList.remove('selected'));
+
+                // Select current option
+                option.classList.add('selected');
+                selectedWord = option.dataset.word;
+
+                // Enable verify button
+                verifyBtn.disabled = false;
+
+                // Auto-verify after selection
+                setTimeout(() => this.verifyChallenge(), 300);
+            });
+
+            // Keyboard support
+            option.addEventListener('keydown', (e) => {
+                if(e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    option.click();
+                }
+            });
+        });
+
+        // Store selected word for verification
+        this.selectedWord = selectedWord;
+    }
+
+    setupAudioEvents() {
+        const playBtn = this.challengeContainer.querySelector('.audio-play-btn');
+        const input = this.challengeContainer.querySelector('.captcha-input');
+
+        if(playBtn) {
+            playBtn.addEventListener('click', () => {
+                this.playAudioChallenge();
+            });
+        }
+
+        if(input) {
+            input.addEventListener('keypress', (e) => {
+                if(e.key === 'Enter') {
+                    this.verifyChallenge();
+                }
+            });
+
+            input.addEventListener('input', (e) => {
+                if(e.target.value.length === 4) {
+                    setTimeout(() => this.verifyChallenge(), 500);
+                }
+            });
+        }
+
+        // Auto-play when generated
+        setTimeout(() => this.playAudioChallenge(), 500);
+    }
+
+    playAudioChallenge() {
+        if (!this.audioSupported) return;
+
+        const btn = this.challengeContainer.querySelector('.captcha-audio, .audio-play-btn');
+        if(btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> ${this.language === 'ar' ? 'جاري التشغيل' : 'Playing...'}';
+        }
+
+        // Cancel any existing speech
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance();
+        utterance.text = this.currentAnswer.split('').join(' ');
+        utterance.lang = this.language === 'ar' ? 'ar-SA' : 'en-US';
+        utterance.rate = 0.8;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+
+        utterance.onend = () => {
+            if(btn) {
+                btn.disabled = false;
+                const iconClass = btn.classList.contains('audio-play-btn') ? 'fa-play' : 'fa-volume-up';
+                btn.innerHTML = `<i class="fas ${iconClass}" aria-hidden="true"></i> ${this.language === 'ar' ? 'تشغيل' : 'Play'}`;
+            }
+        };
+
+        utterance.onerror = () => {
+            if(btn) {
+                btn.disabled = false;
+                const iconClass = btn.classList.contains('audio-play-btn') ? 'fa-play' : 'fa-volume-up';
+                btn.innerHTML = `<i class="fas ${iconClass}" aria-hidden="true"></i> ${this.language === 'ar' ? 'تشغيل' : 'Play'}`;
+            }
+            this.showMessage('Audio playback failed. Please try again.', 'error');
+        };
+
+        window.speechSynthesis.speak(utterance);
+    }
+
+    switchCaptchaType() {
+        const types = ['text', 'math', 'selection'];
+        if (this.audioSupported) {
+            types.push('audio');
+        }
+
+        const currentIndex = types.indexOf(this.currentType);
+        this.currentType = types[(currentIndex + 1) % types.length];
+
+        this.generateChallenge();
+    }
+
+    verifyChallenge() {
+        let userInput = null;
+        let isCorrect = false;
+
+        switch(this.currentType) {
+            case 'text':
+            case 'audio':
+                userInput = this.challengeContainer.querySelector('.captcha-input');
+                if(userInput) {
+                    isCorrect = userInput.value.trim().toLowerCase() === this.currentAnswer.toLowerCase();
+                }
+                break;
+            case 'math':
+                userInput = this.challengeContainer.querySelector('.captcha-input');
+                if(userInput) {
+                    isCorrect = parseInt(userInput.value) === this.currentAnswer;
+                }
+                break;
+            case 'selection':
+                const selected = this.challengeContainer.querySelector('.word-option.selected');
+                if(selected) {
+                    isCorrect = selected.dataset.word === this.currentAnswer;
+                }
+                break;
+        }
 
         if(isCorrect) {
             this.handleSuccess();
@@ -188,12 +611,18 @@ class SimpleCaptcha {
     handleSuccess() {
         this.isVerified = true;
         this.container.classList.add('captcha-success');
+
+        const successMessage = this.language === 'ar' ?
+            'تم التحقق بنجاح! يمكنك الآن إرسال النموذج.' :
+            'Verification successful! You may now submit the form.';
+
         this.challengeContainer.innerHTML = `
-            <div class="captcha-success-message">
-                <i class="fas fa-check-circle"></i>
-                Verification successful! You may now submit the form.
+            <div class="captcha-success-message" role="alert" aria-live="polite">
+                <i class="fas fa-check-circle" aria-hidden="true"></i>
+                ${successMessage}
             </div>
         `;
+
         this.updateSubmitButton(true);
     }
 
@@ -201,32 +630,56 @@ class SimpleCaptcha {
         this.attempts++;
         this.container.classList.add('captcha-error');
 
+        // Show error briefly
+        const errorMessage = this.language === 'ar' ?
+            `إجابة خاطئة. ${this.maxAttempts - this.attempts} محاولات متبقية.` :
+            `Incorrect answer. ${this.maxAttempts - this.attempts} attempts remaining.`;
+
+        this.showMessage(errorMessage, 'error');
+
         setTimeout(() => {
             this.container.classList.remove('captcha-error');
         }, 500);
 
         if(this.attempts >= this.maxAttempts) {
+            const blockMessage = this.language === 'ar' ?
+                'تجاوزت الحد الأقصى من المحاولات. يرجى تحديث الصفحة والمحاولة مرة أخرى.' :
+                'Too many failed attempts. Please refresh the page and try again.';
+
             this.challengeContainer.innerHTML = `
-                <div class="captcha-error-message">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Too many failed attempts. Please refresh the page and try again.
+                <div class="captcha-error-message" role="alert" aria-live="assertive">
+                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                    ${blockMessage}
                 </div>
             `;
             this.updateSubmitButton(false);
         } else {
-            // Show error message briefly then regenerate
-            const errorMessage = `
-                <div class="captcha-error-message">
-                    <i class="fas fa-times-circle"></i>
-                    Incorrect selection. ${this.maxAttempts - this.attempts} attempts remaining.
-                </div>
-            `;
-            this.challengeContainer.insertAdjacentHTML('afterbegin', errorMessage);
-
+            // Regenerate challenge after delay
             setTimeout(() => {
                 this.generateChallenge();
             }, 2000);
         }
+    }
+
+    showMessage(message, type) {
+        // Remove existing messages
+        const existing = this.challengeContainer.querySelector('.captcha-temp-message');
+        if(existing) existing.remove();
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `captcha-temp-message captcha-${type}`;
+        messageDiv.textContent = message;
+        messageDiv.setAttribute('role', 'alert');
+        messageDiv.setAttribute('aria-live', 'polite');
+
+        this.challengeContainer.insertBefore(messageDiv, this.challengeContainer.firstChild);
+
+        // Auto-remove
+        setTimeout(() => {
+            if(messageDiv.parentElement) {
+                messageDiv.remove();
+            }
+        }, 3000);
     }
 
     updateSubmitButton(enabled) {
@@ -244,8 +697,9 @@ class SimpleCaptcha {
     reset() {
         this.isVerified = false;
         this.attempts = 0;
-        this.selectedImages = [];
+        this.selectedWord = null;
         this.container.classList.remove('captcha-success', 'captcha-error');
+        this.selectRandomType();
         this.generateChallenge();
     }
 }
