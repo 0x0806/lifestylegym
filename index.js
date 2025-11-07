@@ -769,54 +769,128 @@ app.post('/api/contact', formLimiter, async (req, res) => {
     }
 });
 
-// Newsletter subscription endpoint
+// Enhanced newsletter subscription endpoint
 app.post('/api/newsletter', [
     body('email').isEmail().normalizeEmail()
 ], async (req, res) => {
+    const startTime = Date.now();
+
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ 
-                success: false, 
-                errors: errors.array() 
+            return res.status(400).json({
+                success: false,
+                error: 'Please provide a valid email address'
             });
         }
 
         const { email } = req.body;
-        console.log(`Newsletter subscription: ${email} - ${new Date().toISOString()}`);
-        
-        // Send welcome email
+
+        logger.info(`Newsletter subscription: ${email}`, {
+            ip: req.ip,
+            userAgent: req.get('User-Agent')
+        });
+
+        // Send welcome email with enhanced template
         if (process.env.SMTP_USER) {
-            const mailOptions = {
-                from: process.env.SMTP_USER,
-                to: email,
-                subject: 'Welcome to New Lifestyle Gym Newsletter!',
-                html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                        <h2 style="color: #ff6b35;">Welcome to Our Community!</h2>
-                        <p>Thank you for subscribing to our newsletter!</p>
-                        <p>You'll receive the latest updates about:</p>
-                        <ul>
-                            <li>New fitness programs and classes</li>
-                            <li>Health and nutrition tips</li>
-                            <li>Special offers and promotions</li>
-                            <li>Success stories from our members</li>
-                        </ul>
-                        <p>Stay fit, stay healthy!</p>
-                        <p>Best regards,<br>New Lifestyle Gym Team</p>
-                    </div>
-                `
-            };
-            
-            await transporter.sendMail(mailOptions);
+            try {
+                const mailOptions = {
+                    from: `"New Lifestyle Gym" <${process.env.SMTP_USER}>`,
+                    to: email,
+                    subject: '🎉 Welcome to New Lifestyle Gym Newsletter!',
+                    html: `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>Newsletter Subscription</title>
+                        </head>
+                        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+                            <div style="background: linear-gradient(135deg, #ff6b35, #ff8f65); padding: 30px; border-radius: 10px; text-align: center; color: white;">
+                                <h1 style="margin: 0; font-size: 28px;">🎉 Welcome to Our Community!</h1>
+                                <p style="margin: 10px 0 0 0; font-size: 18px;">New Lifestyle Gym Newsletter</p>
+                            </div>
+
+                            <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #ff6b35;">
+                                <h2 style="color: #ff6b35; margin-top: 0;">Hello Fitness Enthusiast!</h2>
+                                <p style="font-size: 16px;">Thank you for subscribing to the <strong>New Lifestyle Gym</strong> newsletter! You're now part of our fitness community in Sharjah.</p>
+
+                                <h3 style="color: #ff6b35; border-bottom: 2px solid #ff6b35; padding-bottom: 5px;">What You'll Receive:</h3>
+                                <div style="background: white; padding: 20px; border-radius: 8px; margin: 15px 0;">
+                                    <ul style="padding-left: 20px; color: #333;">
+                                        <li>🏋️ <strong>New fitness programs and classes</strong></li>
+                                        <li>🥗 <strong>Health and nutrition tips</strong> from our experts</li>
+                                        <li>💰 <strong>Exclusive offers and promotions</strong> for members</li>
+                                        <li>🏆 <strong>Success stories</strong> from our gym members</li>
+                                        <li>📅 <strong>Event announcements</strong> and challenges</li>
+                                        <li>🎯 <strong>Fitness tips</strong> from our certified trainers</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div style="background: #e8f5e8; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #28a745;">
+                                <h3 style="color: #28a745; margin-top: 0;">🏃‍♂️ Ready to Start Your Journey?</h3>
+                                <p>Take the next step towards a healthier lifestyle!</p>
+                                <div style="text-align: center; margin: 20px 0;">
+                                    <a href="https://newlifestylegym.ae" style="background: #ff6b35; color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;">
+                                        Visit Our Gym
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div style="background: #fff3cd; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #ffc107;">
+                                <h3 style="color: #856404; margin-top: 0;">📞 Questions?</h3>
+                                <p>Our team is always here to help you with your fitness journey.</p>
+                                <p style="margin: 10px 0;"><strong>Call:</strong> +971581790093</p>
+                                <p style="margin: 10px 0;"><strong>Email:</strong> newlifeconnection1@gmail.com</p>
+                            </div>
+
+                            <div style="border-top: 1px solid #ddd; padding-top: 20px; text-align: center; color: #666; font-size: 14px;">
+                                <p><strong>New Lifestyle Gym</strong><br>
+                                Al Tayer 5, 19 street G Floor, Al Nahda, Sharjah, UAE 61179<br>
+                                📞 +971581790093 | 📧 newlifeconnection1@gmail.com</p>
+                                <p style="margin-top: 15px; font-size: 12px;">
+                                    You're receiving this email because you subscribed to our newsletter.<br>
+                                    <a href="#" style="color: #ff6b35;">Unsubscribe</a> | <a href="#" style="color: #ff6b35;">Update Preferences</a>
+                                </p>
+                            </div>
+                        </body>
+                        </html>
+                    `
+                };
+
+                await transporter.sendMail(mailOptions);
+                logger.info(`Newsletter welcome email sent to: ${email}`);
+
+            } catch (emailError) {
+                logger.error('Failed to send newsletter email:', emailError);
+                // Continue with response even if email fails
+            }
         }
 
-        res.json({ success: true, message: 'Successfully subscribed to newsletter!' });
+        const processingTime = Date.now() - startTime;
+        logger.info(`Newsletter subscription processed in ${processingTime}ms`, { email: email });
+
+        res.json({
+            success: true,
+            message: 'Successfully subscribed to our newsletter! Check your email for a welcome message.',
+            processingTime: processingTime
+        });
+
     } catch (error) {
-        console.error('Newsletter subscription error:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Internal server error. Please try again later.' 
+        const processingTime = Date.now() - startTime;
+        logger.error('Newsletter subscription error:', {
+            error: error.message,
+            stack: error.stack,
+            ip: req.ip,
+            processingTime: processingTime
+        });
+
+        res.status(500).json({
+            success: false,
+            error: 'Internal server error. Please try again later.',
+            processingTime: processingTime
         });
     }
 });
