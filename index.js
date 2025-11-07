@@ -596,58 +596,175 @@ app.post('/api/demo', formLimiter, async (req, res) => {
     }
 });
 
-// Handle contact form submission with advanced validation
-app.post('/submit-contact', formLimiter, contactValidation, async (req, res) => {
+// Enhanced contact form submission with Joi validation
+app.post('/api/contact', formLimiter, async (req, res) => {
+    const startTime = Date.now();
+
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ 
-                success: false, 
-                errors: errors.array() 
+        logger.info(`Contact submission attempt from IP: ${req.ip}`, {
+            userAgent: req.get('User-Agent'),
+            body: { ...req.body, email: req.body.email ? 'masked' : undefined }
+        });
+
+        // Validate CAPTCHA first
+        if (!validateCaptcha(req.body.captchaId, req.body.captchaAnswer)) {
+            logger.warn(`Invalid CAPTCHA for contact form from IP: ${req.ip}`);
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid or expired CAPTCHA. Please try again.',
+                field: 'captcha'
             });
         }
 
-        const { name, email, phone, subject, message } = req.body;
-        
-        console.log(`Contact message from: ${name} (${email}) - Subject: ${subject} - ${new Date().toISOString()}`);
-        
-        // Send confirmation email
-        if (process.env.SMTP_USER) {
-            const mailOptions = {
-                from: process.env.SMTP_USER,
-                to: email,
-                subject: 'Message Received - New Lifestyle Gym',
-                html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                        <h2 style="color: #ff6b35;">Thank You for Contacting Us!</h2>
-                        <p>Hi ${name},</p>
-                        <p>We've received your message and will get back to you within 24 hours.</p>
-                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                            <h3>Your Message:</h3>
-                            <p><strong>Subject:</strong> ${subject}</p>
-                            <p><strong>Message:</strong> ${message}</p>
-                        </div>
-                        <p>Best regards,<br>New Lifestyle Gym Team</p>
-                    </div>
-                `
-            };
-            
-            await transporter.sendMail(mailOptions);
+        // Validate with Joi schema
+        const { error, value } = contactSchema.validate(req.body, { abortEarly: false });
+        if (error) {
+            const validationErrors = error.details.map(detail => ({
+                field: detail.path.join('.'),
+                message: detail.message
+            }));
+
+            logger.warn(`Contact validation failed from IP: ${req.ip}`, { errors: validationErrors });
+            return res.status(400).json({
+                success: false,
+                error: 'Validation failed',
+                errors: validationErrors
+            });
         }
 
-        // Simulate processing delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        if (req.headers.accept && req.headers.accept.includes('application/json')) {
-            res.json({ success: true, message: 'Message sent successfully!' });
-        } else {
-            res.redirect('/?success=contact');
+        const { name, email, inquiry_type, subject, message } = value;
+
+        logger.info(`Contact message from: ${name} (${email}) - ${inquiry_type}: ${subject}`, {
+            ip: req.ip,
+            userAgent: req.get('User-Agent')
+        });
+
+        // Send confirmation email with enhanced template
+        if (process.env.SMTP_USER) {
+            try {
+                const mailOptions = {
+                    from: `"New Lifestyle Gym" <${process.env.SMTP_USER}>`,
+                    to: email,
+                    subject: '💬 Message Received - New Lifestyle Gym Sharjah',
+                    html: `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>Message Received</title>
+                        </head>
+                        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+                            <div style="background: linear-gradient(135deg, #ff6b35, #ff8f65); padding: 30px; border-radius: 10px; text-align: center; color: white;">
+                                <h1 style="margin: 0; font-size: 28px;">💬 Message Received!</h1>
+                                <p style="margin: 10px 0 0 0; font-size: 18px;">New Lifestyle Gym - Sharjah</p>
+                            </div>
+
+                            <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #ff6b35;">
+                                <h2 style="color: #ff6b35; margin-top: 0;">Hello ${name}!</h2>
+                                <p style="font-size: 16px;">Thank you for contacting <strong>New Lifestyle Gym</strong>! We've received your message and our team will get back to you within <strong>24 hours</strong>.</p>
+
+                                <h3 style="color: #ff6b35; border-bottom: 2px solid #ff6b35; padding-bottom: 5px;">Your Message Details:</h3>
+                                <div style="background: white; padding: 20px; border-radius: 8px; margin: 15px 0;">
+                                    <p><strong>📧 Inquiry Type:</strong> ${inquiry_type.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
+                                    <p><strong>📝 Subject:</strong> ${subject}</p>
+                                    <p><strong>💬 Message:</strong></p>
+                                    <div style="background: #e9ecef; padding: 15px; border-radius: 5px; font-style: italic;">
+                                        ${message}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="background: #e8f5e8; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #28a745;">
+                                <h3 style="color: #28a745; margin-top: 0;">What Happens Next?</h3>
+                                <ul style="padding-left: 20px;">
+                                    <li>Our team will review your message carefully</li>
+                                    <li>You'll receive a personalized response within 24 hours</li>
+                                    <li>If it's urgent, feel free to call us at <strong>+971581790093</strong></li>
+                                    <li>We're committed to providing excellent service</li>
+                                </ul>
+                            </div>
+
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="tel:+971581790093" style="background: #28a745; color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block; margin: 0 10px;">
+                                    📞 Call Us
+                                </a>
+                                <a href="https://wa.me/971581790093" style="background: #25d366; color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block; margin: 0 10px;">
+                                    💬 WhatsApp
+                                </a>
+                            </div>
+
+                            <div style="border-top: 1px solid #ddd; padding-top: 20px; text-align: center; color: #666; font-size: 14px;">
+                                <p><strong>New Lifestyle Gym</strong><br>
+                                Al Tayer 5, 19 street G Floor, Al Nahda, Sharjah, UAE 61179<br>
+                                📞 +971581790093 | 📧 newlifeconnection1@gmail.com</p>
+                            </div>
+                        </body>
+                        </html>
+                    `
+                };
+
+                await transporter.sendMail(mailOptions);
+                logger.info(`Contact confirmation email sent to: ${email}`);
+
+                // Send notification to gym
+                const notificationMail = {
+                    from: `"New Lifestyle Gym" <${process.env.SMTP_USER}>`,
+                    to: process.env.SMTP_USER,
+                    subject: `💬 New Contact Message - ${inquiry_type}: ${subject}`,
+                    html: `
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                            <h2 style="color: #ff6b35;">New Contact Message Received!</h2>
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                                <p><strong>Name:</strong> ${name}</p>
+                                <p><strong>Email:</strong> ${email}</p>
+                                <p><strong>Inquiry Type:</strong> ${inquiry_type}</p>
+                                <p><strong>Subject:</strong> ${subject}</p>
+                                <p><strong>Message:</strong></p>
+                                <div style="background: #e9ecef; padding: 15px; border-radius: 5px;">
+                                    ${message}
+                                </div>
+                                <p><strong>IP Address:</strong> ${req.ip}</p>
+                                <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
+                            </div>
+                        </div>
+                    `
+                };
+
+                await transporter.sendMail(notificationMail);
+
+            } catch (emailError) {
+                logger.error('Failed to send contact email:', emailError);
+                // Continue with response even if email fails
+            }
         }
+
+        const processingTime = Date.now() - startTime;
+        logger.info(`Contact form processed successfully in ${processingTime}ms`, {
+            email: email,
+            ip: req.ip
+        });
+
+        res.json({
+            success: true,
+            message: 'Your message has been sent successfully! We will get back to you within 24 hours.',
+            processingTime: processingTime
+        });
+
     } catch (error) {
-        console.error('Contact submission error:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Internal server error. Please try again later.' 
+        const processingTime = Date.now() - startTime;
+        logger.error('Contact submission error:', {
+            error: error.message,
+            stack: error.stack,
+            ip: req.ip,
+            processingTime: processingTime,
+            body: req.body
+        });
+
+        res.status(500).json({
+            success: false,
+            error: 'Internal server error. Please try again later.',
+            processingTime: processingTime
         });
     }
 });
