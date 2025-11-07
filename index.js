@@ -316,23 +316,50 @@ app.use((req, res, next) => {
     next();
 });
 
+// Performance monitoring middleware
+app.use((req, res, next) => {
+    const start = Date.now();
+
+    res.on('finish', () => {
+        const duration = Date.now() - start;
+        logger.info('Request completed', {
+            method: req.method,
+            url: req.url,
+            statusCode: res.statusCode,
+            duration: duration,
+            userAgent: req.get('User-Agent'),
+            ip: req.ip
+        });
+    });
+
+    next();
+});
+
 // Middleware to parse form data
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.json({ limit: '10mb' }));
 
-// Serve static files with caching and security
+// Enhanced static file serving with performance optimizations
 app.use(express.static(__dirname, {
-    maxAge: process.env.NODE_ENV === 'production' ? '1y' : 0,
+    maxAge: process.env.NODE_ENV === 'production' ? '1y' : '1d',
     etag: true,
     lastModified: true,
     setHeaders: (res, filePath) => {
         // Security headers for static files
         if (filePath.endsWith('.js')) {
             res.setHeader('Content-Type', 'application/javascript');
+            res.setHeader('X-Content-Type-Options', 'nosniff');
         }
         if (filePath.endsWith('.css')) {
             res.setHeader('Content-Type', 'text/css');
+            res.setHeader('X-Content-Type-Options', 'nosniff');
         }
+        if (filePath.match(/\.(png|jpg|jpeg|gif|webp|svg)$/)) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        }
+
+        // Add compression headers
+        res.setHeader('Vary', 'Accept-Encoding');
     }
 }));
 
