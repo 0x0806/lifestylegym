@@ -377,23 +377,55 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// API endpoints
+// Enhanced API endpoints
 app.get('/api/health', (req, res) => {
-    res.json({ 
-        status: 'healthy', 
+    res.json({
+        status: 'healthy',
         timestamp: new Date().toISOString(),
-        uptime: process.uptime()
+        uptime: process.uptime(),
+        memory: process.memoryUsage(),
+        version: process.env.npm_package_version || '1.0.0'
     });
 });
 
 app.get('/api/gym-stats', (req, res) => {
     res.json({
-        members: 2847,
-        trainers: 23,
-        classes: 156,
-        equipment: 89,
-        satisfaction: 98.5
+        members: 12800,
+        trainers: 15,
+        classes: 50,
+        equipment: 100,
+        satisfaction: 98.5,
+        yearsExperience: 15,
+        facilities: ['24/7 Access', 'Ladies Section', 'Personal Training', 'Group Classes', 'Cardio Area', 'Weight Training']
     });
+});
+
+// CAPTCHA generation endpoint
+app.get('/api/captcha', captchaLimiter, (req, res) => {
+    try {
+        const captcha = generateCaptcha();
+        logger.info(`CAPTCHA generated: ${captcha.id} for IP: ${req.ip}`);
+
+        res.json({
+            id: captcha.id,
+            image: `data:image/svg+xml;base64,${Buffer.from(`
+                <svg width="150" height="50" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="150" height="50" fill="#f0f0f0"/>
+                    <text x="75" y="30" font-family="Arial" font-size="20" text-anchor="middle" fill="#333">
+                        ${captcha.text.split('').map(char =>
+                            `<tspan x="${75 + (Math.random() - 0.5) * 20}" y="${30 + (Math.random() - 0.5) * 10}">${char}</tspan>`
+                        ).join('')}
+                    </text>
+                    ${Array.from({length: 5}, () =>
+                        `<line x1="${Math.random() * 150}" y1="${Math.random() * 50}" x2="${Math.random() * 150}" y2="${Math.random() * 50}" stroke="#ccc" stroke-width="1"/>`
+                    ).join('')}
+                </svg>
+            `).toString('base64')}`
+        });
+    } catch (error) {
+        logger.error('CAPTCHA generation error:', error);
+        res.status(500).json({ error: 'Failed to generate CAPTCHA' });
+    }
 });
 
 // Handle demo form submission with advanced validation
