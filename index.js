@@ -19,7 +19,28 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Security middleware
+// Enhanced logging configuration
+const logger = winston.createLogger({
+    level: process.env.LOG_LEVEL || 'info',
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.errors({ stack: true }),
+        winston.format.json()
+    ),
+    defaultMeta: { service: 'lifestyle-gym' },
+    transports: [
+        new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
+        new winston.transports.File({ filename: 'logs/combined.log' })
+    ]
+});
+
+if (process.env.NODE_ENV !== 'production') {
+    logger.add(new winston.transports.Console({
+        format: winston.format.simple()
+    }));
+}
+
+// Enhanced security middleware
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
@@ -31,10 +52,183 @@ app.use(helmet({
             mediaSrc: ["'self'", "blob:"],
             connectSrc: ["'self'"],
             objectSrc: ["'none'"],
+            baseUri: ["'self'"],
+            formAction: ["'self'"],
+            frameAncestors: ["'none'"],
             upgradeInsecureRequests: [],
         },
     },
+    crossOriginEmbedderPolicy: false,
+    hsts: {
+        maxAge: 31536000,
+        includeSubDomains: true,
+        preload: true
+    }
 }));
+
+// Session-based CAPTCHA storage
+const captchaStore = new Map();
+
+// Generate secure CAPTCHA
+function generateCaptcha() {
+    const captcha = {
+        id: crypto.randomBytes(16).toString('hex'),
+        text: '',
+        type: 'text',
+        createdAt: Date.now()
+    };
+
+    // Generate random text
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    for (let i = 0; i < 6; i++) {
+        captcha.text += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    captchaStore.set(captcha.id, captcha);
+
+    // Clean up old CAPTCHAs
+    setTimeout(() => {
+        captchaStore.delete(captcha.id);
+    }, 5 * 60 * 1000); // 5 minutes
+
+    return captcha;
+}
+
+// Enhanced Joi validation schemas
+const demoSchema = Joi.object({
+    firstName: Joi.string()
+        .trim()
+        .min(2)
+        .max(50)
+        .pattern(/^[A-Za-z\s]+$/)
+        .required()
+        .messages({
+            'string.empty': 'First name is required',
+            'string.min': 'First name must be at least 2 characters',
+            'string.max': 'First name cannot exceed 50 characters',
+            'string.pattern.base': 'First name can only contain letters and spaces'
+        }),
+    lastName: Joi.string()
+        .trim()
+        .min(2)
+        .max(50)
+        .pattern(/^[A-Za-z\s]+$/)
+        .required()
+        .messages({
+            'string.empty': 'Last name is required',
+            'string.min': 'Last name must be at least 2 characters',
+            'string.max': 'Last name cannot exceed 50 characters',
+            'string.pattern.base': 'Last name can only contain letters and spaces'
+        }),
+    email: Joi.string()
+        .email()
+        .max(100)
+        .required()
+        .messages({
+            'string.email': 'Please provide a valid email address',
+            'string.max': 'Email cannot exceed 100 characters',
+            'any.required': 'Email is required'
+        }),
+    phone: Joi.string()
+        .pattern(/^[+]?[0-9]{7,15}$/)
+        .required()
+        .messages({
+            'string.pattern.base': 'Phone number must be valid (7-15 digits, optional +)',
+            'any.required': 'Phone number is required'
+        }),
+    service: Joi.string()
+        .valid('personal-training', 'group-classes', 'ladies-section', 'home-training', 'general-fitness')
+        .required()
+        .messages({
+            'any.only': 'Please select a valid service type',
+            'any.required': 'Service selection is required'
+        }),
+    planChoice: Joi.string()
+        .valid('basic', 'premium', 'vip-single', 'vip-couple')
+        .required()
+        .messages({
+            'any.only': 'Please select a valid membership plan',
+            'any.required': 'Membership plan selection is required'
+        }),
+    preferredDate: Joi.date()
+        .min('now')
+        .max(Joi.ref('maxDate'))
+        .required()
+        .messages({
+            'date.min': 'Preferred date must be in the future',
+            'any.required': 'Preferred date is required'
+        }),
+    message: Joi.string()
+        .trim()
+        .max(500)
+        .allow('')
+        .optional(),
+    captchaId: Joi.string().required(),
+    captchaAnswer: Joi.string().required()
+});
+
+const contactSchema = Joi.object({
+    name: Joi.string()
+        .trim()
+        .min(2)
+        .max(100)
+        .pattern(/^[A-Za-z\s]+$/)
+        .required()
+        .messages({
+            'string.empty': 'Name is required',
+            'string.min': 'Name must be at least 2 characters',
+            'string.max': 'Name cannot exceed 100 characters',
+            'string.pattern.base': 'Name can only contain letters and spaces'
+        }),
+    email: Joi.string()
+        .email()
+        .max(100)
+        .required()
+        .messages({
+            'string.email': 'Please provide a valid email address',
+            'string.max': 'Email cannot exceed 100 characters',
+            'any.required': 'Email is required'
+        }),
+    inquiry_type: Joi.string()
+        .valid('membership', 'personal-training', 'classes', 'facilities', 'pricing', 'complaint', 'other')
+        .required()
+        .messages({
+            'any.only': 'Please select a valid inquiry type',
+            'any.required': 'Inquiry type is required'
+        }),
+    subject: Joi.string()
+        .trim()
+        .min(5)
+        .max(150)
+        .required()
+        .messages({
+            'string.empty': 'Subject is required',
+            'string.min': 'Subject must be at least 5 characters',
+            'string.max': 'Subject cannot exceed 150 characters'
+        }),
+    message: Joi.string()
+        .trim()
+        .min(10)
+        .max(1000)
+        .required()
+        .messages({
+            'string.empty': 'Message is required',
+            'string.min': 'Message must be at least 10 characters',
+            'string.max': 'Message cannot exceed 1000 characters'
+        }),
+    captchaId: Joi.string().required(),
+    captchaAnswer: Joi.string().required()
+});
+
+// Enhanced security headers middleware
+app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+    next();
+});
 
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : true,
