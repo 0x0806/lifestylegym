@@ -851,18 +851,9 @@
                     </div>
                 </div>
                 <div class="demo-form">
-                    <form id="demoForm" class="booking-form" action="https://formsubmit.co/newlifeconnection1@gmail.com" method="POST">
+                    <form id="demoForm" class="booking-form">
                         <h3>Book Your Free Demo</h3>
-                        
-                        <!-- Enhanced FormSubmit Configuration - NO REDIRECTS -->
-                        <input type="hidden" name="_subject" value="🏋️ New Demo Booking Request - New Lifestyle Gym">
-                        <input type="hidden" name="_captcha" value="false">
-                        <input type="hidden" name="_template" value="table">
-                        <input type="hidden" name="_autoresponse" value="Thank you for booking a demo session with New Lifestyle Gym! We will contact you within 24 hours to confirm your appointment. Our team will reach out to you soon.">
-                        <input type="hidden" name="_blacklist" value="spammer@example.com,bot@test.com">
-                        <input type="hidden" name="_format" value="html">
-                        <input type="hidden" name="_replyto" value="email">
-                        
+
                         <!-- Form Fields -->
                         <div class="form-row">
                             <div class="form-group">
@@ -874,17 +865,17 @@
                                 <label for="lastName">Last Name</label>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <input type="email" id="email" name="email" placeholder="Email Address" required maxlength="100" autocomplete="email" inputmode="email">
                             <label for="email">Email Address</label>
                         </div>
-                        
+
                         <div class="form-group">
                             <input type="tel" id="phone" name="phone" placeholder="Phone Number (UAE: +971...)" required pattern="[\+]?[0-9]{7,15}" maxlength="15" autocomplete="tel" inputmode="tel">
                             <label for="phone">Phone Number</label>
                         </div>
-                        
+
                         <div class="form-row">
                             <div class="form-group">
                                 <select id="service" name="service" required>
@@ -908,12 +899,12 @@
                                 <label for="planChoice">Membership Plan</label>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <input type="date" id="preferredDate" name="preferredDate" required>
                             <label for="preferredDate">Preferred Date</label>
                         </div>
-                        
+
                         <div class="form-group">
                             <textarea id="message" name="message" placeholder="Tell us about your fitness goals..." maxlength="500"></textarea>
                             <label for="message">Message (Optional)</label>
@@ -925,17 +916,27 @@
                                 <i class="fas fa-shield-alt"></i> Security Verification
                             </label>
                             <div class="captcha-challenge" id="demoCaptchaChallenge">
-                                <!-- CAPTCHA will be dynamically generated here -->
+                                <div class="captcha-loading">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    Loading CAPTCHA...
+                                </div>
+                            </div>
+                            <div class="captcha-input-container">
+                                <input type="text" id="demoCaptchaAnswer" placeholder="Enter the code shown above" required>
+                                <button type="button" class="captcha-refresh" id="demoCaptchaRefresh">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
                             </div>
                         </div>
-                        
-                        <!-- Hidden fields for security -->
+
+                        <!-- Hidden fields -->
+                        <input type="hidden" name="captchaId" id="demoCaptchaId">
                         <input type="hidden" name="_form_id" value="demo_booking">
                         <input type="hidden" name="_timestamp" id="demoTimestamp">
                         <input type="hidden" name="_user_agent" id="demoUserAgent">
                         <input type="hidden" name="_referrer" id="demoReferrer">
-                        
-                        <button type="submit" class="btn btn-primary btn-full" id="demoSubmitBtn" disabled>
+
+                        <button type="submit" class="btn btn-primary btn-full" id="demoSubmitBtn">
                             <i class="fas fa-calendar-check"></i>
                             Book Free Demo
                         </button>
