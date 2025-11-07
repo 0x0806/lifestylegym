@@ -985,18 +985,9 @@
                     </div>
                 </div>
                 <div class="contact-form-container">
-                    <form id="contactForm" class="contact-form" action="https://formsubmit.co/newlifeconnection1@gmail.com" method="POST">
+                    <form id="contactForm" class="contact-form">
                         <h3>Send us a Message</h3>
-                        
-                        <!-- Enhanced FormSubmit Configuration - NO REDIRECTS -->
-                        <input type="hidden" name="_subject" value="💬 New Contact Message - New Lifestyle Gym">
-                        <input type="hidden" name="_captcha" value="false">
-                        <input type="hidden" name="_template" value="table">
-                        <input type="hidden" name="_autoresponse" value="Thank you for contacting New Lifestyle Gym! We have received your message and will respond within 24 hours. We appreciate your interest in our services.">
-                        <input type="hidden" name="_blacklist" value="spammer@example.com,bot@test.com">
-                        <input type="hidden" name="_format" value="html">
-                        <input type="hidden" name="_replyto" value="email">
-                        
+
                         <!-- Form Fields -->
                         <div class="form-row">
                             <div class="form-group">
@@ -1008,7 +999,7 @@
                                 <label for="contactEmail">Your Email</label>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <select id="inquiryType" name="inquiry_type" required>
                                 <option value="">Select Inquiry Type</option>
@@ -1022,12 +1013,12 @@
                             </select>
                             <label for="inquiryType">Inquiry Type</label>
                         </div>
-                        
+
                         <div class="form-group">
                             <input type="text" id="subject" name="subject" placeholder="Subject" required maxlength="150">
                             <label for="subject">Subject</label>
                         </div>
-                        
+
                         <div class="form-group">
                             <textarea id="contactMessage" name="message" placeholder="Your message..." required maxlength="1000" rows="5"></textarea>
                             <label for="contactMessage">Your Message</label>
@@ -1042,17 +1033,27 @@
                                 <i class="fas fa-shield-alt"></i> Security Verification
                             </label>
                             <div class="captcha-challenge" id="contactCaptchaChallenge">
-                                <!-- CAPTCHA will be dynamically generated here -->
+                                <div class="captcha-loading">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    Loading CAPTCHA...
+                                </div>
+                            </div>
+                            <div class="captcha-input-container">
+                                <input type="text" id="contactCaptchaAnswer" placeholder="Enter the code shown above" required>
+                                <button type="button" class="captcha-refresh" id="contactCaptchaRefresh">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
                             </div>
                         </div>
-                        
-                        <!-- Hidden fields for security -->
+
+                        <!-- Hidden fields -->
+                        <input type="hidden" name="captchaId" id="contactCaptchaId">
                         <input type="hidden" name="_form_id" value="contact_message">
                         <input type="hidden" name="_timestamp" id="contactTimestamp">
                         <input type="hidden" name="_user_agent" id="contactUserAgent">
                         <input type="hidden" name="_referrer" id="contactReferrer">
-                        
-                        <button type="submit" class="btn btn-primary btn-full" id="contactSubmitBtn" disabled>
+
+                        <button type="submit" class="btn btn-primary btn-full" id="contactSubmitBtn">
                             <i class="fas fa-paper-plane"></i>
                             Send Message
                         </button>
