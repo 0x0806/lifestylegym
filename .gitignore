@@ -131,3 +131,50 @@ dist
 
 # Replit debugger
 .breakpoints
+
+# Production specific files
+uploads/
+logs/
+*.log
+coverage/
+.nyc_output/
+test-results/
+cypress/screenshots/
+cypress/videos/
+.lighthouseci/
+
+# SSL certificates
+*.pem
+*.key
+*.crt
+*.csr
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+tmp/
+temp/
+.cache/
+
+# Build artifacts
+build/
+dist/
