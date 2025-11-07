@@ -428,60 +428,170 @@ app.get('/api/captcha', captchaLimiter, (req, res) => {
     }
 });
 
-// Handle demo form submission with advanced validation
-app.post('/submit-demo', formLimiter, demoValidation, async (req, res) => {
+// Enhanced demo form submission with Joi validation
+app.post('/api/demo', formLimiter, async (req, res) => {
+    const startTime = Date.now();
+
     try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ 
-                success: false, 
-                errors: errors.array() 
+        logger.info(`Demo submission attempt from IP: ${req.ip}`, {
+            userAgent: req.get('User-Agent'),
+            body: { ...req.body, email: req.body.email ? 'masked' : undefined }
+        });
+
+        // Validate CAPTCHA first
+        if (!validateCaptcha(req.body.captchaId, req.body.captchaAnswer)) {
+            logger.warn(`Invalid CAPTCHA for demo form from IP: ${req.ip}`);
+            return res.status(400).json({
+                success: false,
+                error: 'Invalid or expired CAPTCHA. Please try again.',
+                field: 'captcha'
             });
         }
 
-        const { name, email, phone, preferredDate, preferredTime, goals, experience } = req.body;
-        
-        console.log(`Demo booking from: ${name} (${email}) - ${new Date().toISOString()}`);
-        
-        // Send confirmation email
-        if (process.env.SMTP_USER) {
-            const mailOptions = {
-                from: process.env.SMTP_USER,
-                to: email,
-                subject: 'Demo Session Confirmation - New Lifestyle Gym',
-                html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                        <h2 style="color: #ff6b35;">Demo Session Confirmed!</h2>
-                        <p>Hi ${name},</p>
-                        <p>Thank you for booking a demo session with New Lifestyle Gym!</p>
-                        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                            <h3>Session Details:</h3>
-                            <p><strong>Date:</strong> ${new Date(preferredDate).toLocaleDateString()}</p>
-                            <p><strong>Time:</strong> ${preferredTime}</p>
-                            <p><strong>Experience Level:</strong> ${experience}</p>
-                        </div>
-                        <p>We'll contact you soon to confirm the final details.</p>
-                        <p>Best regards,<br>New Lifestyle Gym Team</p>
-                    </div>
-                `
-            };
-            
-            await transporter.sendMail(mailOptions);
+        // Validate with Joi schema
+        const { error, value } = demoSchema.validate(req.body, { abortEarly: false });
+        if (error) {
+            const validationErrors = error.details.map(detail => ({
+                field: detail.path.join('.'),
+                message: detail.message
+            }));
+
+            logger.warn(`Demo validation failed from IP: ${req.ip}`, { errors: validationErrors });
+            return res.status(400).json({
+                success: false,
+                error: 'Validation failed',
+                errors: validationErrors
+            });
         }
 
-        // Simulate processing delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        if (req.headers.accept && req.headers.accept.includes('application/json')) {
-            res.json({ success: true, message: 'Demo session booked successfully!' });
-        } else {
-            res.redirect('/?success=demo');
+        const { firstName, lastName, email, phone, service, planChoice, preferredDate, message } = value;
+        const fullName = `${firstName} ${lastName}`;
+
+        logger.info(`Demo booking from: ${fullName} (${email}) - Service: ${service}`, {
+            ip: req.ip,
+            userAgent: req.get('User-Agent')
+        });
+
+        // Send confirmation email with enhanced template
+        if (process.env.SMTP_USER) {
+            try {
+                const mailOptions = {
+                    from: `"New Lifestyle Gym" <${process.env.SMTP_USER}>`,
+                    to: email,
+                    subject: '🏋️ Demo Session Confirmation - New Lifestyle Gym Sharjah',
+                    html: `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <title>Demo Session Confirmation</title>
+                        </head>
+                        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+                            <div style="background: linear-gradient(135deg, #ff6b35, #ff8f65); padding: 30px; border-radius: 10px; text-align: center; color: white;">
+                                <h1 style="margin: 0; font-size: 28px;">🏋️ Demo Session Confirmed!</h1>
+                                <p style="margin: 10px 0 0 0; font-size: 18px;">New Lifestyle Gym - Sharjah</p>
+                            </div>
+
+                            <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #ff6b35;">
+                                <h2 style="color: #ff6b35; margin-top: 0;">Hello ${firstName} ${lastName}!</h2>
+                                <p style="font-size: 16px;">Thank you for booking a demo session with <strong>New Lifestyle Gym</strong>! We're excited to help you start your fitness journey.</p>
+
+                                <h3 style="color: #ff6b35; border-bottom: 2px solid #ff6b35; padding-bottom: 5px;">Session Details:</h3>
+                                <div style="background: white; padding: 20px; border-radius: 8px; margin: 15px 0;">
+                                    <p><strong>📅 Preferred Date:</strong> ${new Date(preferredDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                                    <p><strong>🎯 Service:</strong> ${service.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
+                                    <p><strong>💳 Membership Plan:</strong> ${planChoice.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}</p>
+                                    <p><strong>📱 Phone:</strong> ${phone}</p>
+                                    ${message ? `<p><strong>📝 Message:</strong> ${message}</p>` : ''}
+                                </div>
+                            </div>
+
+                            <div style="background: #e8f5e8; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #28a745;">
+                                <h3 style="color: #28a745; margin-top: 0;">What's Next?</h3>
+                                <ul style="padding-left: 20px;">
+                                    <li>Our team will contact you within <strong>24 hours</strong> to confirm your demo session</li>
+                                    <li>We'll discuss your fitness goals and preferences</li>
+                                    <li>You'll get a <strong>free tour</strong> of our state-of-the-art facilities</li>
+                                    <li>Meet our expert personal trainers</li>
+                                </ul>
+                            </div>
+
+                            <div style="text-align: center; margin: 30px 0;">
+                                <a href="https://newlifestylegym.ae" style="background: #ff6b35; color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block;">
+                                    Visit Our Website
+                                </a>
+                            </div>
+
+                            <div style="border-top: 1px solid #ddd; padding-top: 20px; text-align: center; color: #666; font-size: 14px;">
+                                <p><strong>New Lifestyle Gym</strong><br>
+                                Al Tayer 5, 19 street G Floor, Al Nahda, Sharjah, UAE 61179<br>
+                                📞 +971581790093 | 📧 newlifeconnection1@gmail.com</p>
+                            </div>
+                        </body>
+                        </html>
+                    `
+                };
+
+                await transporter.sendMail(mailOptions);
+                logger.info(`Demo confirmation email sent to: ${email}`);
+
+                // Send notification to gym
+                const notificationMail = {
+                    from: `"New Lifestyle Gym" <${process.env.SMTP_USER}>`,
+                    to: process.env.SMTP_USER,
+                    subject: `🏋️ New Demo Booking - ${fullName}`,
+                    html: `
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                            <h2 style="color: #ff6b35;">New Demo Booking Received!</h2>
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                                <p><strong>Name:</strong> ${fullName}</p>
+                                <p><strong>Email:</strong> ${email}</p>
+                                <p><strong>Phone:</strong> ${phone}</p>
+                                <p><strong>Service:</strong> ${service}</p>
+                                <p><strong>Plan:</strong> ${planChoice}</p>
+                                <p><strong>Preferred Date:</strong> ${new Date(preferredDate).toLocaleDateString()}</p>
+                                <p><strong>IP Address:</strong> ${req.ip}</p>
+                                <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
+                            </div>
+                        </div>
+                    `
+                };
+
+                await transporter.sendMail(notificationMail);
+
+            } catch (emailError) {
+                logger.error('Failed to send demo email:', emailError);
+                // Continue with response even if email fails
+            }
         }
+
+        const processingTime = Date.now() - startTime;
+        logger.info(`Demo form processed successfully in ${processingTime}ms`, {
+            email: email,
+            ip: req.ip
+        });
+
+        res.json({
+            success: true,
+            message: 'Demo session booked successfully! We will contact you within 24 hours to confirm your appointment.',
+            processingTime: processingTime
+        });
+
     } catch (error) {
-        console.error('Demo submission error:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Internal server error. Please try again later.' 
+        const processingTime = Date.now() - startTime;
+        logger.error('Demo submission error:', {
+            error: error.message,
+            stack: error.stack,
+            ip: req.ip,
+            processingTime: processingTime,
+            body: req.body
+        });
+
+        res.status(500).json({
+            success: false,
+            error: 'Internal server error. Please try again later.',
+            processingTime: processingTime
         });
     }
 });
