@@ -304,46 +304,73 @@ const captchaLimiter = rateLimit({
 
 app.use(apiLimiter);
 
+// Enhanced input sanitization middleware
+app.use((req, res, next) => {
+    if (req.body) {
+        Object.keys(req.body).forEach(key => {
+            if (typeof req.body[key] === 'string') {
+                req.body[key] = DOMPurify.sanitize(req.body[key].trim());
+            }
+        });
+    }
+    next();
+});
+
 // Middleware to parse form data
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.json({ limit: '10mb' }));
 
-// Serve static files with caching
+// Serve static files with caching and security
 app.use(express.static(__dirname, {
     maxAge: process.env.NODE_ENV === 'production' ? '1y' : 0,
     etag: true,
-    lastModified: true
+    lastModified: true,
+    setHeaders: (res, filePath) => {
+        // Security headers for static files
+        if (filePath.endsWith('.js')) {
+            res.setHeader('Content-Type', 'application/javascript');
+        }
+        if (filePath.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css');
+        }
+    }
 }));
 
-// Email transporter setup
+// Email transporter setup with enhanced security
 const transporter = nodemailer.createTransporter({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: process.env.SMTP_PORT || 587,
-    secure: false,
+    secure: process.env.SMTP_SECURE === 'true',
     auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
+    },
+    tls: {
+        rejectUnauthorized: process.env.NODE_ENV === 'production'
     }
 });
 
-// Validation middleware
-const demoValidation = [
-    body('name').trim().isLength({ min: 2, max: 50 }).escape(),
-    body('email').isEmail().normalizeEmail(),
-    body('phone').isMobilePhone().optional(),
-    body('preferredDate').isISO8601().toDate(),
-    body('preferredTime').matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/),
-    body('goals').trim().isLength({ min: 10, max: 500 }).escape(),
-    body('experience').isIn(['beginner', 'intermediate', 'advanced'])
-];
+// CAPTCHA validation function
+function validateCaptcha(captchaId, answer) {
+    const captcha = captchaStore.get(captchaId);
+    if (!captcha) {
+        return false;
+    }
 
-const contactValidation = [
-    body('name').trim().isLength({ min: 2, max: 50 }).escape(),
-    body('email').isEmail().normalizeEmail(),
-    body('phone').isMobilePhone().optional(),
-    body('subject').trim().isLength({ min: 5, max: 100 }).escape(),
-    body('message').trim().isLength({ min: 10, max: 1000 }).escape()
-];
+    // Check if CAPTCHA has expired (5 minutes)
+    if (Date.now() - captcha.createdAt > 5 * 60 * 1000) {
+        captchaStore.delete(captchaId);
+        return false;
+    }
+
+    // Case-insensitive comparison
+    const isValid = captcha.text.toLowerCase() === answer.toLowerCase();
+
+    // Remove used CAPTCHA
+    captchaStore.delete(captchaId);
+
+    return isValid;
+}
 
 // Serve index.html for the root route
 app.get('/', (req, res) => {
