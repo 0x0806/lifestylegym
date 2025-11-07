@@ -232,26 +232,77 @@ app.use((req, res, next) => {
 
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : true,
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 app.use(compression());
-app.use(morgan('combined'));
+app.use(morgan('combined', {
+    stream: {
+        write: (message) => logger.info(message.trim())
+    }
+}));
 
-// Rate limiting
-const limiter = rateLimit({
+// Enhanced multi-level rate limiting
+const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
-    message: 'Too many requests from this IP, please try again later.'
+    max: 200, // limit each IP to 200 requests per windowMs
+    message: {
+        error: 'Too many requests from this IP, please try again later.',
+        retryAfter: 900
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (req, res) => {
+        logger.warn(`Rate limit exceeded for IP: ${req.ip}, Path: ${req.path}`);
+        res.status(429).json({
+            error: 'Too many requests from this IP, please try again later.',
+            retryAfter: 900
+        });
+    }
 });
 
 const formLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour
     max: 5, // limit each IP to 5 form submissions per hour
-    message: 'Too many form submissions, please try again later.'
+    message: {
+        error: 'Too many form submissions, please try again later.',
+        retryAfter: 3600
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    keyGenerator: (req) => {
+        return req.ip + ':' + (req.body._form_id || 'unknown');
+    },
+    handler: (req, res) => {
+        logger.warn(`Form rate limit exceeded for IP: ${req.ip}, Form: ${req.body._form_id}`);
+        res.status(429).json({
+            error: 'Too many form submissions, please try again later.',
+            retryAfter: 3600
+        });
+    }
 });
 
-app.use(limiter);
+const captchaLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000, // 5 minutes
+    max: 10, // limit each IP to 10 CAPTCHA requests per 5 minutes
+    message: {
+        error: 'Too many CAPTCHA requests, please try again later.',
+        retryAfter: 300
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (req, res) => {
+        logger.warn(`CAPTCHA rate limit exceeded for IP: ${req.ip}`);
+        res.status(429).json({
+            error: 'Too many CAPTCHA requests, please try again later.',
+            retryAfter: 300
+        });
+    }
+});
+
+app.use(apiLimiter);
 
 // Middleware to parse form data
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
