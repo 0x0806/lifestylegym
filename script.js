@@ -1261,9 +1261,9 @@ function initializeFormSecurity() {
     // Initialize form security
     formSecurity = new FormSecurity();
 
-    // Initialize simple CAPTCHA systems
-    demoCaptcha = new SimpleCaptcha('demoCaptcha', 'demo');
-    contactCaptcha = new SimpleCaptcha('contactCaptcha', 'contact');
+    // Initialize enhanced CAPTCHA systems
+    demoCaptcha = new EnhancedCaptcha('demoCaptcha', 'demo');
+    contactCaptcha = new EnhancedCaptcha('contactCaptcha', 'contact');
 }
 
 // Enhanced FormSubmit handler with mobile support
