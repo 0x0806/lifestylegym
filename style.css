@@ -4666,6 +4666,244 @@ textarea:focus {
     border-radius: 12px;
 }
 
+/* Backend CAPTCHA Integration Styles */
+.captcha-loading {
+    text-align: center;
+    padding: 30px;
+    color: var(--gray-color);
+    font-size: 0.9rem;
+}
+
+.captcha-loading i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    display: block;
+    color: var(--primary-color);
+}
+
+.captcha-input-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    align-items: center;
+}
+
+.captcha-input-container input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background: white;
+}
+
+.captcha-input-container input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
+}
+
+.captcha-input-container input:invalid {
+    border-color: var(--danger-color);
+}
+
+.captcha-refresh {
+    padding: 12px 16px;
+    background: var(--light-gray);
+    border: none;
+    border-radius: 8px;
+    color: var(--gray-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    min-width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.captcha-refresh:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: rotate(180deg);
+}
+
+.captcha-refresh:active {
+    transform: rotate(180deg) scale(0.95);
+}
+
+.captcha-challenge img {
+    border-radius: 8px;
+    width: 100%;
+    height: auto;
+    max-width: 200px;
+    display: block;
+    margin: 0 auto;
+    border: 2px solid #e0e0e0;
+}
+
+/* Form submission states */
+.form-submitting {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.form-submitting::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    z-index: 10;
+    border-radius: inherit;
+}
+
+.form-success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    border-color: #28a745;
+}
+
+.form-error {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    border-color: #dc3545;
+}
+
+/* Notification styles */
+.form-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 16px 24px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    z-index: 10000;
+    max-width: 400px;
+    box-shadow: var(--shadow-heavy);
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+}
+
+.form-notification.show {
+    transform: translateX(0);
+}
+
+.form-notification.success {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.form-notification.error {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+}
+
+.form-notification.info {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+}
+
+/* Form validation error styles */
+.form-error-message {
+    color: var(--danger-color);
+    font-size: 0.875rem;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.form-error-message i {
+    font-size: 0.8rem;
+}
+
+.form-group.has-error input,
+.form-group.has-error select,
+.form-group.has-error textarea {
+    border-color: var(--danger-color);
+    box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
+}
+
+.form-group.has-success input,
+.form-group.has-success select,
+.form-group.has-success textarea {
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.1);
+}
+
+/* Loading spinner for buttons */
+.btn.loading {
+    position: relative;
+    color: transparent;
+    pointer-events: none;
+}
+
+.btn.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Character count styling */
+.character-count {
+    font-size: 0.8rem;
+    color: var(--gray-color);
+    text-align: right;
+    margin-top: 5px;
+}
+
+.character-count.warning {
+    color: var(--warning-color);
+}
+
+.character-count.danger {
+    color: var(--danger-color);
+}
+
+/* Mobile optimizations for new forms */
+@media (max-width: 768px) {
+    .captcha-input-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .captcha-refresh {
+        align-self: center;
+        min-width: 60px;
+    }
+
+    .form-notification {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        transform: translateY(-100px);
+    }
+
+    .form-notification.show {
+        transform: translateY(0);
+    }
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
     .captcha-controls button,
@@ -4682,5 +4920,17 @@ textarea:focus {
 
     .word-option.selected {
         transform: none;
+    }
+
+    .captcha-refresh:hover {
+        transform: none;
+    }
+
+    .form-notification {
+        transition: none;
+    }
+
+    .btn.loading::after {
+        animation: none;
     }
 }
