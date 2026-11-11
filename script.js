@@ -25,30 +25,6 @@
     window.addEventListener('resize', function () { if (window.innerWidth > 980) setMenu(false); });
   }
 
-  /* ---- hero video: plays when visible, pausable ---- */
-  var hero = $('#heroVideo'), pauseBtn = $('#heroPause');
-  if (hero) {
-    var userPaused = !canAutoplay;
-    var syncBtn = function () {
-      if (!pauseBtn) return;
-      pauseBtn.classList.toggle('is-paused', userPaused);
-      pauseBtn.setAttribute('aria-label', userPaused ? 'Play video' : 'Pause video');
-    };
-    syncBtn();
-    if ('IntersectionObserver' in window) {
-      new IntersectionObserver(function (es) {
-        es.forEach(function (e) {
-          if (e.isIntersecting && !userPaused) { var p = hero.play(); if (p && p.catch) p.catch(function () {}); }
-          else hero.pause();
-        });
-      }, { threshold: 0.25 }).observe(hero);
-    } else if (!userPaused) { var pp = hero.play(); if (pp && pp.catch) pp.catch(function () {}); }
-    if (pauseBtn) pauseBtn.addEventListener('click', function () {
-      userPaused = !userPaused; syncBtn();
-      if (userPaused) hero.pause(); else { var p2 = hero.play(); if (p2 && p2.catch) p2.catch(function () {}); }
-    });
-  }
-
   /* ---- services: pick a row to change the picture, and prefill the form ---- */
   var svcVideo = $('#svcVideo'), rows = $$('.svc-row'), service = $('#service');
   function pickService(row, fromUser) {
@@ -112,31 +88,32 @@
     }
   }
 
-  /* ---- booking form ---- */
-  var form = $('#demoForm');
-  if (form) {
-    var status = $('#formStatus'), btn = $('#submitBtn'), ts = $('#ts');
-    var date = $('#preferredDate');
-    var opened = Date.now();
+  /* ---- demo forms (hero quick card + booking section): one handler ---- */
+  var formDate = $('#preferredDate');
+  if (formDate) { var d0 = new Date(); formDate.min = d0.getFullYear() + '-' + String(d0.getMonth() + 1).padStart(2, '0') + '-' + String(d0.getDate()).padStart(2, '0'); }
+
+  function wireLeadForm(form) {
+    var status = $('.form-status', form), btn = $('button[type="submit"]', form), ts = $('.ts', form) || $('[name="_timestamp"]', form);
+    var label = btn.textContent, opened = Date.now();
     if (ts) ts.value = new Date().toISOString();
-    if (date) { var d = new Date(); date.min = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
-    var setErr = function (id, msg) {
-      var f = $('#' + id), e = $('.err[data-for="' + id + '"]');
-      if (f) { if (msg) f.setAttribute('aria-invalid', 'true'); else f.removeAttribute('aria-invalid'); if (e) f.setAttribute('aria-describedby', e.id || (e.id = id + '-err')); }
-      if (e) e.textContent = msg || '';
+    var field = function (name) { return form.querySelector('[name="' + name + '"]'); };
+    var setErr = function (el, msg) {
+      if (!el) return;
+      var e = $('.err[data-for="' + el.id + '"]', form);
+      if (msg) el.setAttribute('aria-invalid', 'true'); else el.removeAttribute('aria-invalid');
+      if (e) { e.textContent = msg || ''; if (!e.id) e.id = el.id + '-err'; el.setAttribute('aria-describedby', e.id); }
     };
     var validate = function () {
       var ok = true, first = null;
-      var fn = $('#firstName').value.trim(), ph = $('#phone').value.replace(/[\s\-().]/g, ''), em = $('#email').value.trim(), sv = $('#service').value;
-      var chk = function (id, bad, msg) { setErr(id, bad ? msg : ''); if (bad) { ok = false; if (!first) first = $('#' + id); } };
-      chk('firstName', fn.length < 2, 'Please enter your first name.');
-      chk('phone', !/^\+?\d{7,15}$/.test(ph), 'Please enter a valid phone number, for example 0581234567.');
-      chk('email', em && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em), 'That email address looks incomplete.');
-      chk('service', !sv, 'Please choose a service.');
+      var chk = function (name, bad, msg) { var el = field(name); if (!el) return; setErr(el, bad ? msg : ''); if (bad) { ok = false; if (!first) first = el; } };
+      chk('firstName', field('firstName').value.trim().length < 2, 'Please enter your first name.');
+      chk('phone', !/^\+?\d{7,15}$/.test(field('phone').value.replace(/[\s\-().]/g, '')), 'Please enter a valid phone number, for example 0581234567.');
+      var em = field('email'); if (em) chk('email', em.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.value.trim()), 'That email address looks incomplete.');
+      chk('service', !field('service').value, 'Please choose a service.');
       if (first) first.focus();
       return ok;
     };
-    $$('input,select', form).forEach(function (f) { f.addEventListener('input', function () { if (f.id) setErr(f.id, ''); }); });
+    $$('input,select', form).forEach(function (f) { f.addEventListener('input', function () { setErr(f, ''); }); });
     var say = function (msg, kind, wa) {
       status.className = 'form-status ' + (kind || '');
       status.textContent = msg;
@@ -148,12 +125,12 @@
     };
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      if (form.querySelector('[name="_honey"]').value) return; /* bot */
+      if (field('_honey').value) return; /* bot */
       if (!validate()) return;
       if (Date.now() - opened < 2500) { say('Please check your details, then press the button again.', 'bad'); opened = 0; return; }
       var data = {};
       new FormData(form).forEach(function (v, k) { data[k] = v; });
-      btn.disabled = true; btn.textContent = 'Sending…'; say('');
+      btn.disabled = true; btn.textContent = 'Sending\u2026'; say('');
       var wa = 'https://wa.me/971581790093?text=' + encodeURIComponent('Hi, I would like to book a free demo. My name is ' + data.firstName + ' and my number is ' + data.phone + '.');
       fetch(form.action.replace('formsubmit.co/', 'formsubmit.co/ajax/'), { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(data) })
         .then(function (r) { if (!r.ok) throw new Error('http'); return r.json().catch(function () { return {}; }); })
@@ -163,9 +140,10 @@
           say('Thank you. We have your request and will contact you within 24 hours to arrange your free demo.', 'ok');
         })
         .catch(function () { say('Sorry, that did not send. Please try again.', 'bad', wa); })
-        .then(function () { btn.disabled = false; btn.textContent = 'Book my free demo'; });
+        .then(function () { btn.disabled = false; btn.textContent = label; });
     });
   }
+  $$('#demoForm').forEach(wireLeadForm);
 
   /* ---- chat: load the assistant only when someone asks for it ---- */
   var chatBtn = $('#chatOpen');

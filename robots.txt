@@ -1,6 +1,12 @@
 # https://www.lifestylegym.fit/
 User-agent: *
 Allow: /
+# Repo and project files that GitHub Pages publishes but are not part of the site
+Disallow: /README.md
+Disallow: /PRODUCT.md
+Disallow: /DESIGN.md
 Disallow: /tests/
+Disallow: /.well-known/
+Disallow: /404.html
 
 Sitemap: https://www.lifestylegym.fit/sitemap.xml

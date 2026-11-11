@@ -8,6 +8,8 @@
 
 **Shape:** 3px radius, 1px hairlines, a skewed red plate offset behind video frames (echoes the italic logo). No gradients, no glass, no cards-in-cards.
 
+**Hero:** a still photo of the real gym floor, nothing laid over it; h1 top-aligned at the left line; one filled action plus WhatsApp; on phones the photo comes first. No hero video.
+
 **Motion:** one hero entrance on load; services picture swaps on pick; the 24/7 numerals fill red as the section scrolls (the one dealt moment); hover lifts 2px; everything off under reduced motion; videos pause off-screen and have a pause control.
 
 **Components:** header with 44px targets, full-screen mobile menu, mobile dock (call, WhatsApp, demo), chat launcher stacked above the dock.
