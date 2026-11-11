@@ -1,0 +1,6 @@
+# https://www.lifestylegym.fit/
+User-agent: *
+Allow: /
+Disallow: /tests/
+
+Sitemap: https://www.lifestylegym.fit/sitemap.xml

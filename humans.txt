@@ -1,0 +1,7 @@
+/* TEAM */
+Business: New Lifestyle Way Gym, Al Nahda, Sharjah, UAE
+
+/* SITE */
+Last update: 2026/11/11
+Standards: HTML5, CSS3, ES2015+, JSON-LD
+Hosting: GitHub Pages

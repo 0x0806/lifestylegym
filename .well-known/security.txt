@@ -1,0 +1,4 @@
+Contact: mailto:newlifeconnection1@gmail.com
+Expires: 2027-11-11T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://www.lifestylegym.fit/.well-known/security.txt

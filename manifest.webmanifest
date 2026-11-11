@@ -1,0 +1,14 @@
+{
+  "name": "New Lifestyle Way Gym",
+  "short_name": "Lifestyle Gym",
+  "description": "24/7 gym and personal training in Al Nahda, Sharjah.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
+  "background_color": "#08090a",
+  "theme_color": "#08090a",
+  "icons": [
+    { "src": "assets/img/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/img/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
