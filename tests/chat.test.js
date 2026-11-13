@@ -75,6 +75,12 @@ const T=[
  ['lead html name',['demo','fit','<b>Bob</b>'],{has:/phone/i}],
  ['lead edit',['demo','fit','Sara','0581234567','not sure yet','change something'],{has:/first name/i}],
  ['no english gibberish',['asdkjh qwe zxcmnb'],{has:/outside what I can help|only help with/}],
+ ['no-word in confirm is not "change"',['demo','fit','Sara','0581234567','not sure yet','I have no idea'],{has:/Should I send/,step:'confirm'}],
+ ['goal: father is not fat',['demo','my father told me to come'],{has:/Basic gives you|staying fit/i}],
+ ['goal: home beats lose',['demo','lose weight at home'],{has:/certified trainer can come to your home/i}],
+ ['service: sept is not pt',['demo','fit','Sara','0581234567','sept'],{has:/general fitness/i}],
+ ['help alone is not services',['help'],{not:/home personal training, personal training/}],
+ ['tie offers other angle',['home gym price'],{has:/./}],
 ];
 for(const [l,s,e] of T) run(l,s,e);
 // rate limit / cap

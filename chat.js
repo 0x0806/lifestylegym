@@ -24,7 +24,6 @@
     address: 'Al Tayer Tower, G Floor, 5 19 Street, Hay Al Nahda, Sharjah, near Sahara Centre',
     maps: 'https://www.google.com/maps/search/?api=1&query=New+Lifestyle+Way+Gym+Al+Nahda+Sharjah',
     reviews: 'https://share.google/qr4uVM5GB1ZwikSRC',
-    endpoint: 'https://formsubmit.co/ajax/newlifeconnection1@gmail.com',
     maxInput: 300,
     maxMessages: 60,
     minGapMs: 500
@@ -52,7 +51,7 @@
     }
     return prev[b.length];
   }
-  function hasArabicOrOther(s) { return /[^\u0000-ɏ -⁯₠-⃏\s]/.test(s); }
+  function hasArabicOrOther(s) { return /[^\u0000-\u024F\u2000-\u206F\u20A0-\u20CF\s]/.test(s); }
 
   /* keyword grammar: 'word' exact (fuzzy for 5+ letters); 'stem~' prefix; 'two words' phrase; leading '*' = strong */
   function kwScore(list, text, tokens) {
@@ -84,26 +83,26 @@
     { id: 'thanks', kw: ['thanks', 'thank you', 'thx', 'cheers', 'appreciate', 'shukran', 'great', 'perfect', 'awesome'] },
     { id: 'bye', kw: ['bye', 'goodbye', 'see you', 'later', 'cya', 'no thanks', 'not now', 'maybe later'] },
     { id: 'greet', kw: ['hi', 'hello', 'hey', 'hiya', 'salam', 'assalam~', 'marhaba', 'good morning', 'good evening', 'good afternoon', 'yo', 'sup'] },
-    { id: 'human', kw: ['*human', '*real person', '*agent', '*manager', '*owner', '*speak to someone', '*talk to someone', '*talk to a', '*call me', 'representative', 'someone', 'staff'] },
+    { id: 'human', kw: ['*human', '*real person', '*agent', '*manager', '*owner', '*speak to someone', '*talk to someone', '*talk to a', '*call me', 'representative', 'someone', 'staff member'] },
     { id: 'hours', kw: ['hours', 'timing~', 'open', 'close', 'closed', 'closing', 'opening', '*24', '24/7', '*24 7', 'late', 'midnight', 'night', 'early', 'what time', 'holiday~', 'friday', 'sunday', 'ramadan', 'eid', 'weekend~', '*when are you'] },
-    { id: 'location', kw: ['where', 'address', 'location', 'locate~', 'directions', 'direction', 'map', 'find you', 'reach', 'near', 'nearby', 'sahara', 'landmark', 'nahda', 'qasimia', 'daniq', 'sharjah', 'metro', 'bus', 'parking', 'how to get'] },
-    { id: 'price', kw: ['*price~', '*cost~', '*fee', '*fees', '*rate', '*rates', '*how much', '*charge~', 'pay', 'payment', 'afford~', 'cheap~', 'expensive', 'offer~', 'promo~', 'deal', 'aed', 'dirham~', 'monthly', 'per month', 'yearly', 'annual', 'budget', 'free of charge', 'joining fee', 'installment~', 'tabby', 'tamara', 'card', 'cash'] },
+    { id: 'location', kw: ['where', 'address', 'location', 'locate~', 'directions', 'direction', 'map', 'find you', 'near', 'nearby', 'sahara', 'landmark', 'nahda', 'qasimia', 'daniq', 'sharjah', 'metro', 'bus', 'parking', 'how to get'] },
+    { id: 'price', kw: ['*price~', '*cost~', '*fee', '*fees', '*rate', '*rates', '*how much', '*charge~', 'payment', 'afford~', 'cheap~', 'expensive', 'offer~', 'promo~', 'deal', 'aed', 'dirham~', 'monthly', 'per month', 'yearly', 'annual', 'budget', 'free of charge', 'joining fee', 'installment~', 'tabby', 'tamara', 'credit card', 'cash payment'] },
     { id: 'plans', kw: ['*plan~', '*membership~', '*package~', 'basic', 'premium', 'vip', 'subscription~', 'subscribe', 'join', 'joining', 'register', 'registration', 'sign up', 'signup', 'enrol~', 'enroll~', 'member', 'pass', 'couple'] },
     { id: 'home', kw: ['*home', '*house', '*villa', '*apartment', '*my place', '*at my', '*come to me', '*come to my', 'doorstep', 'flat', 'residence', 'mobile trainer'] },
-    { id: 'online', kw: ['*online', '*virtual', '*remote~', '*zoom', '*video call', '*overseas', '*abroad', '*outside uae', '*another country', 'live session~', 'from anywhere', 'internet', 'app'] },
+    { id: 'online', kw: ['*online', '*virtual', '*remote~', '*zoom', '*video call', '*overseas', '*abroad', '*outside uae', '*another country', 'live session~', 'from anywhere', 'internet'] },
     { id: 'group', kw: ['*class', '*classes', '*yoga', '*bootcamp', '*bodypump', '*body pump', '*circuit', '*group', 'zumba', 'aerobic~', 'hiit', 'crossfit', 'spinning', 'pilates', 'boxing', 'timetable', 'schedule', 'batch', 'batches'] },
-    { id: 'weights', kw: ['*weight training', '*bodybuilding', '*muscle~', '*bulk~', '*gain muscle', '*strength', '*powerlifting', 'dumbbell~', 'barbell~', 'weights', 'machine~', 'equipment', 'squat~', 'deadlift~', 'bench', 'lift', 'lifting', 'gym floor', 'hypertrophy', 'build body', 'six pack', 'abs'] },
+    { id: 'weights', kw: ['*weight training', '*bodybuilding', '*muscle~', '*bulk~', '*gain muscle', '*strength', '*powerlifting', 'dumbbell~', 'barbell~', 'weights', 'machine~', 'equipment', 'squat~', 'deadlift~', 'bench', 'lifting', 'gym floor', 'hypertrophy', 'build body', 'six pack'] },
     { id: 'fatloss', kw: ['*lose weight', '*weight loss', '*fat loss', '*lose fat', '*burn fat', '*slim~', '*belly', '*tummy', '*get lean', '*cutting', 'overweight', 'obese', 'obesity', 'chubby', 'diet', 'cardio', 'treadmill', 'kilos', 'kg', 'shape', 'toned', 'tone'] },
     { id: 'wellness', kw: ['*massage', '*recovery', '*nutrition~', '*meditation', '*wellness', '*sports massage', 'relax~', 'stress', 'sleep', 'spa', 'dietician', 'dietitian', 'consultation'] },
     { id: 'personal', kw: ['*personal training', '*personal trainer', '*one to one', '*one on one', '*1 on 1', '*pt', '*coach~', 'private session~', 'trainer', 'train me', 'guide me', 'beginner~', 'newbie', 'first time', 'never been'] },
-    { id: 'trainers', kw: ['*who are', 'meet', 'team', 'trainers', 'sajith', 'bijo', 'joseph', 'prasanth', 'aromal', 'certified', 'qualified', 'experience~', 'experienced', 'staff'] },
+    { id: 'trainers', kw: ['*who are', 'meet', 'team', 'trainers', 'sajith', 'bijo', 'joseph', 'prasanth', 'aromal', 'certified', 'qualified', 'experience~', 'experienced'] },
     { id: 'ladies', kw: ['*ladies', '*women', '*woman', '*female~', '*girls', '*lady', '*women only', '*ladies only', '*separate', 'hijab', 'privacy', 'private area'] },
-    { id: 'facilities', kw: ['locker~', 'shower~', 'sauna', 'steam', 'pool', 'swimming', 'jacuzzi', 'changing room', 'toilet', 'wifi', 'water', 'towel~', 'facility', 'facilities', 'amenities', 'ac', 'air condition~', 'lounge', 'juice', 'cafe', 'store', 'shop'] },
+    { id: 'facilities', kw: ['locker~', 'shower~', 'sauna', 'steam', 'pool', 'swimming', 'jacuzzi', 'changing room', 'toilet', 'wifi', 'water', 'towel~', 'facility', 'facilities', 'amenities', 'air condition~', 'lounge', 'juice', 'cafe', 'store', 'shop'] },
     { id: 'demo', kw: ['*free demo', '*free trial', '*demo', '*trial', '*try', '*tour', '*visit', '*assessment', '*appointment', '*book~', '*booking', '*reserve', 'free', 'test', 'see the gym', 'look around', 'walk in', 'walk through', 'drop in', 'come by'] },
     { id: 'contact', kw: ['*phone', '*number', '*whatsapp', '*call', '*email', '*mail', '*contact', 'reach you', 'instagram', 'insta', 'social', 'message you', 'dm'] },
     { id: 'reviews', kw: ['*review~', '*rating~', '*reputation', '*testimonial~', 'trusted', 'trust', 'legit', 'genuine', 'reliable', 'good gym', 'best gym', 'stars', 'feedback', 'google'] },
     { id: 'about', kw: ['who are you', 'tell me about', 'about you', 'about the gym', 'about your gym', 'about us', 'history', 'how long', 'founded', 'established', 'what is this', 'how many members'] },
-    { id: 'services', kw: ['services', 'service', 'what do you offer', 'what do you do', 'what can you', 'what you offer', 'programs', 'program', 'programme~', 'options', 'help me', 'help'] },
+    { id: 'services', kw: ['services', 'service', 'what do you offer', 'what do you do', 'what can you', 'what you offer', 'programs', 'program', 'programme~', 'options', 'help me'] },
     { id: 'competitor', kw: ['gymnation', 'gym nation', 'fitness first', 'powerhouse', 'anytime', 'goldsgym', 'golds gym', 'xfit', 'befit', 'compare', 'comparison', 'better than', 'versus', 'vs', 'competitor~', 'other gym~', 'cheaper'] },
     { id: 'negotiate', kw: ['*discount~', 'negotiat~', 'bargain', 'lowest', 'best price', 'reduce', 'special rate', 'student', 'corporate', 'family discount', 'group discount', 'referral', 'coupon'] }
   ];
@@ -111,7 +110,7 @@
   /* ---------- classification ---------- */
   function classify(text) {
     var t = norm(text), tokens = t ? t.split(' ') : [];
-    var res = { text: t, tokens: tokens, safety: null, intent: null, score: 0, tie: false };
+    var res = { text: t, tokens: tokens, safety: null, intent: null, alt: null, score: 0, tie: false };
     if (!t) return res;
     if (/<\s*\/?\s*(script|img|iframe|svg|a|body|style|link|object|embed)\b|javascript\s*:|\bon[a-z]+\s*=/i.test(String(text))) { res.safety = 'injection'; return res; }
     var order = ['emergency', 'injection', 'abuse', 'medical'];
@@ -119,13 +118,13 @@
       var s = kwScore(SAFETY[order[i]], t, tokens);
       if (s >= (order[i] === 'medical' ? 2 : 3)) { res.safety = order[i]; return res; }
     }
-    var best = null, bestScore = 0, second = 0;
+    var best = null, bestScore = 0, second = 0, secondId = null;
     for (var j = 0; j < INTENTS.length; j++) {
       var sc = kwScore(INTENTS[j].kw, t, tokens);
-      if (sc > bestScore) { second = bestScore; bestScore = sc; best = INTENTS[j].id; }
-      else if (sc > second) second = sc;
+      if (sc > bestScore) { second = bestScore; secondId = best; bestScore = sc; best = INTENTS[j].id; }
+      else if (sc > second) { second = sc; secondId = INTENTS[j].id; }
     }
-    if (bestScore >= 2) { res.intent = best; res.score = bestScore; res.tie = second > 0 && second === bestScore; }
+    if (bestScore >= 2) { res.intent = best; res.score = bestScore; res.tie = second > 0 && second === bestScore; res.alt = res.tie ? secondId : null; }
     return res;
   }
 
@@ -161,11 +160,11 @@
     online: { say: 'Online coaching gives you live video sessions with a personal plan and real-time form correction, from Sharjah or anywhere else.', service: 'online-training', plan: '' }
   };
   function goalFromText(t) {
-    if (/(lose|loss|fat|slim|belly|tummy|weight loss|burn|lean|tone)/.test(t)) return 'lose';
-    if (/(muscle|bulk|strength|bodybuild|gain|build|lift|abs|six pack)/.test(t)) return 'muscle';
-    if (/(home|house|villa|apartment)/.test(t)) return 'home';
-    if (/(online|virtual|remote|zoom|abroad|overseas)/.test(t)) return 'online';
-    if (/(fit|health|active|general|stay|stamina|energy|flexib|yoga)/.test(t)) return 'fit';
+    if (/\b(home|house|villa|apartment)\b/.test(t)) return 'home';
+    if (/\b(online|virtual|remote|zoom|abroad|overseas)\b/.test(t)) return 'online';
+    if (/\b(lose|loss|fat|slim|belly|tummy|burn|lean|tone|toned)\b/.test(t)) return 'lose';
+    if (/\b(muscle|muscles|bulk|strength|bodybuild\w*|gain|build|lift\w*|abs|six pack)\b/.test(t)) return 'muscle';
+    if (/\b(fit|fitness|health\w*|active|general|stay|stamina|energy|flexib\w*|yoga)\b/.test(t)) return 'fit';
     return '';
   }
 
@@ -235,11 +234,11 @@
   var SERVICE_LABEL = { 'home-training': 'home personal training', 'personal-training': 'personal training', 'group-classes': 'group classes', 'online-training': 'online coaching', 'general-fitness': 'general fitness' };
 
   function serviceFromText(t) {
-    if (/home|house|villa|apartment/.test(t)) return 'home-training';
-    if (/online|virtual|remote|zoom/.test(t)) return 'online-training';
-    if (/class|yoga|bootcamp|group|circuit|bodypump/.test(t)) return 'group-classes';
-    if (/personal|pt|trainer|one to one|coach/.test(t)) return 'personal-training';
-    if (/general|fit|gym|weights|membership|not sure|anything/.test(t)) return 'general-fitness';
+    if (/\b(home|house|villa|apartment)\b/.test(t)) return 'home-training';
+    if (/\b(online|virtual|remote|zoom)\b/.test(t)) return 'online-training';
+    if (/\b(class|classes|yoga|bootcamp|group|circuit|bodypump)\b/.test(t)) return 'group-classes';
+    if (/\b(personal|pt|trainer|one to one|coach)\b/.test(t)) return 'personal-training';
+    if (/\b(general|fit|fitness|gym|weights|membership|not sure|anything)\b/.test(t)) return 'general-fitness';
     return '';
   }
   function cleanName(s) {
@@ -312,7 +311,7 @@
         st.step = 'sending';
         return { messages: [M('Sending…')], state: st, effect: { type: 'send', data: st.lead } };
       }
-      if (/change|edit|wrong|redo|no\b/.test(t)) { st.lead = { goalText: st.lead.goalText, service: st.lead.service }; return { messages: [askName(st)], state: st }; }
+      if (/^(change|edit|wrong|redo|no|nope)\b/.test(t)) { st.lead = { goalText: st.lead.goalText, service: st.lead.service }; return { messages: [askName(st)], state: st }; }
       return { messages: [M('Should I send these details to the gym? Tap "Yes, send it", or "Change something" to edit.', { chips: ['Yes, send it', 'Change something', 'Cancel'] })], state: st };
     }
     st.step = 'idle';
@@ -369,6 +368,11 @@
     var out = answer(c.intent, st);
     if (!out) return { messages: fallback(st), state: st };
     /* two equally strong intents (e.g. "home gym price"): answer the first, then offer the other angle */
+    var ALT = { price: CHIP.price, plans: CHIP.plans, hours: CHIP.hours, location: CHIP.where, home: CHIP.home, online: CHIP.online, group: CHIP.classes, personal: CHIP.pt, human: CHIP.human };
+    if (c.tie && c.alt && c.alt !== c.intent && ALT[c.alt]) {
+      var last = out[out.length - 1];
+      last.chips = [ALT[c.alt]].concat((last.chips || []).filter(function (x) { return x !== ALT[c.alt]; })).slice(0, 6);
+    }
     return { messages: out, state: st };
   }
 
@@ -448,13 +452,10 @@
       if (r.effect && r.effect.type === 'send') post(r.effect.data);
     }
     function post(lead) {
-      var body = { firstName: lead.name || '', lastName: '', phone: lead.phone || '', email: '', service: lead.service || 'general-fitness', planChoice: lead.plan || '', preferredDate: '', message: 'Lead from website chat assistant. Goal: ' + (lead.goalText || 'not given'), _subject: 'New chat lead - New Lifestyle Way Gym', _captcha: 'false', _template: 'table', _form_id: 'chat_lead', _honey: '' };
+      var body = { firstName: lead.name || '', lastName: '', phone: lead.phone || '', email: '', service: lead.service || 'general-fitness', planChoice: lead.plan || '', preferredDate: '', message: 'Lead from website chat assistant. Goal: ' + (lead.goalText || 'not given'), _subject: 'New chat lead - New Lifestyle Way Gym', _form_id: 'chat_lead', source: 'chat' };
       var done = function (ok) { var out = sendResult(st, ok); root.setTimeout(function () { show(out, 300); }, 900); };
-      if (!root.fetch) { done(false); return; }
-      root.fetch(FACTS.endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(body) })
-        .then(function (res) { return res.ok ? res.json().catch(function () { return {}; }) : Promise.reject(new Error('http')); })
-        .then(function (j) { done(!(j && (j.success === 'false' || j.success === false))); })
-        .catch(function () { done(false); });
+      if (!root.LGLead) { done(false); return; }
+      root.LGLead.send(body).then(function () { done(true); }, function () { done(false); });
     }
 
     function openPanel() {

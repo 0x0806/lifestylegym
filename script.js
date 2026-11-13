@@ -88,6 +88,17 @@
     }
   }
 
+  /* ---- lead delivery: one sender shared by the booking form and the chat assistant ---- */
+  var EMAIL_API = 'https://formsubmit.co/ajax/newlifeconnection1@gmail.com';
+  window.LGLead = {
+    send: function (data) {
+      var body = Object.assign({ _captcha: 'false', _template: 'table' }, data);
+      return fetch(EMAIL_API, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(body) })
+        .then(function (r) { if (!r.ok) throw new Error('http'); return r.json().catch(function () { return {}; }); })
+        .then(function (j) { if (j && (j.success === 'false' || j.success === false)) throw new Error('rejected'); return j; });
+    }
+  };
+
   /* ---- demo forms (hero quick card + booking section): one handler ---- */
   var formDate = $('#preferredDate');
   if (formDate) { var d0 = new Date(); formDate.min = d0.getFullYear() + '-' + String(d0.getMonth() + 1).padStart(2, '0') + '-' + String(d0.getDate()).padStart(2, '0'); }
@@ -127,15 +138,14 @@
       e.preventDefault();
       if (field('_honey').value) return; /* bot */
       if (!validate()) return;
-      if (Date.now() - opened < 2500) { say('Please check your details, then press the button again.', 'bad'); opened = 0; return; }
+      if (Date.now() - opened < 2500) { say('Please check your details, then press the button again.', 'bad'); opened = Date.now() - 2500; return; }
       var data = {};
       new FormData(form).forEach(function (v, k) { data[k] = v; });
       btn.disabled = true; btn.textContent = 'Sending\u2026'; say('');
       var wa = 'https://wa.me/971581790093?text=' + encodeURIComponent('Hi, I would like to book a free demo. My name is ' + data.firstName + ' and my number is ' + data.phone + '.');
-      fetch(form.action.replace('formsubmit.co/', 'formsubmit.co/ajax/'), { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(data) })
-        .then(function (r) { if (!r.ok) throw new Error('http'); return r.json().catch(function () { return {}; }); })
-        .then(function (j) {
-          if (j && (j.success === 'false' || j.success === false)) throw new Error('rejected');
+      data.source = 'website form';
+      window.LGLead.send(data)
+        .then(function () {
           form.reset(); if (ts) ts.value = new Date().toISOString();
           say('Thank you. We have your request and will contact you within 24 hours to arrange your free demo.', 'ok');
         })
@@ -148,14 +158,24 @@
   /* ---- chat: load the assistant only when someone asks for it ---- */
   var chatBtn = $('#chatOpen');
   if (chatBtn) {
-    var loading = false;
-    chatBtn.addEventListener('click', function onFirst() {
-      if (window.LGChat || loading) return;
-      loading = true;
-      chatBtn.removeEventListener('click', onFirst);
+    var chatLoading = false;
+    var loadChat = function () {
+      if (window.LGChat || chatLoading) return;
+      chatLoading = true;
+      var s = doc.createElement('script'); s.src = 'chat.js';
+      s.onload = function () {
+        /* chat.js has attached its own click handler and opens the panel itself */
+        chatBtn.removeEventListener('click', loadChat);
+      };
+      s.onerror = function () {
+        /* leave the button working: try again on the next click, and offer WhatsApp meanwhile */
+        chatLoading = false;
+        if (s.parentNode) s.parentNode.removeChild(s);
+        window.open('https://wa.me/971581790093?text=' + encodeURIComponent('Hi, I have a question about New Lifestyle Way Gym.'), '_blank', 'noopener');
+      };
       window.__lgChatOpenOnLoad = true;
-      var s = doc.createElement('script'); s.src = 'chat.js'; s.defer = true; doc.body.appendChild(s);
-    }, { once: false });
-    /* the opener's own handler is attached by chat.js after load; the first click only loads it */
+      doc.body.appendChild(s);
+    };
+    chatBtn.addEventListener('click', loadChat);
   }
 })();

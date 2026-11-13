@@ -26,4 +26,4 @@ Plain HTML, CSS and JavaScript. No build step, no dependencies. Hosted on GitHub
 
 ## Chat assistant
 
-It is not an LLM. It answers only from `FACTS`, refuses medical, emergency, abusive and prompt-injection messages, never invents prices, and hands off to WhatsApp, a call or the free demo form. Leads are sent through the same FormSubmit mailbox as the booking form after an explicit confirmation.
+It is not an LLM. It answers only from `FACTS`, refuses medical, emergency, abusive and prompt-injection messages, never invents prices, and hands off to WhatsApp, a call or the free demo form. Leads go through the same `LGLead.send` as the booking form (FormSubmit email) after an explicit confirmation.
